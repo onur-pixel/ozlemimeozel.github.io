@@ -3,193 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geleceğin Doktoru 🩺</title>
+    <title>Dr. Hedef 2026 🩺</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        /* TASARIM (CSS) KISMI - HİÇBİR ŞEY DEĞİŞTİRİLMEDİ */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
 
         body {
-            background: linear-gradient(135deg, #1a0b2e 0%, #4a148c 100%);
+            background: radial-gradient(circle at center, #2d0a55 0%, #0f051d 100%);
             color: white;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             padding: 20px;
+            padding-bottom: 60px;
         }
 
         h1 {
-            text-align: center;
-            margin-bottom: 5px;
             color: #e0aaff;
-            text-shadow: 0 0 10px rgba(224, 170, 255, 0.5);
-            font-size: 1.5rem;
+            text-shadow: 0 0 15px rgba(224, 170, 255, 0.6);
+            margin-bottom: 5px;
+            font-size: 1.8rem;
         }
 
-        /* Rütbe Rozeti */
-        .rank-badge {
-            background: linear-gradient(45deg, #ff9100, #ffea00);
-            color: #000;
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: 800;
-            margin-bottom: 20px;
-            box-shadow: 0 0 20px rgba(255, 145, 0, 0.6);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            animation: pulse 2s infinite;
-            display: inline-block;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 145, 0, 0.6); }
-            50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(255, 145, 0, 0.8); }
-            100% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 145, 0, 0.6); }
-        }
-
-        /* YKS Sayaç Kartı */
-        .yks-counter {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            padding: 15px;
-            border-radius: 15px;
-            text-align: center;
-            width: 100%;
-            max-width: 400px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(224, 170, 255, 0.3);
-        }
-
-        .yks-days {
-            font-size: 2.2rem;
-            font-weight: bold;
-            color: #00ff88;
-        }
-
-        .yks-detail { font-size: 0.8rem; opacity: 0.8; margin-top: 5px; }
-
-        /* Veri Giriş Alanı */
-        .input-card {
-            background: #2d0a55;
+        /* KART TASARIMI */
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             padding: 20px;
             border-radius: 20px;
             width: 100%;
-            max-width: 400px;
+            max-width: 500px;
+            border: 1px solid rgba(224, 170, 255, 0.15);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+
+        .card:hover { transform: translateY(-3px); border-color: #bb86fc; }
+
+        /* YKS SAYAÇ */
+        .yks-area { text-align: center; padding: 15px; }
+        .yks-days { font-size: 2.2rem; font-weight: 800; color: #00ff88; margin: 5px 0; }
+        .yks-date { font-size: 0.8rem; opacity: 0.7; }
+
+        /* İSTATİSTİK KUTULARI */
+        .stats-row {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
         }
 
+        /* DAİRE GRAFİK */
+        .circle-wrap { position: relative; width: 80px; height: 80px; margin-bottom: 10px; }
+        .circle-wrap svg { width: 80px; height: 80px; transform: rotate(-90deg); }
+        .circle-bg { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 8; }
+        .circle-progress { 
+            fill: none; 
+            stroke: #bc13fe; 
+            stroke-width: 8; 
+            stroke-dasharray: 200; 
+            stroke-dashoffset: 200; 
+            transition: stroke-dashoffset 1s ease;
+            stroke-linecap: round;
+        }
+        .circle-text {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-weight: bold; font-size: 0.9rem;
+        }
+
+        .stat-label { font-size: 0.8rem; color: #e0aaff; }
+        .stat-val { font-size: 1.4rem; font-weight: bold; }
+
+        /* GİRİŞ ALANI */
+        .input-group { display: flex; gap: 10px; }
+        
         input {
+            flex: 1;
             padding: 15px;
-            border-radius: 10px;
-            border: none;
-            background: #1a0b2e;
+            border-radius: 12px;
+            border: 1px solid #7b2cbf;
+            background: rgba(0,0,0,0.3);
             color: white;
             font-size: 1rem;
-            outline: none;
-            border: 1px solid #7b2cbf;
             text-align: center;
+            outline: none;
         }
 
-        button.save-btn {
-            padding: 15px;
-            background: #bc13fe;
+        button.main-btn {
+            padding: 15px 20px;
+            background: linear-gradient(90deg, #bc13fe, #7b2cbf);
             color: white;
             border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
+            border-radius: 12px;
             font-weight: bold;
             cursor: pointer;
-            transition: transform 0.2s;
-        }
-        button.save-btn:active { transform: scale(0.95); }
-
-        /* İlerleme Çubuğu */
-        .progress-container {
-            width: 100%;
-            background-color: #1a0b2e;
-            border-radius: 10px;
-            height: 12px;
-            margin: 10px 0;
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 5px 15px rgba(188, 19, 254, 0.3);
         }
 
-        .progress-bar {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(90deg, #bc13fe, #00ff88);
-            border-radius: 10px;
-            transition: width 1s ease-in-out;
-            box-shadow: 0 0 10px #bc13fe;
-        }
-
-        .total-stats {
-            text-align: center;
-            font-size: 0.9rem;
-            color: #e0aaff;
-        }
-
-        /* Geçmiş Kayıtlar Listesi */
-        .history-list {
-            margin-top: 20px;
-            width: 100%;
-            max-width: 400px;
-            max-height: 250px;
-            overflow-y: auto;
-        }
-
-        .history-item {
-            background: rgba(255,255,255,0.05);
-            padding: 10px 15px;
+        /* LİSTE */
+        .history-list { max-height: 300px; overflow-y: auto; }
+        
+        .entry-item {
+            background: rgba(255,255,255,0.03);
+            border-radius: 12px;
+            padding: 12px;
             margin-bottom: 10px;
-            border-radius: 10px;
+            border-left: 4px solid #555;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-left: 3px solid #bc13fe;
         }
 
-        .delete-btn {
-            background: #ff3b3b;
-            color: white;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 0.8rem;
+        .entry-info { display: flex; flex-direction: column; }
+        .entry-date { font-size: 0.75rem; color: #aaa; }
+        .entry-goal { font-size: 0.9rem; color: #fff; margin-top: 2px; }
+        
+        /* Buton Grubu */
+        .action-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Düzenle / Tamamla Butonu */
+        .complete-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #00e5ff;
+            padding: 6px 12px;
+            border-radius: 8px;
             cursor: pointer;
-            margin-left: 10px;
-        }
-
-        /* Motivasyon Popup */
-        #notification {
-            position: fixed;
-            top: 20px;
-            background: #00ff88;
-            color: #1a0b2e;
-            padding: 15px 25px;
-            border-radius: 50px;
-            font-weight: bold;
-            transform: translateY(-150%);
-            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 100;
-            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.4);
-            text-align: center;
-            width: 80%;
-            max-width: 300px;
-        }
-
-        /* Ana Sayfaya Dön */
-        .home-link {
-            margin-top: 20px;
-            color: rgba(255,255,255,0.6);
-            text-decoration: none;
             font-size: 0.8rem;
-            border-bottom: 1px dashed rgba(255,255,255,0.3);
+        }
+
+        /* Silme Butonu (YENİ EKLENDİ) */
+        .delete-btn {
+            background: rgba(255, 59, 59, 0.15);
+            border: 1px solid #ff3b3b;
+            color: #ff3b3b;
+            padding: 6px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .delete-btn:hover { background: #ff3b3b; color: white; }
+
+        .status-badge { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; margin-left: 5px; font-weight: bold; }
+        .pending { background: #ff9800; color: black; }
+        .success { background: #00ff88; color: black; }
+        .fail { background: #ff3b3b; color: white; }
+
+        /* Bildirim */
+        #notification {
+            position: fixed; top: 20px;
+            background: #00ff88; color: #1a0b2e;
+            padding: 12px 25px; border-radius: 50px;
+            font-weight: bold; transform: translateY(-200%);
+            transition: transform 0.5s; z-index: 100;
         }
     </style>
 </head>
@@ -197,196 +188,202 @@
 
     <div id="notification">Harikasın! 🩺</div>
 
-    <div id="rankBadge" class="rank-badge">Tıp Fakültesi Çömezi</div>
+    <h1>Dr. Hedef 2026</h1>
+    <div style="font-size: 0.9rem; opacity: 0.7; margin-bottom: 20px;" id="currentDateDisplay">...</div>
 
-    <h1>Hedef: Tıp Fakültesi</h1>
-    
-    <div class="yks-counter">
+    <div class="card yks-area">
         <div>YKS 2026'ya Kalan</div>
-        <div class="yks-days" id="countdown">Hesaplanıyor...</div>
-        <div class="yks-detail">20 Haziran 2026 Cumartesi, 10.15</div>
+        <div class="yks-days" id="countdown">...</div>
+        <div class="yks-date">20 Haziran 2026 Cumartesi, 10.15</div>
     </div>
 
-    <div class="input-card">
-        <label>Bugün kaç saat çalıştın? 💊</label>
-        <input type="number" id="studyHours" placeholder="Örn: 4.5" step="0.5">
-        <button class="save-btn" onclick="saveData()">Sisteme İşle</button>
-
-        <div class="total-stats">
-            <div>Toplam Emek: <span id="totalDisplay" style="font-size: 1.5rem; color:white; font-weight:bold;">0</span> Saat</div>
-            
-            <div class="progress-container">
-                <div class="progress-bar" id="progressBar"></div>
+    <div class="stats-row">
+        <div class="stat-box">
+            <div class="circle-wrap">
+                <svg><circle cx="40" cy="40" r="32" class="circle-bg"></circle><circle cx="40" cy="40" r="32" class="circle-progress" id="weekCircle"></circle></svg>
+                <div class="circle-text" id="weekPercent">%0</div>
             </div>
-            <div id="nextRankMsg" style="font-size: 0.7rem; opacity: 0.7;">Sonraki Rütbeye: 50 Saat</div>
+            <div class="stat-label">Bu Hafta</div>
+            <div class="stat-val"><span id="weekTotal">0</span> / 65s</div>
+        </div>
+        <div class="stat-box">
+            <div style="font-size: 2.5rem; margin-bottom: 10px;">📅</div>
+            <div class="stat-label">Bu Ay Toplam</div>
+            <div class="stat-val" style="color: #00e5ff;"><span id="monthTotal">0</span> Saat</div>
         </div>
     </div>
 
-    <h3 style="margin-top:20px; font-size: 1rem; opacity: 0.8;">Çalışma Geçmişi</h3>
-    <div class="history-list" id="historyList">
+    <div class="card">
+        <h3 style="margin-bottom:10px; color:#e0aaff;">🎯 Bugün Ne Kadar Çalışacaksın?</h3>
+        <div class="input-group">
+            <input type="number" id="targetInput" placeholder="Hedef (Saat)" step="0.5">
+            <button class="main-btn" onclick="addGoal()">Hedefi Başlat</button>
         </div>
+    </div>
 
-    <a href="index.html" class="home-link">🏠 Ana Sayfaya Dön</a>
+    <div class="card">
+        <h3 style="margin-bottom:10px; font-size:1rem; opacity:0.8;">Çalışma Günlüğü</h3>
+        <div class="history-list" id="historyList"></div>
+    </div>
+
+    <a href="index.html" style="color:rgba(255,255,255,0.5); text-decoration:none; margin-top:10px; font-size:0.9rem;">🏠 Ana Sayfaya Dön</a>
 
     <script>
-        // 1. YKS SAYAÇ AYARI
-        // Tarih: 20 Haziran 2026, Saat: 10:15:00
+        document.getElementById('currentDateDisplay').innerText = new Date().toLocaleDateString('tr-TR', { weekday: 'long', day: 'numeric', month: 'long' });
+
         const yksDate = new Date("2026-06-20T10:15:00").getTime();
-        
         setInterval(() => {
             const now = new Date().getTime();
-            const distance = yksDate - now;
-
-            // Zaman hesaplamaları
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            
-            // Eğer süre bittiyse
-            if (distance < 0) {
-                document.getElementById("countdown").innerText = "SINAV GELDİ!";
-                document.getElementById("countdown").style.color = "#ff3b3b";
-            } else {
-                // Sadece gün sayısını büyük gösteriyoruz (Görünüm bozulmasın diye)
-                document.getElementById("countdown").innerText = days + " Gün";
-            }
+            const days = Math.floor((yksDate - now) / (1000 * 60 * 60 * 24));
+            document.getElementById("countdown").innerText = days + " Gün";
         }, 1000);
 
-        // 2. MOTİVASYON SÖZLERİ
-        const quotes = [
-            "O önlük sana çok yakışacak! 🥼",
-            "Hastaların seni bekliyor, devam et!",
-            "Şu an çözdüğün soru, bir hayat kurtarabilir.",
-            "Tıp fakültesi kapıları gıcırdıyor... Duyuyor musun? 🚪",
-            "Yorulmak yok, sen geleceğin doktorusun!",
-            "Bugünkü emeğin, yarınki başarın.",
-            "Stetoskopun sesini hayal et... 🩺",
-            "Ders çalışmak, gelecekteki hastalarına bir borçtur."
-        ];
+        const WEEKLY_GOAL = 65;
 
-        // 3. RÜTBE SİSTEMİ
-        function updateRank(totalHours) {
-            const badge = document.getElementById('rankBadge');
-            const nextMsg = document.getElementById('nextRankMsg');
-            const bar = document.getElementById('progressBar');
-            let rank = "Tıp Fakültesi Çömezi";
-            let nextTarget = 50;
-            let color = "#ff9100";
-
-            if (totalHours >= 1000) {
-                rank = "ORDİNARYÜS PROFESÖR 🏛️";
-                nextTarget = 2000;
-                color = "#ff0055";
-            } else if (totalHours >= 500) {
-                rank = "PROFESÖR DOKTOR 🎓";
-                nextTarget = 1000;
-                color = "#00e5ff";
-            } else if (totalHours >= 300) {
-                rank = "UZMAN DOKTOR 🏥";
-                nextTarget = 500;
-                color = "#d500f9";
-            } else if (totalHours >= 150) {
-                rank = "ASİSTAN DOKTOR 💉";
-                nextTarget = 300;
-                color = "#00e676";
-            } else if (totalHours >= 50) {
-                rank = "PRATİSYEN HEKİM 🚑";
-                nextTarget = 150;
-                color = "#2979ff";
-            }
-
-            badge.innerText = rank;
-            badge.style.background = color;
-            badge.style.boxShadow = `0 0 20px ${color}`;
-
-            // İlerleme çubuğunu hesapla (Mevcut hedef aralığına göre)
-            // Basitlik için 1000 saati max kabul edip scale edebiliriz veya target'a göre yapabiliriz.
-            // Görsel bütünlük için totalHours / nextTarget mantığı:
-            
-            // Burayı daha akıcı hale getirdim:
-            let percentage = 0;
-            if(totalHours >= 1000) {
-                percentage = 100;
-            } else {
-                 percentage = (totalHours / nextTarget) * 100;
-            }
-            
-            bar.style.width = percentage + "%";
-            
-            if (totalHours < 1000) {
-                nextMsg.innerText = `Sonraki Rütbeye: ${(nextTarget - totalHours).toFixed(1)} Saat kaldı`;
-            } else {
-                nextMsg.innerText = "Artık sen bir Efsanesin! 🌟";
-            }
-        }
-
-        // 4. VERİ YÖNETİMİ
         function loadData() {
-            const records = JSON.parse(localStorage.getItem('studyRecords')) || [];
+            const records = JSON.parse(localStorage.getItem('docTracker')) || [];
             const list = document.getElementById('historyList');
-            let total = 0;
-            
-            list.innerHTML = ""; 
-            
-            records.slice().reverse().forEach((rec) => {
-                total += parseFloat(rec.hours);
-                
+            list.innerHTML = "";
+            records.sort((a, b) => b.timestamp - a.timestamp);
+
+            records.forEach(rec => {
                 const item = document.createElement('div');
-                item.className = 'history-item';
+                let statusBadge = "";
+                let borderStyle = "";
+                let actionHTML = "";
+
+                // Silme Butonu Her Durumda Görünsün
+                const deleteBtn = `<button class="delete-btn" onclick="deleteEntry(${rec.id})">🗑️</button>`;
+
+                if (rec.actual === null) {
+                    // BEKLİYOR
+                    borderStyle = "border-left-color: #ff9800;"; 
+                    statusBadge = "<span class='status-badge pending'>Sürüyor...</span>";
+                    actionHTML = `<button class="complete-btn" onclick="completeDay(${rec.id})">Günü Tamamla</button>`;
+                } else {
+                    // TAMAMLANDI
+                    if (rec.actual >= rec.target) {
+                        // KİLİTLİ (Başarılı)
+                        borderStyle = "border-left-color: #00ff88;";
+                        statusBadge = "<span class='status-badge success'>Başarılı</span>";
+                        actionHTML = `<span style="font-size:1.2rem; margin-right:5px;">🔒</span>`;
+                    } else {
+                        // DÜZENLENEBİLİR (Eksik)
+                        borderStyle = "border-left-color: #ff3b3b;";
+                        statusBadge = "<span class='status-badge fail'>Eksik</span>";
+                        actionHTML = `<button class="complete-btn" onclick="completeDay(${rec.id})" style="border-color:#ff3b3b; color:#ff3b3b;">Düzenle</button>`;
+                    }
+                }
+
+                item.className = "entry-item";
+                item.style = borderStyle;
                 item.innerHTML = `
-                    <div>
-                        <div style="font-size:0.8rem; color:#bb86fc;">${rec.date}</div>
-                        <div style="font-weight:bold;">${rec.hours} Saat</div>
+                    <div class="entry-info">
+                        <div class="entry-date">${rec.dateString}</div>
+                        <div class="entry-goal">
+                            Hedef: <b>${rec.target}s</b> 
+                            ${rec.actual !== null ? ` | Yapılan: <b>${rec.actual}s</b>` : ""}
+                            ${statusBadge}
+                        </div>
                     </div>
-                    <button class="delete-btn" onclick="deleteItem(${rec.id})">Sil 🗑️</button>
+                    <div class="action-group">
+                        ${actionHTML}
+                        ${deleteBtn}
+                    </div>
                 `;
                 list.appendChild(item);
             });
-
-            document.getElementById('totalDisplay').innerText = total.toFixed(1);
-            updateRank(total);
+            calculateStats(records);
         }
 
-        function saveData() {
-            const input = document.getElementById('studyHours');
-            const hours = parseFloat(input.value);
+        function addGoal() {
+            const inp = document.getElementById('targetInput');
+            const val = parseFloat(inp.value);
+            if (!val || val <= 0) { alert("Geçersiz hedef."); return; }
 
-            if (!hours || hours <= 0) {
-                alert("Lütfen geçerli bir saat gir.");
-                return;
-            }
-
-            const records = JSON.parse(localStorage.getItem('studyRecords')) || [];
+            const records = JSON.parse(localStorage.getItem('docTracker')) || [];
             const now = new Date();
-            const dateStr = now.toLocaleDateString('tr-TR') + ' ' + now.getHours() + ':' + (now.getMinutes()<10?'0':'') + now.getMinutes();
-
-            const newRecord = { 
-                id: Date.now(), 
-                date: dateStr, 
-                hours: hours 
-            };
-
-            records.push(newRecord);
-            localStorage.setItem('studyRecords', JSON.stringify(records));
-
-            const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-            const notif = document.getElementById('notification');
-            notif.innerText = randomQuote;
-            notif.style.transform = 'translateY(0)';
-            
-            setTimeout(() => {
-                notif.style.transform = 'translateY(-150%)';
-            }, 3500);
-
-            input.value = "";
+            records.push({
+                id: Date.now(),
+                timestamp: now.getTime(),
+                dateString: now.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', hour:'2-digit', minute:'2-digit' }),
+                target: val,
+                actual: null
+            });
+            localStorage.setItem('docTracker', JSON.stringify(records));
+            inp.value = "";
+            showNotif("Hedef Başlatıldı! 🚀");
             loadData();
         }
 
-        function deleteItem(id) {
-            if(confirm("Bu kaydı silmek istediğine emin misin?")) {
-                let records = JSON.parse(localStorage.getItem('studyRecords')) || [];
-                records = records.filter(rec => rec.id !== id);
-                localStorage.setItem('studyRecords', JSON.stringify(records));
+        function completeDay(id) {
+            let hours = prompt("Bugün kaç saat çalıştın?");
+            if (hours === null) return;
+            hours = parseFloat(hours);
+            if (isNaN(hours) || hours < 0) { alert("Geçersiz saat."); return; }
+
+            const records = JSON.parse(localStorage.getItem('docTracker')) || [];
+            const index = records.findIndex(r => r.id === id);
+            if (index !== -1) {
+                records[index].actual = hours;
+                localStorage.setItem('docTracker', JSON.stringify(records));
+                if (hours >= records[index].target) showNotif("TEBRİKLER! Kilitlendi 🔒");
+                else showNotif("Kaydedildi. Telafi edebilirsin! 💪");
                 loadData();
             }
+        }
+
+        // SİLME FONKSİYONU
+        function deleteEntry(id) {
+            if(confirm("Bu kaydı tamamen silmek istiyor musun?")) {
+                let records = JSON.parse(localStorage.getItem('docTracker')) || [];
+                records = records.filter(r => r.id !== id);
+                localStorage.setItem('docTracker', JSON.stringify(records));
+                loadData();
+            }
+        }
+
+        function calculateStats(records) {
+            const now = new Date();
+            const currentWeekStart = getMonday(new Date());
+            const currentMonth = now.getMonth();
+            let weekTotal = 0;
+            let monthTotal = 0;
+
+            records.forEach(rec => {
+                if (rec.actual !== null) {
+                    const recDate = new Date(rec.timestamp);
+                    if (recDate >= currentWeekStart) weekTotal += rec.actual;
+                    if (recDate.getMonth() === currentMonth && recDate.getFullYear() === now.getFullYear()) monthTotal += rec.actual;
+                }
+            });
+
+            let percentage = (weekTotal / WEEKLY_GOAL) * 100;
+            if (percentage > 100) percentage = 100;
+            document.getElementById('weekCircle').style.strokeDashoffset = 200 - (percentage / 100) * 200;
+            document.getElementById('weekPercent').innerText = `%${Math.round((weekTotal / WEEKLY_GOAL) * 100)}`;
+            document.getElementById('weekTotal').innerText = weekTotal.toFixed(1);
+            document.getElementById('monthTotal').innerText = monthTotal.toFixed(1);
+            
+            if(weekTotal >= WEEKLY_GOAL) {
+                document.getElementById('weekCircle').style.stroke = "#00ff88"; 
+                document.getElementById('weekPercent').style.color = "#00ff88";
+            } else {
+                document.getElementById('weekCircle').style.stroke = "#bc13fe";
+                document.getElementById('weekPercent').style.color = "white";
+            }
+        }
+
+        function getMonday(d) {
+            d = new Date(d);
+            var day = d.getDay(), diff = d.getDate() - day + (day == 0 ? -6 : 1); 
+            d.setDate(diff); d.setHours(0,0,0,0); return d;
+        }
+
+        function showNotif(msg) {
+            const n = document.getElementById('notification');
+            n.innerText = msg; n.style.transform = "translateY(0)";
+            setTimeout(() => n.style.transform = "translateY(-200%)", 3000);
         }
 
         loadData();
