@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sonsuza Dek Biz | 17.03.2025</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            /* Mor geçişli arka plan */
+            background: linear-gradient(135deg, #1a0b2e 0%, #31135e 50%, #1a0b2e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* Cam Efekti Kartı */
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            padding: 40px;
+            width: 100%;
+            max-width: 500px; /* Bilgisayarda çok yayılmasın */
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+        }
+
+        /* Başlıklar */
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+            color: #bb86fc;
+            text-shadow: 0 0 15px rgba(187, 134, 252, 0.4);
+        }
+
+        /* Sayaç Kutuları */
+        .counter-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .stat-card {
+            background: rgba(187, 134, 252, 0.1);
+            padding: 20px;
+            border-radius: 20px;
+            border-left: 4px solid #bb86fc;
+        }
+
+        .label {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: #d1d1d1;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .value {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1;
+        }
+
+        .unit {
+            font-size: 1rem;
+            color: #bb86fc;
+            margin-left: 5px;
+        }
+
+        /* Kalp Efekti */
+        .heart-icon {
+            font-size: 40px;
+            color: #ff4d6d;
+            margin-bottom: 10px;
+            display: inline-block;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); filter: drop-shadow(0 0 0px #ff4d6d); }
+            50% { transform: scale(1.15); filter: drop-shadow(0 0 15px #ff4d6d); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 0px #ff4d6d); }
+        }
+
+        /* Mobil Ayarlar (Responsive) */
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px 15px;
+            }
+            h1 {
+                font-size: 1.4rem;
+            }
+            .value {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="heart-icon">💜</div>
+        <h1>BİRLİKTELİĞİMİZ</h1>
+
+        <div class="counter-wrapper">
+            <div class="stat-card">
+                <span class="label">İlk Karşılaşma (02/03/2025)</span>
+                <div>
+                    <span id="tanisma-gun" class="value">0</span>
+                    <span class="unit">Gündür Seni Tanıyorum</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <span class="label">Sonsuzluğa Adım (17/03/2025)</span>
+                <div>
+                    <span id="sevgili-gun" class="value">0</span>
+                    <span class="unit">Gündür Sevgiliyiz</span>
+                </div>
+            </div>
+        </div>
+
+        <p style="margin-top: 30px; font-size: 0.8rem; opacity: 0.5;">
+            Seni her geçen gün daha çok seviyorum...
+        </p>
+    </div>
+
+    <script>
+        function hesapla(tarihStr) {
+            const baslangic = new Date(tarihStr);
+            const simdi = new Date();
+            const farkMiliSaniye = simdi - baslangic;
+            return Math.floor(farkMiliSaniye / (1000 * 60 * 60 * 24));
+        }
+
+        function guncelle() {
+            // JS formatı YYYY-MM-DD
+            document.getElementById('tanisma-gun').innerText = hesapla('2025-03-02');
+            document.getElementById('sevgili-gun').innerText = hesapla('2025-03-17');
+        }
+
+        // Sayfa açıldığında çalıştır
+        guncelle();
+        // Her 1 saatte bir arka planda kontrol et (opsiyonel)
+        setInterval(guncelle, 3600000);
+    </script>
+</body>
+</html>
