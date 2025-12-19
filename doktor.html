@@ -15,7 +15,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 15px; /* Mobilde kenar boşluğu azaltıldı */
+            padding: 15px; 
             padding-bottom: 80px;
         }
 
@@ -76,7 +76,7 @@
             fill: none; 
             stroke: #bc13fe; 
             stroke-width: 6; 
-            stroke-dasharray: 175; /* r=28 için çevre ~175 */
+            stroke-dasharray: 175; 
             stroke-dashoffset: 175; 
             transition: stroke-dashoffset 1s ease;
             stroke-linecap: round;
@@ -91,6 +91,24 @@
         .stat-label { font-size: 0.75rem; color: #e0aaff; }
         .stat-val { font-size: 1.2rem; font-weight: bold; }
 
+        /* HAFTALIK RAPOR LİSTESİ */
+        .weekly-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .week-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border-left: 4px solid #555;
+        }
+        .week-dates { font-size: 0.85rem; color: #ddd; }
+        .week-total { font-size: 0.95rem; font-weight: bold; color: white; }
+
         /* GİRİŞ ALANI */
         .input-group { display: flex; gap: 10px; }
         
@@ -104,7 +122,7 @@
             font-size: 1rem;
             text-align: center;
             outline: none;
-            width: 100%; /* Mobilde taşmasın */
+            width: 100%;
         }
 
         button.main-btn {
@@ -115,10 +133,10 @@
             border-radius: 12px;
             font-weight: bold;
             cursor: pointer;
-            white-space: nowrap; /* Yazı alt satıra geçmesin */
+            white-space: nowrap;
         }
 
-        /* LİSTE - MOBİL UYUMLU AYARLAR */
+        /* GÜNLÜK LİSTE */
         .history-list { max-height: 350px; overflow-y: auto; }
         
         .entry-item {
@@ -130,42 +148,39 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap; /* Mobilde sığmazsa aşağı kaysın */
+            flex-wrap: wrap; 
             gap: 10px;
         }
 
         .entry-info { 
             display: flex; 
             flex-direction: column; 
-            flex: 1; /* Alanın çoğunu kaplasın */
-            min-width: 150px; /* Çok küçülmesin */
+            flex: 1; 
+            min-width: 150px; 
         }
         
         .entry-date { font-size: 0.7rem; color: #aaa; }
         .entry-goal { font-size: 0.9rem; color: #fff; margin-top: 2px; line-height: 1.4; }
         
-        /* Buton Grubu */
         .action-group {
             display: flex;
             align-items: center;
             gap: 8px;
         }
 
-        /* Mobilde butonlar aşağı kaysın diye özel ayar */
         @media (max-width: 450px) {
             .entry-item {
-                flex-direction: column; /* Alt alta diz */
-                align-items: flex-start; /* Sola yasla */
+                flex-direction: column;
+                align-items: flex-start;
             }
             .action-group {
                 width: 100%;
-                justify-content: flex-end; /* Butonları sağa it */
+                justify-content: flex-end;
                 border-top: 1px solid rgba(255,255,255,0.1);
                 padding-top: 8px;
             }
         }
 
-        /* Butonlar */
         .complete-btn {
             background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.2);
@@ -222,13 +237,19 @@
                 <div class="circle-text" id="weekPercent">%0</div>
             </div>
             <div class="stat-label">Bu Hafta</div>
-            <div class="stat-val"><span id="weekTotal">0</span> / 65s</div>
+            <div class="stat-val"><span id="weekTotal">0</span> / 50s</div>
         </div>
         <div class="stat-box">
             <div style="font-size: 2rem; margin-bottom: 5px;">📅</div>
             <div class="stat-label">Bu Ay Toplam</div>
             <div class="stat-val" style="color: #00e5ff;"><span id="monthTotal">0</span> Saat</div>
         </div>
+    </div>
+
+    <div class="card">
+        <h3 style="margin-bottom:10px; font-size:1rem; color:#e0aaff;">📊 Haftalık Geçmiş (Son 1 Ay)</h3>
+        <div class="weekly-list" id="weeklyReportList">
+            </div>
     </div>
 
     <div class="card">
@@ -256,7 +277,7 @@
             document.getElementById("countdown").innerText = days + " Gün";
         }, 1000);
 
-        const WEEKLY_GOAL = 65;
+        const WEEKLY_GOAL = 50;
 
         function loadData() {
             const records = JSON.parse(localStorage.getItem('docTracker')) || [];
@@ -269,8 +290,6 @@
                 let statusBadge = "";
                 let borderStyle = "";
                 let actionHTML = "";
-
-                // Silme Butonu
                 const deleteBtn = `<button class="delete-btn" onclick="deleteEntry(${rec.id})">🗑️</button>`;
 
                 if (rec.actual === null) {
@@ -285,7 +304,7 @@
                     } else {
                         borderStyle = "border-left-color: #ff3b3b;";
                         statusBadge = "<span class='status-badge fail'>Eksik</span>";
-                        actionHTML = `<button class="complete-btn" onclick="completeDay(${rec.id})" style="border-color:#ff3b3b; color:#ff3b3b;">Düzenle</button>`;
+                        actionHTML = `<button class="complete-btn" onclick="completeDay(${rec.id})" style="border-color:#00e5ff; color:#00e5ff;">+ Ekle</button>`;
                     }
                 }
 
@@ -308,6 +327,61 @@
                 list.appendChild(item);
             });
             calculateStats(records);
+            renderWeeklyReport(records);
+        }
+
+        // --- HAFTALIK RAPORLAMA (SON 4 HAFTA KURALI) ---
+        function renderWeeklyReport(records) {
+            const list = document.getElementById('weeklyReportList');
+            list.innerHTML = "";
+            const weeks = {};
+
+            records.forEach(rec => {
+                if (rec.actual !== null) {
+                    const d = new Date(rec.timestamp);
+                    const monday = getMonday(d);
+                    // Anahtar: YYYY-MM-DD (Yerel Saat)
+                    const year = monday.getFullYear();
+                    const month = String(monday.getMonth() + 1).padStart(2, '0');
+                    const day = String(monday.getDate()).padStart(2, '0');
+                    const key = `${year}-${month}-${day}`; 
+                    
+                    if (!weeks[key]) weeks[key] = 0;
+                    weeks[key] += rec.actual;
+                }
+            });
+
+            // Haftaları sırala (Yeniden eskiye)
+            const sortedKeys = Object.keys(weeks).sort((a, b) => new Date(b) - new Date(a));
+
+            // SADECE İLK 4 HAFTAYI GÖSTER (Dilimleme işlemi)
+            const recentWeeks = sortedKeys.slice(0, 4); 
+
+            recentWeeks.forEach(key => {
+                const parts = key.split('-');
+                const monday = new Date(parts[0], parts[1] - 1, parts[2]);
+                const sunday = new Date(monday);
+                sunday.setDate(monday.getDate() + 6); 
+
+                const formatOpts = { day: 'numeric', month: 'short' };
+                const rangeStr = `${monday.toLocaleDateString('tr-TR', formatOpts)} - ${sunday.toLocaleDateString('tr-TR', formatOpts)}`;
+                
+                const total = weeks[key];
+                const borderClass = total >= WEEKLY_GOAL ? "border-left-color: #00ff88;" : "border-left-color: #ff9800;";
+
+                const div = document.createElement('div');
+                div.className = "week-item";
+                div.style = borderClass;
+                div.innerHTML = `
+                    <div class="week-dates">${rangeStr}</div>
+                    <div class="week-total">${total} Saat</div>
+                `;
+                list.appendChild(div);
+            });
+
+            if(sortedKeys.length === 0) {
+                list.innerHTML = "<div style='text-align:center; font-size:0.8rem; opacity:0.5; padding:10px;'>Henüz veri yok.</div>";
+            }
         }
 
         function addGoal() {
@@ -331,20 +405,24 @@
         }
 
         function completeDay(id) {
-            let hours = prompt("Bugün kaç saat çalıştın?");
+            const records = JSON.parse(localStorage.getItem('docTracker')) || [];
+            const index = records.findIndex(r => r.id === id);
+            if (index === -1) return;
+
+            const currentActual = records[index].actual || 0;
+            let msg = currentActual === 0 ? "Bugün kaç saat çalıştın?" : `Şu an ${currentActual} saat kayıtlı. Üzerine kaç saat eklemek istersin?`;
+
+            let hours = prompt(msg);
             if (hours === null) return;
             hours = parseFloat(hours);
             if (isNaN(hours) || hours < 0) { alert("Geçersiz saat."); return; }
 
-            const records = JSON.parse(localStorage.getItem('docTracker')) || [];
-            const index = records.findIndex(r => r.id === id);
-            if (index !== -1) {
-                records[index].actual = hours;
-                localStorage.setItem('docTracker', JSON.stringify(records));
-                if (hours >= records[index].target) showNotif("TEBRİKLER! Kilitlendi 🔒");
-                else showNotif("Kaydedildi. Telafi edebilirsin! 💪");
-                loadData();
-            }
+            records[index].actual = currentActual + hours;
+            localStorage.setItem('docTracker', JSON.stringify(records));
+            
+            if (records[index].actual >= records[index].target) showNotif("TEBRİKLER! Kilitlendi 🔒");
+            else showNotif(`Toplam ${records[index].actual} saat oldu. Harika! 💪`);
+            loadData();
         }
 
         function deleteEntry(id) {
@@ -366,12 +444,13 @@
             records.forEach(rec => {
                 if (rec.actual !== null) {
                     const recDate = new Date(rec.timestamp);
+                    // Haftalık (Şu anki hafta)
                     if (recDate >= currentWeekStart) weekTotal += rec.actual;
+                    // Aylık (Şu anki ay)
                     if (recDate.getMonth() === currentMonth && recDate.getFullYear() === now.getFullYear()) monthTotal += rec.actual;
                 }
             });
 
-            // Daire hesaplama (Çevre = 175)
             const MAX_DASH = 175;
             let percentage = (weekTotal / WEEKLY_GOAL) * 100;
             if (percentage > 100) percentage = 100;
