@@ -6,6 +6,7 @@
     <title>Dr. Hedef 2026 🩺</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
+        /* MOBİL UYUMLU VE MODERN CSS */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
 
         body {
@@ -16,14 +17,14 @@
             flex-direction: column;
             align-items: center;
             padding: 15px; 
-            padding-bottom: 80px;
+            padding-bottom: 90px;
         }
 
         h1 {
             color: #e0aaff;
             text-shadow: 0 0 15px rgba(224, 170, 255, 0.6);
             margin-bottom: 5px;
-            font-size: 1.6rem;
+            font-size: 1.5rem; /* Mobilde biraz küçülttüm */
             text-align: center;
         }
 
@@ -46,7 +47,7 @@
         .yks-days { font-size: 2rem; font-weight: 800; color: #00ff88; margin: 5px 0; }
         .yks-date { font-size: 0.75rem; opacity: 0.7; }
 
-        /* İSTATİSTİK KUTULARI */
+        /* İSTATİSTİK KUTULARI (YAN YANA) */
         .stats-row {
             display: flex;
             gap: 10px;
@@ -59,7 +60,7 @@
             flex: 1;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 20px;
-            padding: 15px 10px;
+            padding: 15px 5px;
             border: 1px solid rgba(255,255,255,0.1);
             text-align: center;
             display: flex;
@@ -69,15 +70,15 @@
         }
 
         /* DAİRE GRAFİK */
-        .circle-wrap { position: relative; width: 70px; height: 70px; margin-bottom: 5px; }
-        .circle-wrap svg { width: 70px; height: 70px; transform: rotate(-90deg); }
-        .circle-bg { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 6; }
+        .circle-wrap { position: relative; width: 60px; height: 60px; margin-bottom: 5px; }
+        .circle-wrap svg { width: 60px; height: 60px; transform: rotate(-90deg); }
+        .circle-bg { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 5; }
         .circle-progress { 
             fill: none; 
             stroke: #bc13fe; 
-            stroke-width: 6; 
-            stroke-dasharray: 175; 
-            stroke-dashoffset: 175; 
+            stroke-width: 5; 
+            stroke-dasharray: 150; /* Çevre */
+            stroke-dashoffset: 150; 
             transition: stroke-dashoffset 1s ease;
             stroke-linecap: round;
         }
@@ -85,32 +86,30 @@
             position: absolute;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            font-weight: bold; font-size: 0.8rem;
+            font-weight: bold; font-size: 0.7rem;
         }
 
-        .stat-label { font-size: 0.75rem; color: #e0aaff; }
-        .stat-val { font-size: 1.2rem; font-weight: bold; }
+        .stat-label { font-size: 0.7rem; color: #e0aaff; }
+        .stat-val { font-size: 1.1rem; font-weight: bold; }
+        .stat-desc { font-size: 0.6rem; color: #aaa; margin-top: 2px; line-height: 1.2; }
 
         /* HAFTALIK RAPOR LİSTESİ */
-        .weekly-list {
-            max-height: 200px;
-            overflow-y: auto;
-        }
+        .weekly-list { max-height: 180px; overflow-y: auto; }
         .week-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 15px;
+            padding: 10px 12px;
             background: rgba(0,0,0,0.2);
             border-radius: 12px;
             margin-bottom: 8px;
             border-left: 4px solid #555;
         }
-        .week-dates { font-size: 0.85rem; color: #ddd; }
-        .week-total { font-size: 0.95rem; font-weight: bold; color: white; }
+        .week-dates { font-size: 0.8rem; color: #ddd; }
+        .week-total { font-size: 0.9rem; font-weight: bold; color: white; }
 
         /* GİRİŞ ALANI */
-        .input-group { display: flex; gap: 10px; }
+        .input-group { display: flex; gap: 8px; }
         
         input {
             flex: 1;
@@ -122,7 +121,7 @@
             font-size: 1rem;
             text-align: center;
             outline: none;
-            width: 100%;
+            width: 100%; /* Mobil taşma önlemi */
         }
 
         button.main-btn {
@@ -136,8 +135,8 @@
             white-space: nowrap;
         }
 
-        /* GÜNLÜK LİSTE */
-        .history-list { max-height: 350px; overflow-y: auto; }
+        /* GÜNLÜK LİSTE (MOBİL UYUMLU) */
+        .history-list { max-height: 300px; overflow-y: auto; }
         
         .entry-item {
             background: rgba(255,255,255,0.03);
@@ -148,7 +147,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap; 
+            flex-wrap: wrap; /* Mobilde sığmazsa aşağı kaysın */
             gap: 10px;
         }
 
@@ -156,11 +155,11 @@
             display: flex; 
             flex-direction: column; 
             flex: 1; 
-            min-width: 150px; 
+            min-width: 140px; 
         }
         
         .entry-date { font-size: 0.7rem; color: #aaa; }
-        .entry-goal { font-size: 0.9rem; color: #fff; margin-top: 2px; line-height: 1.4; }
+        .entry-goal { font-size: 0.85rem; color: #fff; margin-top: 2px; }
         
         .action-group {
             display: flex;
@@ -168,24 +167,17 @@
             gap: 8px;
         }
 
+        /* Mobil Ekran Ayarı */
         @media (max-width: 450px) {
-            .entry-item {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            .action-group {
-                width: 100%;
-                justify-content: flex-end;
-                border-top: 1px solid rgba(255,255,255,0.1);
-                padding-top: 8px;
-            }
+            .entry-item { flex-direction: column; align-items: flex-start; }
+            .action-group { width: 100%; justify-content: flex-end; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; }
         }
 
         .complete-btn {
             background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.2);
             color: #00e5ff;
-            padding: 8px 12px;
+            padding: 6px 10px;
             border-radius: 8px;
             cursor: pointer;
             font-size: 0.8rem;
@@ -195,13 +187,13 @@
             background: rgba(255, 59, 59, 0.15);
             border: 1px solid #ff3b3b;
             color: #ff3b3b;
-            padding: 8px 12px;
+            padding: 6px 10px;
             border-radius: 8px;
             cursor: pointer;
             font-size: 0.9rem;
         }
 
-        .status-badge { font-size: 0.65rem; padding: 2px 5px; border-radius: 4px; margin-left: 5px; font-weight: bold; vertical-align: middle; }
+        .status-badge { font-size: 0.6rem; padding: 2px 4px; border-radius: 4px; margin-left: 4px; font-weight: bold; vertical-align: middle; }
         .pending { background: #ff9800; color: black; }
         .success { background: #00ff88; color: black; }
         .fail { background: #ff3b3b; color: white; }
@@ -209,11 +201,12 @@
         #notification {
             position: fixed; top: 20px;
             background: #00ff88; color: #1a0b2e;
-            padding: 12px 20px; border-radius: 50px;
+            padding: 10px 20px; border-radius: 50px;
             font-weight: bold; transform: translateY(-200%);
             transition: transform 0.5s; z-index: 999;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             width: 80%; text-align: center; left: 10%;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
         }
     </style>
 </head>
@@ -233,27 +226,29 @@
     <div class="stats-row">
         <div class="stat-box">
             <div class="circle-wrap">
-                <svg><circle cx="35" cy="35" r="28" class="circle-bg"></circle><circle cx="35" cy="35" r="28" class="circle-progress" id="weekCircle"></circle></svg>
+                <svg><circle cx="30" cy="30" r="25" class="circle-bg"></circle><circle cx="30" cy="30" r="25" class="circle-progress" id="weekCircle"></circle></svg>
                 <div class="circle-text" id="weekPercent">%0</div>
             </div>
             <div class="stat-label">Bu Hafta</div>
             <div class="stat-val"><span id="weekTotal">0</span> / 50s</div>
         </div>
-        <div class="stat-box">
-            <div style="font-size: 2rem; margin-bottom: 5px;">📅</div>
-            <div class="stat-label">Bu Ay Toplam</div>
-            <div class="stat-val" style="color: #00e5ff;"><span id="monthTotal">0</span> Saat</div>
+
+        <div class="stat-box" style="border-color: #00e5ff;">
+            <div style="font-size: 1.5rem; margin-bottom: 5px;">🏆</div>
+            <div class="stat-label">Tamamlanan Döngüler</div>
+            <div class="stat-val" style="color: #00e5ff;"><span id="cycleTotal">0</span> Saat</div>
+            <div class="stat-desc">4 hafta dolunca eklenir</div>
         </div>
     </div>
 
     <div class="card">
-        <h3 style="margin-bottom:10px; font-size:1rem; color:#e0aaff;">📊 Haftalık Geçmiş (Son 1 Ay)</h3>
+        <h3 style="margin-bottom:10px; font-size:0.95rem; color:#e0aaff;">📊 Haftalık Geçmiş (Son 1 Ay)</h3>
         <div class="weekly-list" id="weeklyReportList">
             </div>
     </div>
 
     <div class="card">
-        <h3 style="margin-bottom:10px; color:#e0aaff; font-size:1rem;">🎯 Bugün Ne Kadar Çalışacaksın?</h3>
+        <h3 style="margin-bottom:10px; color:#e0aaff; font-size:0.95rem;">🎯 Bugün Ne Kadar Çalışacaksın?</h3>
         <div class="input-group">
             <input type="number" id="targetInput" placeholder="Saat Gir" step="0.5">
             <button class="main-btn" onclick="addGoal()">Başlat 🚀</button>
@@ -261,7 +256,7 @@
     </div>
 
     <div class="card">
-        <h3 style="margin-bottom:10px; font-size:1rem; opacity:0.8;">Çalışma Günlüğü</h3>
+        <h3 style="margin-bottom:10px; font-size:0.95rem; opacity:0.8;">Çalışma Günlüğü</h3>
         <div class="history-list" id="historyList"></div>
     </div>
 
@@ -283,6 +278,8 @@
             const records = JSON.parse(localStorage.getItem('docTracker')) || [];
             const list = document.getElementById('historyList');
             list.innerHTML = "";
+            
+            // Tarihe göre sırala
             records.sort((a, b) => b.timestamp - a.timestamp);
 
             records.forEach(rec => {
@@ -326,11 +323,12 @@
                 `;
                 list.appendChild(item);
             });
+            
             calculateStats(records);
             renderWeeklyReport(records);
         }
 
-        // --- HAFTALIK RAPORLAMA (SON 4 HAFTA KURALI) ---
+        // --- HAFTALIK RAPOR (SON 4 HAFTA) ---
         function renderWeeklyReport(records) {
             const list = document.getElementById('weeklyReportList');
             list.innerHTML = "";
@@ -340,7 +338,8 @@
                 if (rec.actual !== null) {
                     const d = new Date(rec.timestamp);
                     const monday = getMonday(d);
-                    // Anahtar: YYYY-MM-DD (Yerel Saat)
+                    
+                    // Anahtar: YYYY-MM-DD (Yerel Saat ile)
                     const year = monday.getFullYear();
                     const month = String(monday.getMonth() + 1).padStart(2, '0');
                     const day = String(monday.getDate()).padStart(2, '0');
@@ -351,17 +350,15 @@
                 }
             });
 
-            // Haftaları sırala (Yeniden eskiye)
             const sortedKeys = Object.keys(weeks).sort((a, b) => new Date(b) - new Date(a));
-
-            // SADECE İLK 4 HAFTAYI GÖSTER (Dilimleme işlemi)
             const recentWeeks = sortedKeys.slice(0, 4); 
 
             recentWeeks.forEach(key => {
                 const parts = key.split('-');
-                const monday = new Date(parts[0], parts[1] - 1, parts[2]);
+                const monday = new Date(parts[0], parts[1] - 1, parts[2]); // Yıl, Ay(0-11), Gün
+                
                 const sunday = new Date(monday);
-                sunday.setDate(monday.getDate() + 6); 
+                sunday.setDate(monday.getDate() + 6); // Pazartesi + 6 gün = Pazar
 
                 const formatOpts = { day: 'numeric', month: 'short' };
                 const rangeStr = `${monday.toLocaleDateString('tr-TR', formatOpts)} - ${sunday.toLocaleDateString('tr-TR', formatOpts)}`;
@@ -382,6 +379,65 @@
             if(sortedKeys.length === 0) {
                 list.innerHTML = "<div style='text-align:center; font-size:0.8rem; opacity:0.5; padding:10px;'>Henüz veri yok.</div>";
             }
+        }
+
+        // --- İSTATİSTİK VE KUMBARA HESABI ---
+        function calculateStats(records) {
+            const now = new Date();
+            const currentWeekStart = getMonday(new Date());
+            
+            let weekTotal = 0;
+            let bankedTotal = 0; 
+
+            // İlk Kayıt Tarihini Bul
+            let firstRecordTime = now.getTime();
+            if (records.length > 0) {
+                const timestamps = records.map(r => r.timestamp);
+                firstRecordTime = Math.min(...timestamps);
+            }
+
+            const msPer28Days = 28 * 24 * 60 * 60 * 1000;
+            const timeSinceStart = now.getTime() - firstRecordTime;
+            const currentCycleIndex = Math.floor(timeSinceStart / msPer28Days);
+
+            records.forEach(rec => {
+                if (rec.actual !== null) {
+                    const recDate = new Date(rec.timestamp);
+
+                    // A) BU HAFTA (Canlı Veri) - Pazartesi Başlangıçlı Kontrol
+                    if (recDate >= currentWeekStart) {
+                        weekTotal += rec.actual;
+                    }
+
+                    // B) KUMBARA (Bitmiş 4 Haftalık Döngüler)
+                    const diff = rec.timestamp - firstRecordTime;
+                    const recCycleIndex = Math.floor(diff / msPer28Days);
+
+                    if (recCycleIndex < currentCycleIndex) {
+                        bankedTotal += rec.actual;
+                    }
+                }
+            });
+
+            // GÖSTERİM: BU HAFTA
+            const MAX_DASH = 150; // SVG stroke-dasharray
+            let percentage = (weekTotal / WEEKLY_GOAL) * 100;
+            if (percentage > 100) percentage = 100;
+            
+            document.getElementById('weekCircle').style.strokeDashoffset = MAX_DASH - (percentage / 100) * MAX_DASH;
+            document.getElementById('weekPercent').innerText = `%${Math.round((weekTotal / WEEKLY_GOAL) * 100)}`;
+            document.getElementById('weekTotal').innerText = weekTotal.toFixed(1);
+            
+            if(weekTotal >= WEEKLY_GOAL) {
+                document.getElementById('weekCircle').style.stroke = "#00ff88"; 
+                document.getElementById('weekPercent').style.color = "#00ff88";
+            } else {
+                document.getElementById('weekCircle').style.stroke = "#bc13fe";
+                document.getElementById('weekPercent').style.color = "white";
+            }
+
+            // GÖSTERİM: TAMAMLANAN DÖNGÜLER
+            document.getElementById('cycleTotal').innerText = bankedTotal.toFixed(1);
         }
 
         function addGoal() {
@@ -434,45 +490,17 @@
             }
         }
 
-        function calculateStats(records) {
-            const now = new Date();
-            const currentWeekStart = getMonday(new Date());
-            const currentMonth = now.getMonth();
-            let weekTotal = 0;
-            let monthTotal = 0;
-
-            records.forEach(rec => {
-                if (rec.actual !== null) {
-                    const recDate = new Date(rec.timestamp);
-                    // Haftalık (Şu anki hafta)
-                    if (recDate >= currentWeekStart) weekTotal += rec.actual;
-                    // Aylık (Şu anki ay)
-                    if (recDate.getMonth() === currentMonth && recDate.getFullYear() === now.getFullYear()) monthTotal += rec.actual;
-                }
-            });
-
-            const MAX_DASH = 175;
-            let percentage = (weekTotal / WEEKLY_GOAL) * 100;
-            if (percentage > 100) percentage = 100;
-            
-            document.getElementById('weekCircle').style.strokeDashoffset = MAX_DASH - (percentage / 100) * MAX_DASH;
-            document.getElementById('weekPercent').innerText = `%${Math.round((weekTotal / WEEKLY_GOAL) * 100)}`;
-            document.getElementById('weekTotal').innerText = weekTotal.toFixed(1);
-            document.getElementById('monthTotal').innerText = monthTotal.toFixed(1);
-            
-            if(weekTotal >= WEEKLY_GOAL) {
-                document.getElementById('weekCircle').style.stroke = "#00ff88"; 
-                document.getElementById('weekPercent').style.color = "#00ff88";
-            } else {
-                document.getElementById('weekCircle').style.stroke = "#bc13fe";
-                document.getElementById('weekPercent').style.color = "white";
-            }
-        }
-
+        // --- PAZARTESİ HESAPLAMA (UTC SORUNU ÇÖZÜLDÜ) ---
         function getMonday(d) {
             d = new Date(d);
-            var day = d.getDay(), diff = d.getDate() - day + (day == 0 ? -6 : 1); 
-            d.setDate(diff); d.setHours(0,0,0,0); return d;
+            var day = d.getDay();
+            // Pazar(0) ise, 6 gün geri git. Diğer günler için (gün - 1) kadar geri git.
+            var diff = d.getDate() - day + (day == 0 ? -6 : 1); 
+            
+            // Yeni tarihi set et ve saati sıfırla
+            var newDate = new Date(d.setDate(diff));
+            newDate.setHours(0,0,0,0);
+            return newDate;
         }
 
         function showNotif(msg) {
