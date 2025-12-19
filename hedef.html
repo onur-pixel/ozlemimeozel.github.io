@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 Hedeflerim 🎀</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* GENEL AYARLAR */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+
+        body {
+            /* Tatlı Pembe Geçişli Arka Plan */
+            background: linear-gradient(135deg, #fff0f5 0%, #ffe4e1 100%);
+            color: #880e4f;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* BAŞLIK ALANI */
+        header {
+            text-align: center;
+            margin: 40px 0;
+            animation: fadeIn 1.5s ease;
+        }
+
+        h1 {
+            color: #d81b60;
+            font-size: 2.5rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-shadow: 2px 2px 0px rgba(255, 182, 193, 0.5);
+            margin-bottom: 10px;
+        }
+
+        p {
+            background: #f8bbd0;
+            color: #fff;
+            padding: 8px 25px;
+            border-radius: 50px;
+            display: inline-block;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(216, 27, 96, 0.2);
+        }
+
+        /* VISION BOARD DÜZENİ (MASONRY/PINTEREST TARZI) */
+        .gallery-container {
+            column-count: 4; /* Geniş ekranda 4 sütun */
+            column-gap: 20px;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* MOBİL UYUMU */
+        @media (max-width: 1100px) {
+            .gallery-container { column-count: 3; } 
+        }
+        @media (max-width: 800px) {
+            .gallery-container { column-count: 2; } 
+        }
+        @media (max-width: 500px) {
+            .gallery-container { column-count: 1; } /* Telefondan tek sütun */
+            h1 { font-size: 2rem; }
+        }
+
+        /* KART TASARIMI */
+        .card {
+            background: white;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            break-inside: avoid; /* Kartın bölünmesini engeller */
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(233, 30, 99, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            border: 4px solid #fff;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(233, 30, 99, 0.25);
+            border-color: #ff80ab;
+        }
+
+        .card img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .card-caption {
+            padding: 15px;
+            text-align: center;
+            background: #fff;
+        }
+
+        .card-title {
+            font-weight: 700;
+            color: #c2185b;
+            font-size: 1rem;
+            margin-bottom: 5px;
+        }
+        
+        .card-desc {
+            font-size: 0.8rem;
+            color: #f06292;
+        }
+
+        /* Animasyon */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Alt Bilgi */
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            color: #ad1457;
+            font-size: 0.9rem;
+            padding-bottom: 20px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🎀 2026 HEDEFLERİM 🎀</h1>
+        <p>Geleceğin Doktorunun Yol Haritası 🩺</p>
+    </header>
+
+    <div class="gallery-container">
+
+        <div class="card">
+            <img src="she.jpeg" alt="She is a Doctor">
+            <div class="card-caption">
+                <div class="card-title">She's a Doctor 👩‍⚕️</div>
+                <div class="card-desc">Kimlik: Doktor</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="dokorrr.jpeg" alt="Stetoskop">
+            <div class="card-caption">
+                <div class="card-title">Beyaz Önlük & Stetoskop 🩺</div>
+                <div class="card-desc">Boynumda parlayacak</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="hacettepe.jpeg" alt="Hacettepe">
+            <div class="card-caption">
+                <div class="card-title">Hacettepe Tıp Fakültesi 🏛️</div>
+                <div class="card-desc">O kampüse girilecek!</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="tyt.jpeg" alt="YKS Puan Hedefi">
+            <div class="card-caption">
+                <div class="card-title">Zirve Hedef 🎯</div>
+                <div class="card-desc">TYT 110 - AYT 80</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="temel.jpeg" alt="TYT Deneme">
+            <div class="card-caption">
+                <div class="card-title">Prova: 111,25 Net 🔥</div>
+                <div class="card-desc">Başarı tesadüf değildir</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="fizik.jpeg" alt="Fizik Neti">
+            <div class="card-caption">
+                <div class="card-title">Fizik Full Çekilecek ⚡</div>
+                <div class="card-desc">14 Doğru 0 Yanlış</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="namaz.jpeg" alt="Namaz">
+            <div class="card-caption">
+                <div class="card-title">Huzur & Maneviyat 🤲</div>
+                <div class="card-desc">Ruhun gıdası</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="dua.jpeg" alt="Dua Sözü">
+            <div class="card-caption">
+                <div class="card-title">Sabır ve Tevekkül ✨</div>
+                <div class="card-desc">"Allah güzeli daha güzel kılmak için erteler"</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="özlemonur.jpeg" alt="Aşk">
+            <div class="card-caption">
+                <div class="card-title">Aşk ile Dünyayı Gezmek ❤️</div>
+                <div class="card-desc">Özlem & Onur</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="pasaport.jpeg" alt="Pasaport">
+            <div class="card-caption">
+                <div class="card-title">Yurt Dışı Tatilleri ✈️</div>
+                <div class="card-desc">Yeni yerler, pembe valizler</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="belge.jpeg" alt="Ehliyet">
+            <div class="card-caption">
+                <div class="card-title">Ehliyet Cepte 🚗</div>
+                <div class="card-desc">Özgürlüğe sürüş</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="55 kilo.jpeg" alt="Tartı">
+            <div class="card-caption">
+                <div class="card-title">Hedef: 55 Kilo ⚖️</div>
+                <div class="card-desc">Fit ve sağlıklı beden</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="koşu.jpeg" alt="Koşu">
+            <div class="card-caption">
+                <div class="card-title">Sabah Koşuları 🏃‍♀️</div>
+                <div class="card-desc">Güneşle uyanmak</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="bisiklet.jpeg" alt="Bisiklet">
+            <div class="card-caption">
+                <div class="card-title">Macera Dolu Anlar 🚲</div>
+                <div class="card-desc">Yağmurda bisiklet keyfi</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="bilgisayar.jpeg" alt="Setup">
+            <div class="card-caption">
+                <div class="card-title">Pembe Çalışma Alanım 💻</div>
+                <div class="card-desc">Verimlilik köşesi</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="telefon.jpeg" alt="Telefon">
+            <div class="card-caption">
+                <div class="card-title">Yeni Telefon 📱</div>
+                <div class="card-desc">Samsung Galaxy S23+</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="giysi.jpeg" alt="Giyim">
+            <div class="card-caption">
+                <div class="card-title">Hayalimdeki Giyim Odası 👗</div>
+                <div class="card-desc">Düzenli ve şık</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="kitap.jpeg" alt="Kitaplar">
+            <div class="card-caption">
+                <div class="card-title">Kütüphanem 📚</div>
+                <div class="card-desc">Bilgi hazinesi</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="kupa.jpeg" alt="Kupalar">
+            <div class="card-caption">
+                <div class="card-title">Kupa Koleksiyonu ☕</div>
+                <div class="card-desc">En tatlı kahve molaları</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <img src="happy.jpeg" alt="Happy">
+            <div class="card-caption">
+                <div class="card-title">Mutlu Zihin 🌸</div>
+                <div class="card-desc">Happy Mind, Happy Life</div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer>
+        ✨ Evrene sipariş verildi. Teslimat tarihi: 2026 ✨
+    </footer>
+
+</body>
+</html>

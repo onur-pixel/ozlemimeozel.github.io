@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geleceğin Doktoru 🩺</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        /* TASARIM (CSS) KISMI - HİÇBİR ŞEY DEĞİŞTİRİLMEDİ */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+
+        body {
+            background: linear-gradient(135deg, #1a0b2e 0%, #4a148c 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 5px;
+            color: #e0aaff;
+            text-shadow: 0 0 10px rgba(224, 170, 255, 0.5);
+            font-size: 1.5rem;
+        }
+
+        /* Rütbe Rozeti */
+        .rank-badge {
+            background: linear-gradient(45deg, #ff9100, #ffea00);
+            color: #000;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(255, 145, 0, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            animation: pulse 2s infinite;
+            display: inline-block;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 145, 0, 0.6); }
+            50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(255, 145, 0, 0.8); }
+            100% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 145, 0, 0.6); }
+        }
+
+        /* YKS Sayaç Kartı */
+        .yks-counter {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(224, 170, 255, 0.3);
+        }
+
+        .yks-days {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: #00ff88;
+        }
+
+        .yks-detail { font-size: 0.8rem; opacity: 0.8; margin-top: 5px; }
+
+        /* Veri Giriş Alanı */
+        .input-card {
+            background: #2d0a55;
+            padding: 20px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        input {
+            padding: 15px;
+            border-radius: 10px;
+            border: none;
+            background: #1a0b2e;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            border: 1px solid #7b2cbf;
+            text-align: center;
+        }
+
+        button.save-btn {
+            padding: 15px;
+            background: #bc13fe;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        button.save-btn:active { transform: scale(0.95); }
+
+        /* İlerleme Çubuğu */
+        .progress-container {
+            width: 100%;
+            background-color: #1a0b2e;
+            border-radius: 10px;
+            height: 12px;
+            margin: 10px 0;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #bc13fe, #00ff88);
+            border-radius: 10px;
+            transition: width 1s ease-in-out;
+            box-shadow: 0 0 10px #bc13fe;
+        }
+
+        .total-stats {
+            text-align: center;
+            font-size: 0.9rem;
+            color: #e0aaff;
+        }
+
+        /* Geçmiş Kayıtlar Listesi */
+        .history-list {
+            margin-top: 20px;
+            width: 100%;
+            max-width: 400px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            background: rgba(255,255,255,0.05);
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 3px solid #bc13fe;
+        }
+
+        .delete-btn {
+            background: #ff3b3b;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        /* Motivasyon Popup */
+        #notification {
+            position: fixed;
+            top: 20px;
+            background: #00ff88;
+            color: #1a0b2e;
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-weight: bold;
+            transform: translateY(-150%);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100;
+            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.4);
+            text-align: center;
+            width: 80%;
+            max-width: 300px;
+        }
+
+        /* Ana Sayfaya Dön */
+        .home-link {
+            margin-top: 20px;
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            font-size: 0.8rem;
+            border-bottom: 1px dashed rgba(255,255,255,0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="notification">Harikasın! 🩺</div>
+
+    <div id="rankBadge" class="rank-badge">Tıp Fakültesi Çömezi</div>
+
+    <h1>Hedef: Tıp Fakültesi</h1>
+    
+    <div class="yks-counter">
+        <div>YKS 2026'ya Kalan</div>
+        <div class="yks-days" id="countdown">Hesaplanıyor...</div>
+        <div class="yks-detail">20 Haziran 2026 Cumartesi, 10.15</div>
+    </div>
+
+    <div class="input-card">
+        <label>Bugün kaç saat çalıştın? 💊</label>
+        <input type="number" id="studyHours" placeholder="Örn: 4.5" step="0.5">
+        <button class="save-btn" onclick="saveData()">Sisteme İşle</button>
+
+        <div class="total-stats">
+            <div>Toplam Emek: <span id="totalDisplay" style="font-size: 1.5rem; color:white; font-weight:bold;">0</span> Saat</div>
+            
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div id="nextRankMsg" style="font-size: 0.7rem; opacity: 0.7;">Sonraki Rütbeye: 50 Saat</div>
+        </div>
+    </div>
+
+    <h3 style="margin-top:20px; font-size: 1rem; opacity: 0.8;">Çalışma Geçmişi</h3>
+    <div class="history-list" id="historyList">
+        </div>
+
+    <a href="index.html" class="home-link">🏠 Ana Sayfaya Dön</a>
+
+    <script>
+        // 1. YKS SAYAÇ AYARI
+        // Tarih: 20 Haziran 2026, Saat: 10:15:00
+        const yksDate = new Date("2026-06-20T10:15:00").getTime();
+        
+        setInterval(() => {
+            const now = new Date().getTime();
+            const distance = yksDate - now;
+
+            // Zaman hesaplamaları
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            
+            // Eğer süre bittiyse
+            if (distance < 0) {
+                document.getElementById("countdown").innerText = "SINAV GELDİ!";
+                document.getElementById("countdown").style.color = "#ff3b3b";
+            } else {
+                // Sadece gün sayısını büyük gösteriyoruz (Görünüm bozulmasın diye)
+                document.getElementById("countdown").innerText = days + " Gün";
+            }
+        }, 1000);
+
+        // 2. MOTİVASYON SÖZLERİ
+        const quotes = [
+            "O önlük sana çok yakışacak! 🥼",
+            "Hastaların seni bekliyor, devam et!",
+            "Şu an çözdüğün soru, bir hayat kurtarabilir.",
+            "Tıp fakültesi kapıları gıcırdıyor... Duyuyor musun? 🚪",
+            "Yorulmak yok, sen geleceğin doktorusun!",
+            "Bugünkü emeğin, yarınki başarın.",
+            "Stetoskopun sesini hayal et... 🩺",
+            "Ders çalışmak, gelecekteki hastalarına bir borçtur."
+        ];
+
+        // 3. RÜTBE SİSTEMİ
+        function updateRank(totalHours) {
+            const badge = document.getElementById('rankBadge');
+            const nextMsg = document.getElementById('nextRankMsg');
+            const bar = document.getElementById('progressBar');
+            let rank = "Tıp Fakültesi Çömezi";
+            let nextTarget = 50;
+            let color = "#ff9100";
+
+            if (totalHours >= 1000) {
+                rank = "ORDİNARYÜS PROFESÖR 🏛️";
+                nextTarget = 2000;
+                color = "#ff0055";
+            } else if (totalHours >= 500) {
+                rank = "PROFESÖR DOKTOR 🎓";
+                nextTarget = 1000;
+                color = "#00e5ff";
+            } else if (totalHours >= 300) {
+                rank = "UZMAN DOKTOR 🏥";
+                nextTarget = 500;
+                color = "#d500f9";
+            } else if (totalHours >= 150) {
+                rank = "ASİSTAN DOKTOR 💉";
+                nextTarget = 300;
+                color = "#00e676";
+            } else if (totalHours >= 50) {
+                rank = "PRATİSYEN HEKİM 🚑";
+                nextTarget = 150;
+                color = "#2979ff";
+            }
+
+            badge.innerText = rank;
+            badge.style.background = color;
+            badge.style.boxShadow = `0 0 20px ${color}`;
+
+            // İlerleme çubuğunu hesapla (Mevcut hedef aralığına göre)
+            // Basitlik için 1000 saati max kabul edip scale edebiliriz veya target'a göre yapabiliriz.
+            // Görsel bütünlük için totalHours / nextTarget mantığı:
+            
+            // Burayı daha akıcı hale getirdim:
+            let percentage = 0;
+            if(totalHours >= 1000) {
+                percentage = 100;
+            } else {
+                 percentage = (totalHours / nextTarget) * 100;
+            }
+            
+            bar.style.width = percentage + "%";
+            
+            if (totalHours < 1000) {
+                nextMsg.innerText = `Sonraki Rütbeye: ${(nextTarget - totalHours).toFixed(1)} Saat kaldı`;
+            } else {
+                nextMsg.innerText = "Artık sen bir Efsanesin! 🌟";
+            }
+        }
+
+        // 4. VERİ YÖNETİMİ
+        function loadData() {
+            const records = JSON.parse(localStorage.getItem('studyRecords')) || [];
+            const list = document.getElementById('historyList');
+            let total = 0;
+            
+            list.innerHTML = ""; 
+            
+            records.slice().reverse().forEach((rec) => {
+                total += parseFloat(rec.hours);
+                
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.innerHTML = `
+                    <div>
+                        <div style="font-size:0.8rem; color:#bb86fc;">${rec.date}</div>
+                        <div style="font-weight:bold;">${rec.hours} Saat</div>
+                    </div>
+                    <button class="delete-btn" onclick="deleteItem(${rec.id})">Sil 🗑️</button>
+                `;
+                list.appendChild(item);
+            });
+
+            document.getElementById('totalDisplay').innerText = total.toFixed(1);
+            updateRank(total);
+        }
+
+        function saveData() {
+            const input = document.getElementById('studyHours');
+            const hours = parseFloat(input.value);
+
+            if (!hours || hours <= 0) {
+                alert("Lütfen geçerli bir saat gir.");
+                return;
+            }
+
+            const records = JSON.parse(localStorage.getItem('studyRecords')) || [];
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('tr-TR') + ' ' + now.getHours() + ':' + (now.getMinutes()<10?'0':'') + now.getMinutes();
+
+            const newRecord = { 
+                id: Date.now(), 
+                date: dateStr, 
+                hours: hours 
+            };
+
+            records.push(newRecord);
+            localStorage.setItem('studyRecords', JSON.stringify(records));
+
+            const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+            const notif = document.getElementById('notification');
+            notif.innerText = randomQuote;
+            notif.style.transform = 'translateY(0)';
+            
+            setTimeout(() => {
+                notif.style.transform = 'translateY(-150%)';
+            }, 3500);
+
+            input.value = "";
+            loadData();
+        }
+
+        function deleteItem(id) {
+            if(confirm("Bu kaydı silmek istediğine emin misin?")) {
+                let records = JSON.parse(localStorage.getItem('studyRecords')) || [];
+                records = records.filter(rec => rec.id !== id);
+                localStorage.setItem('studyRecords', JSON.stringify(records));
+                loadData();
+            }
+        }
+
+        loadData();
+    </script>
+</body>
+</html>

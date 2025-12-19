@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Beni Affet ❤️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        /* Sayfa kaydırılmasın ve yakınlaştırılmasın */
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            touch-action: none; 
+        }
+
+        body {
+            background: radial-gradient(circle at center, #2d0a55 0%, #0f051d 100%);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Poppins', sans-serif;
+            color: white;
+            text-align: center;
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            padding: 20px;
+            max-width: 90%;
+        }
+
+        /* GIF Alanı */
+        .gif-container img {
+            width: 180px;
+            height: auto;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(188, 19, 254, 0.4);
+            pointer-events: none; /* Resme tıklanmasın */
+        }
+
+        h1 {
+            font-size: 1.6rem;
+            margin-bottom: 30px;
+            line-height: 1.4;
+            text-shadow: 0 0 10px #bc13fe;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            min-height: 80px; /* Butonların hareket alanı için boşluk */
+            position: relative;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            /* Büyüme efekti için yumuşak geçiş */
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            white-space: nowrap; /* Yazı taşmasın */
+            -webkit-tap-highlight-color: transparent; /* Mobilde tıklayınca mavi ışık yanmasın */
+        }
+
+        /* EVET Butonu - Büyüyen Dev */
+        #btn-yes {
+            background-color: #00ff88;
+            color: #0f051d;
+            z-index: 20; 
+        }
+        
+        /* HAYIR Butonu - Kaçak */
+        #btn-no {
+            background-color: #ff3b3b;
+            color: white;
+            z-index: 30; /* En üstte olsun ki dokunmaya çalışılsın */
+            position: relative;
+        }
+
+        /* Gizli mesaj alanı */
+        #success-screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            animation: popIn 0.6s ease forwards;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            80% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="question-screen">
+        <div class="gif-container">
+            <img id="main-gif" src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3QzeXNsY3Z4M2V4bmE5Y3Z4M2V4bmE5Y3Z4M2V4bmE5/LMuWpaL29r88jzwClp/giphy.gif" alt="Üzgün Kedi">
+        </div>
+        
+        <h1 id="question-text">Seni üzdüğüm için özür dilerim.<br>Barışalım mı? 💜</h1>
+
+        <div class="buttons">
+            <button id="btn-yes" onclick="acceptLove()">EVET</button>
+            <button id="btn-no">Hayır</button>
+        </div>
+    </div>
+
+    <div class="container" id="success-screen">
+        <div class="gif-container">
+            <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExanJ5ZHBuY2o0b3lzM3dwYm53b21peW9wZXZ6b2F6bmR5eWJ5b2F6bmR5eWJ5byZlcD12MV9zdGlja2Vyc19zZWFyY2gmY3Q9cw/iCVzZwwE6QhZPqXhXj/giphy.gif" alt="Mutlu Kedi">
+        </div>
+        <h1>BİLİYORDUM! 🥳<br>Seni Çok Seviyorum!</h1>
+    </div>
+
+    <script>
+        const noBtn = document.getElementById('btn-no');
+        const yesBtn = document.getElementById('btn-yes');
+        const questionText = document.getElementById('question-text');
+        const mainGif = document.getElementById('main-gif');
+
+        let yesScale = 1; // Evet butonunun başlangıç boyutu
+        let clickCount = 0; // Kaç kere hayır denendi
+
+        const texts = [
+            "Emin misin?", "Gerçekten mi?", "Yapma be...", 
+            "Kıyamazsın!", "Son kararın mı?", "Üzülürüm...", 
+            "Kalbimi kırma 💔", "Şaka dimi?", "Basamazsın :P"
+        ];
+
+        // Hayır butonunu kaçıran fonksiyon
+        function escapeNow(e) {
+            // MOBİL İÇİN KRİTİK NOKTA:
+            // Eğer bu bir dokunma olayıysa, 'preventDefault' ile tıklamayı iptal et.
+            // Böylece kullanıcı butona basamadan buton kaçmış olur.
+            if (e && e.cancelable) {
+                e.preventDefault();
+            }
+
+            // 1. EVET BUTONUNU BÜYÜT
+            yesScale += 0.2; // Her denemede biraz büyüt
+            yesBtn.style.transform = `scale(${yesScale})`;
+            
+            // Çok büyürse yazısı değişsin
+            if (yesScale > 2) {
+                yesBtn.innerText = "EVET DEMEK ZORUNDASIN! 😈";
+                yesBtn.style.backgroundColor = "#bc13fe"; // Rengi mora dönsün
+                yesBtn.style.color = "#fff";
+            }
+
+            // 2. HAYIR BUTONUNU IŞINLA
+            // Ekran genişliği ve yüksekliğini al
+            const winWidth = window.innerWidth;
+            const winHeight = window.innerHeight;
+            
+            // Butonun kendi boyutları
+            const btnWidth = noBtn.offsetWidth;
+            const btnHeight = noBtn.offsetHeight;
+
+            // Rastgele koordinat (Ekran dışına taşmaması için sınırlar koyuyoruz)
+            // Math.random() 0 ile 1 arası sayı verir. Bunu boş alanla çarpıyoruz.
+            const randomX = Math.random() * (winWidth - btnWidth - 20);
+            const randomY = Math.random() * (winHeight - btnHeight - 20);
+
+            // Pozisyonu güncelle
+            noBtn.style.position = 'fixed'; // 'absolute' yerine 'fixed' daha garanti kaçırır
+            noBtn.style.left = randomX + 'px';
+            noBtn.style.top = randomY + 'px';
+
+            // 3. METİNLERİ DEĞİŞTİR
+            const randomText = texts[Math.floor(Math.random() * texts.length)];
+            noBtn.innerText = randomText;
+
+            clickCount++;
+            // 4 kere denerse daha acıklı moda geç
+            if (clickCount === 4) {
+                mainGif.src = "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExM2Q0b3lzM3dwYm53b21peW9wZXZ6b2F6bmR5eWJ5b2F6bmR5eWJ5byZlcD12MV9zdGlja2Vyc19zZWFyY2gmY3Q9cw/l378giAZgxPw3eO52/giphy.gif"; 
+                questionText.innerHTML = "Lütfen? Yoksa çok ağlarım... 🥺";
+            }
+        }
+
+        // --- OLAY DİNLEYİCİLERİ (EVENTS) ---
+        
+        // 1. Bilgisayar: Mouse üzerine gelince kaç
+        noBtn.addEventListener('mouseover', escapeNow);
+        
+        // 2. Telefon: Ekrana dokunulduğu an kaç
+        // 'passive: false' mobilde preventDefault() kullanabilmek için gereklidir.
+        noBtn.addEventListener('touchstart', escapeNow, { passive: false });
+
+        // 3. Her ihtimale karşı tıklanırsa yine kaç
+        noBtn.addEventListener('click', escapeNow);
+
+        // Evet butonuna basınca
+        function acceptLove() {
+            document.getElementById('question-screen').style.display = 'none';
+            document.getElementById('success-screen').style.display = 'flex';
+            
+            // Konfeti efekti yerine arka planı değiştir
+            document.body.style.background = "radial-gradient(circle at center, #6a0dad 0%, #000 100%)";
+        }
+    </script>
+</body>
+</html>
