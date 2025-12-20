@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onur & Özlem | Ay Işığım</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Montserrat:wght@300;600&display=swap');
+
+        :root {
+            --primary: #ff0055;
+            --secondary: #00d2ff;
+            --bg: #0f0c29;
+            --glass: rgba(255, 255, 255, 0.1);
+            --border: rgba(255, 255, 255, 0.2);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: linear-gradient(135deg, #0f0c29, #201d42, #1a1a2e);
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* --- ANA SAYFA BUTONU (YENİ) --- */
+        .home-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            text-decoration: none;
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(5px);
+            font-weight: bold;
+            transition: all 0.3s ease;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+        }
+
+        .home-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+        }
+        /* -------------------------------- */
+
+        /* --- GERÇEKÇİ AY --- */
+        .the-moon {
+            position: absolute;
+            top: 40px;
+            right: 60px;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background-image: url('https://s3-us-west-2.amazonaws.com/s.cdpn.io/1231630/moon2.png');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            box-shadow: 
+                inset -20px -20px 60px rgba(0,0,0,0.8),
+                0 0 60px 10px rgba(255, 255, 235, 0.3);
+            z-index: 0;
+            animation: moonRotation 240s linear infinite;
+            filter: contrast(1.1) brightness(1.1);
+        }
+
+        @keyframes moonRotation {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Canvas Arka Plan */
+        #stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Ana Konteyner */
+        .container {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* Başlık Alanı */
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 5rem;
+            background: linear-gradient(to right, #ff0055, #ffcc00, #00d2ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            letter-spacing: 3px;
+            margin-bottom: 40px;
+            height: 30px;
+            color: #ddd;
+            font-weight: 300;
+        }
+
+        /* Glassmorphism Kart */
+        .love-card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            max-width: 600px;
+            width: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.3s;
+        }
+
+        .love-card:hover {
+            transform: translateY(-10px) rotateX(5deg);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Sayaç */
+        .timer {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .time-box {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 15px;
+            border-radius: 10px;
+            min-width: 80px;
+            border: 1px solid rgba(255, 0, 85, 0.3);
+        }
+
+        .time-box span {
+            display: block;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .time-box label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+
+        /* Buton */
+        .magic-btn {
+            margin-top: 40px;
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            background: linear-gradient(45deg, var(--primary), #ff6b6b);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            cursor: pointer;
+            transition: 0.5s;
+            box-shadow: 0 0 20px rgba(255, 0, 85, 0.5);
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+        }
+
+        .magic-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 40px rgba(255, 0, 85, 0.8);
+        }
+
+        /* Animasyonlar */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* Kalp Yağmuru İçin */
+        .heart {
+            position: fixed;
+            top: -10vh;
+            color: #ff0055;
+            font-size: 20px;
+            animation: fall linear forwards;
+            z-index: 10;
+            text-shadow: 0 0 10px var(--primary);
+        }
+
+        @keyframes fall {
+            to { transform: translateY(110vh) rotate(360deg); }
+        }
+
+        /* Mobilde Font ve Ay Ayarı */
+        @media (max-width: 768px) {
+            h1 { font-size: 3rem; }
+            .timer { gap: 10px; }
+            .time-box { min-width: 60px; padding: 10px; }
+            .the-moon {
+                width: 100px;
+                height: 100px;
+                top: 20px;
+                right: 20px;
+            }
+            .home-btn {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="home-btn">🏠 Ana Sayfa</a>
+
+    <div class="the-moon"></div>
+    
+    <canvas id="stars"></canvas>
+
+    <div class="container">
+        <h1>Onur & Özlem</h1>
+        <div class="subtitle" id="typing-text"></div>
+
+        <div class="love-card">
+            <p style="font-size: 1.1rem; line-height: 1.6;">
+                Gökyüzündeki bu muhteşem ay ve sayısız yıldız, aşkınızın sonsuzluğuna tanıklık ediyor.<br><br>
+                Sen doğduğunda dünya bir başka aydınlandı, benim ay ışığım...
+            </p>
+
+            <div class="timer">
+                <div class="time-box"><span id="days">0</span><label>Gün</label></div>
+                <div class="time-box"><span id="hours">0</span><label>Saat</label></div>
+                <div class="time-box"><span id="minutes">0</span><label>Dakika</label></div>
+                <div class="time-box"><span id="seconds">0</span><label>Saniye</label></div>
+            </div>
+        </div>
+
+        <button class="magic-btn" onclick="createHearts()">Evrene Aşk Gönder 💖</button>
+    </div>
+
+    <script>
+        // 1. Daktilo Efekti (İSTENEN YAZI GÜNCELLENDİ)
+        const text = "Ay Işığımın doğum Tarihi: 27 Eylül 2007";
+        const typingElement = document.getElementById('typing-text');
+        let i = 0;
+
+        function typeWriter() {
+            if (i < text.length) {
+                typingElement.innerHTML += text.charAt(i);
+                i++;
+                setTimeout(typeWriter, 100);
+            }
+        }
+        window.onload = () => {
+            typeWriter();
+            initStars();
+        };
+
+        // 2. Sayaç (DOĞUM GÜNÜ TARİHİ EKLENDİ: 27.09.2007)
+        // new Date(Yıl, Ay(0'dan başlar: 0=Ocak, 8=Eylül), Gün)
+        // Eylül için 8 yazıyoruz.
+        const startDate = new Date("2007-09-27T00:00:00").getTime();
+
+        function updateTimer() {
+            const now = new Date().getTime();
+            // Geçmişten bugüne geçen süre (Sayacın artması için)
+            const distance = now - startDate;
+
+            document.getElementById("days").innerText = Math.floor(distance / (1000 * 60 * 60 * 24));
+            document.getElementById("hours").innerText = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            document.getElementById("minutes").innerText = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            document.getElementById("seconds").innerText = Math.floor((distance % (1000 * 60)) / 1000);
+        }
+        setInterval(updateTimer, 1000);
+
+        // 3. Kalp Yağmuru Efekti
+        function createHearts() {
+            for(let i=0; i<35; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.classList.add('heart');
+                    heart.innerHTML = '❤';
+                    heart.style.left = Math.random() * 100 + "vw";
+                    heart.style.animationDuration = Math.random() * 2 + 3 + "s";
+                    const size = Math.random() * 25 + 15;
+                    heart.style.fontSize = size + "px";
+                    document.body.appendChild(heart);
+
+                    setTimeout(() => {
+                        heart.remove();
+                    }, 5000);
+                }, i * 80);
+            }
+        }
+
+        // 4. Yıldız Arka Plan
+        function initStars() {
+            const canvas = document.getElementById('stars');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            let stars = [];
+            const numStars = 300;
+
+            for(let i = 0; i < numStars; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 1.2,
+                    vx: Math.random() * 0.4 - 0.2,
+                    vy: Math.random() * 0.4 - 0.2
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                
+                stars.forEach(star => {
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    star.x += star.vx;
+                    star.y += star.vy;
+
+                    if(star.x < 0 || star.x > canvas.width) star.vx = -star.vx;
+                    if(star.y < 0 || star.y > canvas.height) star.vy = -star.vy;
+                });
+
+                requestAnimationFrame(animate);
+            }
+            animate();
+            
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+        }
+    </script>
+</body>
+</html>
