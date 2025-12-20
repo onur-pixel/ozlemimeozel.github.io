@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Hedef Avcısı 🩺</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;800&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; font-family: 'Poppins', sans-serif; }
+        
+        body {
+            background: radial-gradient(circle at center, #2d0a55 0%, #0f051d 100%);
+            overflow: hidden; /* Kaydırmayı engelle */
+            color: white;
+            touch-action: none; /* Mobilde sürüklemeyi engelle */
+        }
+
+        #gameCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ARAYÜZ KATMANLARI */
+        .ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Tıklamalar canvas'a geçsin */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+        }
+
+        /* Skor Tablosu */
+        .score-board {
+            text-align: left;
+            pointer-events: none;
+        }
+        .score-board h2 {
+            font-size: 1.5rem;
+            color: #e0aaff;
+            text-shadow: 0 0 10px rgba(224, 170, 255, 0.5);
+        }
+        .score-board p {
+            font-size: 0.9rem;
+            color: #00ff88;
+        }
+
+        /* Başlangıç / Bitiş Ekranı */
+        #menuScreen, #gameOverScreen {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 40px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            pointer-events: auto;
+            transition: opacity 0.3s;
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .hidden { opacity: 0; pointer-events: none; visibility: hidden; }
+
+        h1 { font-size: 2rem; margin-bottom: 10px; color: #bc13fe; }
+        p.desc { font-size: 0.9rem; margin-bottom: 20px; opacity: 0.8; }
+
+        .btn {
+            background: linear-gradient(90deg, #bc13fe, #7b2cbf);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(188, 19, 254, 0.4);
+            transition: transform 0.2s;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .btn:active { transform: scale(0.95); }
+        .btn-secondary { background: rgba(255,255,255,0.1); font-size: 1rem; }
+
+        /* Mobil Kontrol Bilgisi */
+        .controls-hint {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            font-size: 0.8rem;
+            opacity: 0.5;
+            animation: fadeBlink 3s infinite;
+        }
+
+        @keyframes fadeBlink { 0%,100% {opacity: 0.3;} 50% {opacity: 0.7;} }
+
+        /* Ana Sayfa Butonu */
+        .home-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.8rem;
+            pointer-events: auto;
+            backdrop-filter: blur(5px);
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <div class="ui-layer">
+        <div class="score-board">
+            <h2>Puan: <span id="scoreDisplay">0</span></h2>
+            <p>En Yüksek: <span id="highScoreDisplay">0</span></p>
+        </div>
+        
+        <a href="index.html" class="home-btn">🏠 Ana Sayfa</a>
+
+        <div class="controls-hint" id="controlsHint">
+            Bilgisayar: Yön Tuşları | Mobil: Parmağınla Sürükle
+        </div>
+    </div>
+
+    <div id="menuScreen">
+        <h1>Hedef Avcısı 🩺</h1>
+        <p class="desc">
+            Düşen kitapları ve stetoskopları topla, virüslerden kaç! <br>
+            Tıp Fakültesi seni bekliyor.
+        </p>
+        <button class="btn" onclick="startGame()">BAŞLA 🚀</button>
+    </div>
+
+    <div id="gameOverScreen" class="hidden">
+        <h1 style="color: #ff3b3b;">Oyun Bitti!</h1>
+        <p class="desc">Skorun: <span id="finalScore" style="font-weight:bold; color:white;">0</span></p>
+        <button class="btn" onclick="startGame()">Tekrar Dene 🔄</button>
+        <a href="index.html"><button class="btn btn-secondary">Ana Sayfaya Dön 🏠</button></a>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Oyun Durumu
+        let isPlaying = false;
+        let score = 0;
+        let highScore = localStorage.getItem('drGameHighScore') || 0;
+        let gameSpeed = 3;
+        let spawnRate = 60; // Frame sayısı
+        let frameCount = 0;
+
+        // Ekran Boyutları
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Oyuncu Ayarları
+        const player = {
+            x: canvas.width / 2,
+            y: canvas.height - 100,
+            width: 60,
+            height: 60,
+            emoji: "👩‍⚕️", // Karakter
+            speed: 10,
+            targetX: canvas.width / 2 // Yumuşak hareket için hedef nokta
+        };
+
+        // Objeler
+        let items = [];
+        const itemTypes = [
+            { type: 'good', emoji: '📚', points: 10, speed: 1 }, // Kitap
+            { type: 'good', emoji: '🩺', points: 20, speed: 1.2 }, // Stetoskop
+            { type: 'good', emoji: '💊', points: 5, speed: 1 }, // İlaç
+            { type: 'good', emoji: '🎯', points: 50, speed: 1.5 }, // Tam Hedef (Nadir)
+            { type: 'bad', emoji: '🦠', damage: true, speed: 1.1 }, // Virüs
+            { type: 'bad', emoji: '📱', damage: true, speed: 1.3 }, // Telefon (Dikkat dağıtıcı)
+            { type: 'bad', emoji: '💤', damage: true, speed: 1 } // Uyku
+        ];
+
+        // Parçacık Efekti (Puan kazanınca çıkanlar)
+        let particles = [];
+
+        // --- GİRİŞ KONTROLLERİ ---
+        let keys = {};
+        
+        // PC (Klavye)
+        window.addEventListener('keydown', e => keys[e.key] = true);
+        window.addEventListener('keyup', e => keys[e.key] = false);
+
+        // MOBİL (Dokunmatik)
+        let isTouching = false;
+        
+        canvas.addEventListener('touchstart', e => {
+            isTouching = true;
+            updateTouchPos(e);
+        }, {passive: false});
+
+        canvas.addEventListener('touchmove', e => {
+            if(isPlaying) e.preventDefault(); // Sayfa kaymasın
+            updateTouchPos(e);
+        }, {passive: false});
+
+        canvas.addEventListener('touchend', () => isTouching = false);
+
+        function updateTouchPos(e) {
+            const touchX = e.touches[0].clientX;
+            // Oyuncuyu parmağın olduğu yere götür (sınırlar dahilinde)
+            player.targetX = touchX;
+        }
+
+        // --- OYUN DÖNGÜSÜ ---
+        function startGame() {
+            document.getElementById('menuScreen').classList.add('hidden');
+            document.getElementById('gameOverScreen').classList.add('hidden');
+            document.getElementById('controlsHint').style.display = 'none'; // Başlayınca ipucunu gizle
+            
+            // Sıfırla
+            score = 0;
+            gameSpeed = 3;
+            spawnRate = 60;
+            items = [];
+            particles = [];
+            player.x = canvas.width / 2;
+            player.targetX = player.x;
+            isPlaying = true;
+            
+            updateScoreUI();
+            gameLoop();
+        }
+
+        function gameOver() {
+            isPlaying = false;
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('drGameHighScore', highScore);
+            }
+            document.getElementById('finalScore').innerText = score;
+            document.getElementById('gameOverScreen').classList.remove('hidden');
+            updateScoreUI();
+        }
+
+        function update() {
+            if (!isPlaying) return;
+
+            // 1. Oyuncu Hareketi (Yumuşak Geçiş)
+            // PC: Klavye tuşlarına göre hedefi güncelle
+            if (!isTouching) {
+                if (keys['ArrowLeft'] || keys['a']) player.targetX -= player.speed;
+                if (keys['ArrowRight'] || keys['d']) player.targetX += player.speed;
+            }
+
+            // Sınırları Kontrol Et
+            if (player.targetX < player.width/2) player.targetX = player.width/2;
+            if (player.targetX > canvas.width - player.width/2) player.targetX = canvas.width - player.width/2;
+
+            // "Lerp" (Linear Interpolation) ile yumuşak hareket
+            player.x += (player.targetX - player.x) * 0.2;
+
+            // 2. Zorluk Artışı
+            frameCount++;
+            if (frameCount % 600 === 0) { // Her 10 saniyede bir hızlan
+                gameSpeed += 0.2;
+                if(spawnRate > 20) spawnRate -= 2;
+            }
+
+            // 3. Obje Oluşturma
+            if (frameCount % spawnRate === 0) {
+                spawnItem();
+            }
+
+            // 4. Objeleri Güncelle
+            for (let i = items.length - 1; i >= 0; i--) {
+                let item = items[i];
+                item.y += item.speed * gameSpeed;
+                item.rotation += 0.05;
+
+                // Çarpışma Kontrolü (Basit Mesafe Hesabı)
+                const dist = Math.hypot(player.x - item.x, player.y - item.y);
+                
+                if (dist < player.width / 2 + item.size / 2) {
+                    // Çarpışma Oldu
+                    if (item.type === 'good') {
+                        score += item.points;
+                        createParticles(item.x, item.y, '#00ff88'); // Yeşil efekt
+                    } else {
+                        createParticles(item.x, item.y, '#ff3b3b'); // Kırmızı efekt
+                        gameOver();
+                    }
+                    items.splice(i, 1); // Objeyi sil
+                    updateScoreUI();
+                    continue;
+                }
+
+                // Ekrandan çıktı mı?
+                if (item.y > canvas.height) {
+                    items.splice(i, 1);
+                }
+            }
+
+            // 5. Parçacıkları Güncelle
+            for (let i = particles.length - 1; i >= 0; i--) {
+                let p = particles[i];
+                p.x += p.vx;
+                p.y += p.vy;
+                p.alpha -= 0.02;
+                if (p.alpha <= 0) particles.splice(i, 1);
+            }
+        }
+
+        function draw() {
+            // Arka planı temizle
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Oyuncuyu Çiz
+            ctx.font = `${player.width}px Arial`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            // Hafif bir gölge efekti
+            ctx.shadowColor = "rgba(0,0,0,0.5)";
+            ctx.shadowBlur = 10;
+            ctx.fillText(player.emoji, player.x, player.y);
+            ctx.shadowBlur = 0;
+
+            // Objeleri Çiz
+            for (let item of items) {
+                ctx.save();
+                ctx.translate(item.x, item.y);
+                ctx.rotate(item.rotation);
+                ctx.font = `${item.size}px Arial`;
+                ctx.fillText(item.emoji, 0, 0);
+                ctx.restore();
+            }
+
+            // Parçacıkları Çiz
+            for (let p of particles) {
+                ctx.globalAlpha = p.alpha;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        function gameLoop() {
+            if (isPlaying) {
+                update();
+                draw();
+                requestAnimationFrame(gameLoop);
+            }
+        }
+
+        // --- YARDIMCI FONKSİYONLAR ---
+        function spawnItem() {
+            const typeInfo = itemTypes[Math.floor(Math.random() * itemTypes.length)];
+            const size = 40;
+            const x = Math.random() * (canvas.width - size) + size/2;
+            
+            items.push({
+                x: x,
+                y: -50,
+                size: size,
+                ...typeInfo,
+                rotation: Math.random() * Math.PI
+            });
+        }
+
+        function createParticles(x, y, color) {
+            for (let i = 0; i < 8; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 5,
+                    vy: (Math.random() - 0.5) * 5,
+                    size: Math.random() * 5 + 2,
+                    color: color,
+                    alpha: 1
+                });
+            }
+        }
+
+        function updateScoreUI() {
+            document.getElementById('scoreDisplay').innerText = score;
+            document.getElementById('highScoreDisplay').innerText = highScore;
+        }
+
+        // Pencere boyutu değişirse canvas'ı güncelle
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            // Oyuncuyu ekran içinde tut
+            player.y = canvas.height - 100;
+            player.x = canvas.width / 2; 
+            player.targetX = player.x;
+        });
+
+        // Başlangıçta skoru yükle
+        document.getElementById('highScoreDisplay').innerText = highScore;
+
+    </script>
+</body>
+</html>

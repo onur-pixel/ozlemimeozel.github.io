@@ -169,6 +169,26 @@
         🎀 2026 Panosu
     </button>
 </a>
+<a href="oyun.html" style="position: fixed; bottom: 230px; right: 20px; z-index: 1002; text-decoration: none;">
+    <button style="
+        background: linear-gradient(45deg, #00c6ff, #0072ff); 
+        color: white; 
+        border: none; 
+        padding: 12px 25px; 
+        border-radius: 50px; 
+        font-weight: 800; 
+        box-shadow: 0 0 15px rgba(0, 198, 255, 0.6); 
+        cursor: pointer; 
+        font-family: 'Poppins', sans-serif;
+        display: flex; 
+        align-items: center; 
+        gap: 8px;
+        transition: all 0.3s;"
+        onmouseover="this.style.transform='scale(1.1)'"
+        onmouseout="this.style.transform='scale(1)'">
+        🎮 Stres At
+    </button>
+</a>
 
 <style>
 @keyframes shake {
@@ -207,8 +227,20 @@
 
     <script>
         function hesapla(tarihStr) {
+            // 1. Gelen tarihi al (Örn: 2025-03-02)
             const baslangic = new Date(tarihStr);
-            const simdi = new Date();
+            
+            // 2. Şu anki tarihi TÜRKİYE saat dilimine (Europe/Istanbul) çevirerek al
+            // Bu kısım kullanıcının saati yanlış olsa bile veya farklı ülkede olsa bile
+            // Türkiye saatine göre 00:00'da günün değişmesini sağlar.
+            const simdi = new Date(new Date().toLocaleString("en-US", { timeZone: "Europe/Istanbul" }));
+
+            // 3. Saat farklarını sıfırla ki sadece takvim günü farkını alalım
+            // Böylece gece yarısı 00:00 olduğu an gün sayısı artar.
+            baslangic.setHours(0, 0, 0, 0);
+            simdi.setHours(0, 0, 0, 0);
+
+            // 4. Farkı hesapla (Milisaniye -> Gün)
             const farkMiliSaniye = simdi - baslangic;
             return Math.floor(farkMiliSaniye / (1000 * 60 * 60 * 24));
         }
@@ -221,8 +253,9 @@
 
         // Sayfa açıldığında çalıştır
         guncelle();
-        // Her 1 saatte bir arka planda kontrol et (opsiyonel)
-        setInterval(guncelle, 3600000);
+        
+        // Gece 00:00'ı yakalamak için periyodik kontrol (her dakika)
+        setInterval(guncelle, 60000);
     </script>
 </body>
 </html>
