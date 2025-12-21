@@ -3,105 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GİZLİ GÖREV: 1923 🕵️‍♂️</title>
-    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Black+Ops+One&display=swap" rel="stylesheet">
+    <title>GİZLİ GÖREV: MEGA PAKET 🕵️‍♂️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Black+Ops+One&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <style>
-        /* --- TEMA: GİZLİ AJAN / HACKER --- */
+        /* --- TEMA: CYBERPUNK / HACKER --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
-            background-color: #0d0d0d; 
-            color: #ccc;
-            font-family: 'Courier Prime', monospace;
+            background-color: #050505; 
+            color: #0f0;
+            font-family: 'Share Tech Mono', monospace;
             height: 100vh;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             overflow: hidden;
-            background-image: linear-gradient(0deg, transparent 24%, rgba(0, 255, 0, .03) 25%, rgba(0, 255, 0, .03) 26%, transparent 27%, transparent 74%, rgba(0, 255, 0, .03) 75%, rgba(0, 255, 0, .03) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(0, 255, 0, .03) 25%, rgba(0, 255, 0, .03) 26%, transparent 27%, transparent 74%, rgba(0, 255, 0, .03) 75%, rgba(0, 255, 0, .03) 76%, transparent 77%, transparent);
-            background-size: 50px 50px;
+            background-image: linear-gradient(rgba(0, 255, 0, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 255, 0, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* Glitch Efekti */
+        @keyframes glitch {
+            0% { transform: translate(0) }
+            20% { transform: translate(-2px, 2px) }
+            40% { transform: translate(-2px, -2px) }
+            60% { transform: translate(2px, 2px) }
+            80% { transform: translate(2px, -2px) }
+            100% { transform: translate(0) }
         }
 
         .container {
-            width: 90%; max-width: 600px;
-            background: rgba(20, 20, 20, 0.95);
-            border: 2px solid #333;
-            box-shadow: 0 0 30px rgba(0,0,0,0.8);
-            padding: 20px;
-            border-radius: 10px;
+            width: 95%; max-width: 600px;
+            background: rgba(10, 10, 10, 0.95);
+            border: 1px solid #333;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.2);
+            padding: 15px;
+            border-radius: 5px;
             position: relative;
-            min-height: 400px;
+            min-height: 500px;
             display: flex; flex-direction: column;
         }
 
-        /* Başlık */
         h1 {
             font-family: 'Black Ops One', cursive;
-            color: #e63946;
-            text-align: center;
-            letter-spacing: 2px;
-            margin-bottom: 10px;
-            text-shadow: 0 0 10px rgba(230, 57, 70, 0.5);
+            color: #e63946; text-align: center; letter-spacing: 2px;
+            margin-bottom: 10px; text-shadow: 0 0 10px rgba(230, 57, 70, 0.5);
+            animation: glitch 2s infinite;
         }
 
-        /* Durum Çubuğu */
         .status-bar {
             display: flex; justify-content: space-between;
-            border-bottom: 1px dashed #555;
-            padding-bottom: 10px; margin-bottom: 20px;
-            font-size: 0.8rem; color: #888;
+            border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px;
+            font-size: 0.9rem; color: #888;
         }
         .role-badge { color: #00e5ff; font-weight: bold; text-transform: uppercase; }
 
-        /* Oyun Alanı */
         .game-screen { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
         .hidden { display: none !important; }
 
         /* Mesaj Kutuları */
         .message-box {
-            background: #1a1a1a; border-left: 4px solid #fca311;
+            background: #111; border: 1px solid #444;
             padding: 15px; margin-bottom: 20px; text-align: left;
-            width: 100%; color: #eee; font-size: 1rem; line-height: 1.5;
+            width: 100%; color: #eee; font-size: 0.95rem; line-height: 1.5;
+            box-shadow: inset 0 0 20px rgba(0,0,0,1);
         }
-        .agent-view { border-color: #00e5ff; } /* Mavi: Onur */
-        .analyst-view { border-color: #d000ff; } /* Mor: Özlem */
+        .agent-view { border-left: 4px solid #00e5ff; } 
+        .analyst-view { border-left: 4px solid #d000ff; } 
 
-        /* Girdiler ve Butonlar */
+        /* Butonlar & Girdiler */
         button {
-            background: #333; color: #fff; border: 1px solid #555;
-            padding: 12px 25px; font-family: 'Courier Prime', monospace;
-            font-size: 1rem; font-weight: bold; cursor: pointer;
-            transition: 0.3s; margin-top: 10px; width: 100%;
+            background: #1a1a1a; color: #0f0; border: 1px solid #0f0;
+            padding: 15px; font-family: 'Share Tech Mono', monospace;
+            font-size: 1.1rem; font-weight: bold; cursor: pointer;
+            transition: 0.2s; margin-top: 10px; width: 100%;
+            text-transform: uppercase; letter-spacing: 1px;
         }
-        button:hover { background: #e63946; border-color: #e63946; color: #fff; }
-        button:disabled { opacity: 0.5; cursor: not-allowed; background: #222; border-color: #333; }
-
+        button:hover { background: #0f0; color: #000; box-shadow: 0 0 15px #0f0; }
+        
         input {
-            background: #000; border: 1px solid #444; color: #00e5ff;
-            padding: 10px; width: 100%; font-family: 'Courier Prime', monospace;
-            font-size: 1.5rem; text-align: center; letter-spacing: 5px; margin-bottom: 15px;
+            background: #000; border: 1px solid #333; color: #0f0;
+            padding: 10px; width: 100%; font-family: 'Share Tech Mono', monospace;
+            font-size: 1.5rem; text-align: center; letter-spacing: 3px; margin-bottom: 15px;
         }
 
-        /* --- BULMACA ÖZEL EFEKTLERİ --- */
-        /* Kablo Kesme */
-        .wires-container { display: flex; gap: 15px; justify-content: center; margin: 20px 0; }
-        .wire { width: 30px; height: 100px; border-radius: 5px; cursor: pointer; position: relative; border: 2px solid rgba(255,255,255,0.2); }
-        .wire::after { content: ''; position: absolute; width: 100%; height: 100%; background: inherit; opacity: 0.6; }
-        .wire.cut { height: 40px; margin-top: 30px; opacity: 0.3; cursor: default; }
+        /* --- ÖZEL OYUN ELEMENTLERİ --- */
         
-        /* Radyo */
-        .radio-display { font-size: 2.5rem; color: #e63946; font-family: 'Black Ops One'; margin-bottom: 10px; }
-        input[type=range] { width: 100%; accent-color: #e63946; }
-
-        .scan-line {
-            width: 100%; height: 2px; background: rgba(0, 255, 0, 0.3);
-            position: absolute; top: 0; left: 0; animation: scan 3s linear infinite; pointer-events: none;
+        /* 1. Binary Anahtarlar */
+        .switch-container { display: flex; gap: 10px; margin: 20px 0; }
+        .switch { 
+            width: 50px; height: 50px; border: 2px solid #555; 
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; cursor: pointer; user-select: none;
+            background: #222; color: #555;
         }
-        @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
-        
+        .switch.active { border-color: #0f0; color: #0f0; background: #001a00; text-shadow: 0 0 10px #0f0; }
+
+        /* 2. Renk Tüpleri */
+        .vial-container { display: flex; gap: 15px; margin: 20px 0; }
+        .vial { 
+            width: 40px; height: 80px; border: 2px solid #fff; border-radius: 0 0 20px 20px;
+            position: relative; overflow: hidden; cursor: pointer;
+        }
+        .vial::after { content:''; position: absolute; bottom:0; left:0; width:100%; height: 0%; transition: 0.3s; }
+        .vial.red::after { background: #ff3b3b; }
+        .vial.green::after { background: #0f0; }
+        .vial.blue::after { background: #00e5ff; }
+        .vial.filled::after { height: 80%; }
+
+        /* 3. Mors Işığı */
+        .morse-light {
+            width: 50px; height: 50px; border-radius: 50%; background: #333;
+            margin: 20px auto; border: 2px solid #555;
+            transition: 0.1s;
+        }
+        .morse-light.on { background: #fff; box-shadow: 0 0 30px #fff; border-color: #fff; }
+
+        /* 4. Koordinat Izgarası */
+        .grid-container { 
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin: 20px auto; width: 200px; 
+        }
+        .grid-cell {
+            height: 50px; border: 1px solid #0f0; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 1.2rem;
+        }
+        .grid-cell:hover { background: rgba(0, 255, 0, 0.2); }
+        .grid-cell.selected { background: #0f0; color: #000; }
+
         .home-icon { position: absolute; top: 15px; right: 15px; text-decoration: none; font-size: 1.5rem; z-index: 100; filter: grayscale(100%); transition: 0.3s; }
         .home-icon:hover { filter: grayscale(0%); transform: scale(1.1); }
+        
+        .success-anim { animation: pop 0.5s ease-out; color: #0f0; font-size: 2rem; position: absolute; }
+        @keyframes pop { 0% { transform: scale(0); opacity: 0; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1); opacity: 0; } }
 
     </style>
 </head>
@@ -110,105 +145,97 @@
     <a href="index.html" class="home-icon">🏠</a>
 
     <div class="container">
-        <div class="scan-line"></div>
-        <h1>GİZLİ DOSYA: 1923</h1>
+        <h1>GİZLİ DOSYA: MEGA</h1>
 
         <div id="statusBar" class="status-bar hidden">
             <span>AJAN: <span id="playerRole" class="role-badge">...</span></span>
-            <span>GÖREV: <span id="levelIndicator">1</span>/4</span>
+            <span>BÖLÜM: <span id="levelIndicator">1</span>/10</span>
         </div>
 
         <div id="loginScreen" class="game-screen">
-            <p style="margin-bottom: 20px; font-size: 1.1rem;">GÜVENLİK PROTOKOLÜ BAŞLATILIYOR...</p>
-            <p style="color: #666; font-size: 0.8rem; margin-bottom: 30px;">Lütfen kimlik doğrulaması yapın.</p>
+            <p style="margin-bottom: 20px; font-size: 1.1rem; color:#0f0;">SİSTEME BAĞLANILIYOR...</p>
             
             <button onclick="selectRole('onur')" style="border-left: 5px solid #00e5ff;">BEN ONUR (SAHA AJANI)</button>
-            <p style="font-size: 0.7rem; color:#444; margin: 5px 0 20px;">Görev: Kilitleri açmak, bombaları imha etmek.</p>
+            <p style="font-size: 0.7rem; color:#666; margin: 5px 0 20px;">Fiziksel müdahale yetkisi.</p>
 
-            <button onclick="selectRole('ozlem')" style="border-left: 5px solid #d000ff;">BEN ÖZLEM (İSTİHBARAT)</button>
-            <p style="font-size: 0.7rem; color:#444; margin: 5px 0;">Görev: Şifreleri çözmek, ajanı yönlendirmek.</p>
+            <button onclick="selectRole('ozlem')" style="border-left: 5px solid #d000ff;">BEN ÖZLEM (HACKER)</button>
+            <p style="font-size: 0.7rem; color:#666; margin: 5px 0;">Veri akışı ve şifre çözme.</p>
         </div>
 
         <div id="lobbyScreen" class="game-screen hidden">
-            <h2 style="color: #fca311;">BAĞLANTI KURULUYOR...</h2>
-            <p class="blink" style="margin-top: 20px; color: #888;">Diğer ajan bekleniyor.</p>
+            <h2 style="color: #fca311;">AĞ BEKLENİYOR...</h2>
+            <div style="width: 50px; height: 50px; border: 5px solid #333; border-top-color: #fca311; border-radius: 50%; animation: spin 1s infinite; margin: 20px auto;"></div>
             <p id="lobbyStatus" style="margin-top: 10px; font-size: 0.8rem; color: #00e5ff;">...</p>
+            <button onclick="resetGame()" style="margin-top: 50px; border-color: #333; color: #555; font-size: 0.7rem;">Sistemi Resetle (Acil)</button>
         </div>
+        <style>@keyframes spin { 100% { transform: rotate(360deg); } }</style>
 
-        <div id="gameContent" class="game-screen hidden">
-            </div>
+        <div id="gameContent" class="game-screen hidden"></div>
 
         <div id="victoryScreen" class="game-screen hidden">
-            <h1 style="color: #00ff88; text-shadow: 0 0 20px #00ff88;">GÖREV BAŞARILI!</h1>
-            <p>Dünyayı kurtardınız ajanlar.</p>
-            <p style="margin-top: 20px; color: #ccc;">Harika bir takımsınız! 💜💙</p>
-            <button onclick="location.reload()">YENİ GÖREV BAŞLAT</button>
+            <h1 style="color: #00ff88; text-shadow: 0 0 20px #00ff88;">GÖREV TAMAMLANDI</h1>
+            <p>10 Bölümlük İmkansız Görev Başarıldı.</p>
+            <p style="margin-top: 20px; font-size: 2rem;">🏆</p>
+            <p style="margin-top: 20px; color: #ccc;">Onur & Özlem: Efsane Takım</p>
+            <button onclick="resetGame()">BAŞA SAR</button>
         </div>
-
     </div>
 
     <script>
-        // --- FIREBASE AYARLARI (Senin Kodların) ---
+        // ============================================================
+        // 🔥 BURAYA KENDİ FIREBASE AYARLARINI YAPIŞTIRMAYI UNUTMA! 🔥
+        // (Eski dosyadaki const firebaseConfig = {...} kısmını al)
+        // ============================================================
+        
+        // EĞER YAPISTIRMAZSAN ÇALIŞMAZ! AŞAĞIDAKİ ÖRNEKTİR:
         const firebaseConfig = {
-          apiKey: "AIzaSyBHejjQe2dHnwDYES3Qd30HKO94-_D5lVA",
-          authDomain: "ask-oyunu-5d368.firebaseapp.com",
-          databaseURL: "https://ask-oyunu-5d368-default-rtdb.firebaseio.com",
-          projectId: "ask-oyunu-5d368",
-          storageBucket: "ask-oyunu-5d368.firebasestorage.app",
-          messagingSenderId: "550862375128",
-          appId: "1:550862375128:web:fb49cef5e3c5440d996fad",
-          measurementId: "G-T1GCW04QD0"
+            apiKey: "AIzaSyBHejjQe2dHnwDYES3Qd30HKO94-_D5lVA",
+            authDomain: "ask-oyunu-5d368.firebaseapp.com",
+            databaseURL: "https://ask-oyunu-5d368-default-rtdb.firebaseio.com",
+            projectId: "ask-oyunu-5d368",
+            storageBucket: "ask-oyunu-5d368.firebasestorage.app",
+            messagingSenderId: "550862375128",
+            appId: "1:550862375128:web:fb49cef5e3c5440d996fad",
+            measurementId: "G-T1GCW04QD0"
         };
+        // ============================================================
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        const gameRef = db.ref('detective_game');
+        try {
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.database();
+            console.log("Bağlandı");
+        } catch(e) {
+            console.error(e);
+        }
 
-        // --- OYUN DEĞİŞKENLERİ ---
-        let myRole = ""; // 'onur' veya 'ozlem'
+        const gameRef = firebase.database().ref('mega_game');
+        let myRole = ""; 
         let currentLevel = 1;
 
-        // --- 1. ROL SEÇİMİ ---
         function selectRole(role) {
             myRole = role;
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('lobbyScreen').classList.remove('hidden');
-            
             document.getElementById('statusBar').classList.remove('hidden');
             document.getElementById('playerRole').innerText = role.toUpperCase();
             document.getElementById('playerRole').style.color = role === 'onur' ? '#00e5ff' : '#d000ff';
 
-            // Firebase'e bağlandığını bildir
             gameRef.child('players/' + role).set(true);
-
-            // Oyunu dinle
             listenToGame();
         }
 
-        // --- 2. OYUN DÖNGÜSÜ ---
         function listenToGame() {
-            // Seviye takibi
             gameRef.child('level').on('value', (snapshot) => {
                 const level = snapshot.val() || 1;
                 currentLevel = level;
                 document.getElementById('levelIndicator').innerText = level;
-
-                // Eğer 5. seviyeye gelindiyse oyun bitti
-                if (level > 4) {
-                    showScreen('victoryScreen');
-                } else {
-                    renderLevel(level);
-                }
+                if (level > 10) showScreen('victoryScreen'); // 10 BÖLÜM
+                else renderLevel(level);
             });
 
-            // Lobi kontrolü (İki oyuncu da geldi mi?)
             gameRef.child('players').on('value', (snapshot) => {
                 const players = snapshot.val();
                 if (players && players.onur && players.ozlem) {
-                    // İkisi de hazırsa oyunu başlat (seviye 1 değilse bile mevcut seviyeden devam et)
-                    gameRef.child('level').get().then((snap) => {
-                         if(!snap.exists()) gameRef.child('level').set(1);
-                    });
                     showScreen('gameContent');
                 } else {
                     document.getElementById('lobbyStatus').innerText = 
@@ -224,193 +251,141 @@
             document.getElementById(screenId).classList.remove('hidden');
         }
 
-        // --- 3. SEVİYE TASARIMLARI (Senaryolar) ---
+        // --- BÖLÜM TASARIMLARI (MEGA PAKET) ---
         function renderLevel(level) {
             const container = document.getElementById('gameContent');
-            container.innerHTML = ""; // Temizle
-
             let html = "";
+            const isOzlem = myRole === 'ozlem';
 
-            // ---------------------------------------------------------
-            // SEVİYE 1: RADYO FREKANSI
-            // ---------------------------------------------------------
+            // LEVEL 1: RADYO (KLASİK)
             if (level === 1) {
-                if (myRole === 'ozlem') {
-                    // Özlem (Analist) Görünümü
-                    html = `
-                        <div class="message-box analyst-view">
-                            <h3>📜 İSTİHBARAT RAPORU #1</h3>
-                            <p>Düşman sığınağına sızdık. Ajan Onur bir radyo vericisi bulacak.</p>
-                            <p>Doğru frekans kodunu ona söylemelisin:</p>
-                            <h2 style="color:#d000ff; text-align:center; font-size:2rem; margin-top:10px;">104.5 MHz</h2>
-                            <p style="font-size:0.8rem; margin-top:10px;">(Sakın yanlış frekansı ayarlamasına izin verme!)</p>
-                        </div>
-                        <p>Ajanın frekansı ayarlamasını bekle...</p>
-                    `;
-                } else {
-                    // Onur (Ajan) Görünümü
-                    html = `
-                        <div class="message-box agent-view">
-                            <h3>📻 SAHA GÖREVİ</h3>
-                            <p>Eski bir radyo cihazı buldun. Sinyal karıştırılıyor.</p>
-                            <p>İstihbarat şefine (Özlem) sor: Hangi frekansa ayarlamalıyım?</p>
-                        </div>
-                        <div class="radio-display" id="freqDisplay">88.0 MHz</div>
-                        <input type="range" min="88" max="108" step="0.5" value="88" oninput="updateFreq(this.value)">
-                        <button onclick="checkLevel1()">FREKANSI ONAYLA</button>
-                    `;
-                }
+                if (isOzlem) html = msgBox("analyst", "Radyo Frekansı: 92.4 MHz", "Onur'a söyle ayarlaması lazım.");
+                else html = msgBox("agent", "Radyo Sinyali Gerekli", "Frekans kaç?") + 
+                    `<div style="font-size:2rem; color:#e63946" id="val1">88.0</div><input type="range" min="88" max="108" step="0.1" oninput="document.getElementById('val1').innerText=this.value; checkLvl1(this.value)">`;
             }
-            
-            // ---------------------------------------------------------
-            // SEVİYE 2: ŞİFRELİ KASA
-            // ---------------------------------------------------------
+            // LEVEL 2: ŞİFRE (TERS)
             else if (level === 2) {
-                if (myRole === 'ozlem') {
-                    html = `
-                        <div class="message-box analyst-view">
-                            <h3>📜 İSTİHBARAT RAPORU #2</h3>
-                            <p>Ajan kilitli bir kapı buldu. Şifre, Cumhuriyetimizin ilan edildiği yıldır.</p>
-                            <p>Ama dikkatli ol, şifreyi tersten girmesi gerekiyor!</p>
-                            <h2 style="color:#d000ff; text-align:center; margin-top:10px;">Şifre: 1923</h2>
-                            <p style="color:#ff3b3b; font-weight:bold; text-align:center;">GİRİLECEK KOD: 3291</p>
-                        </div>
-                        <p>Ajanın şifreyi girmesini bekle...</p>
-                    `;
-                } else {
-                    html = `
-                        <div class="message-box agent-view">
-                            <h3>🔒 DİJİTAL KİLİT</h3>
-                            <p>Kapıda 4 haneli bir şifre paneli var.</p>
-                            <p>Özlem'e sor: Şifre nedir? (Ters girilmesi gerekebilir!)</p>
-                        </div>
-                        <input type="number" id="passcode" placeholder="____" maxlength="4">
-                        <button onclick="checkLevel2()">KİLİDİ AÇ</button>
-                    `;
-                }
+                if (isOzlem) html = msgBox("analyst", "Şifre: 2025", "Ama klavye bozuk! Rakamları tersten girmeli.");
+                else html = msgBox("agent", "Kapı Şifresi", "Özlem kod nedir? (Dikkatli ol)") + `<input id="inp2" type="number" placeholder="____"><button onclick="checkLvl2()">GİRİŞ</button>`;
             }
-
-            // ---------------------------------------------------------
-            // SEVİYE 3: BOMBA İMHASI (KABLOLAR)
-            // ---------------------------------------------------------
+            // LEVEL 3: KABLO (RENK)
             else if (level === 3) {
-                if (myRole === 'ozlem') {
-                    html = `
-                        <div class="message-box analyst-view">
-                            <h3>💣 BOMBA İMHA KILAVUZU</h3>
-                            <p>Sakin ol! Onur bir bomba mekanizmasıyla karşı karşıya.</p>
-                            <p>Talimatları sırasıyla okumalısın:</p>
-                            <ul style="margin-left:20px; margin-top:10px;">
-                                <li>1. ASLA Kırmızı kabloyu kesme.</li>
-                                <li>2. Eğer Sarı kablo varsa, Mavi kabloyu kes.</li>
-                                <li>3. Sadece MAVİ kabloyu kesmelisin.</li>
-                            </ul>
-                        </div>
-                        <p>Ajanın doğru kabloyu kesmesini bekle...</p>
-                    `;
-                } else {
-                    html = `
-                        <div class="message-box agent-view">
-                            <h3>⚠️ TEHLİKE: BOMBA</h3>
-                            <p>Zamanlayıcı işliyor! Hangi kabloyu kesmeliyim?</p>
-                            <p>Özlem'in talimatlarını bekle. Yanlış kablo = BOOM.</p>
-                        </div>
-                        <div class="wires-container">
-                            <div class="wire" style="background:red;" onclick="cutWire('red')"></div>
-                            <div class="wire" style="background:blue;" onclick="cutWire('blue')"></div>
-                            <div class="wire" style="background:yellow;" onclick="cutWire('yellow')"></div>
-                            <div class="wire" style="background:green;" onclick="cutWire('green')"></div>
-                        </div>
-                        <p id="wireStatus" style="color:red; height:20px;"></p>
-                    `;
-                }
+                if (isOzlem) html = msgBox("analyst", "Bomba İmha", "1. Kırmızı YASAK.\n2. Yeşil KESİLMEZ.\n3. HEDEF: MAVİ.");
+                else html = msgBox("agent", "Bomba Kabloları", "Hangisini keseyim?") + `<div class="vial-container" style="justify-content:center"><button style="background:red;width:50px;" onclick="fail()">X</button><button style="background:blue;width:50px;" onclick="pass()">X</button><button style="background:green;width:50px;" onclick="fail()">X</button></div>`;
             }
-            
-            // ---------------------------------------------------------
-            // SEVİYE 4: SON DOĞRULAMA (SEVGİ TESTİ)
-            // ---------------------------------------------------------
+            // LEVEL 4: BINARY (MATRİX)
             else if (level === 4) {
-                 if (myRole === 'ozlem') {
-                    html = `
-                        <div class="message-box analyst-view">
-                            <h3>❤️ SON GÜVENLİK DUVARI</h3>
-                            <p>Sistem son bir sesli doğrulama istiyor.</p>
-                            <p>Onur'a şunu sor: "Bizim sonsuzluk tarihimiz ne?"</p>
-                            <p>Cevabı sen de girmelisin, o da girmeli!</p>
-                            <h2 style="color:#d000ff; text-align:center;">17.03.2025</h2>
-                        </div>
-                        <input type="text" id="finalDate" placeholder="GG.AA.YYYY">
-                        <button onclick="checkLevel4()">ONAYLA</button>
-                    `;
-                } else {
-                    html = `
-                        <div class="message-box agent-view">
-                            <h3>❤️ SİSTEM KİLİDİ</h3>
-                            <p>Ana bilgisayara eriştin. Son şifre "Sonsuzluk Tarihiniz".</p>
-                            <p>Özlem ile aynı anda doğru tarihi girmelisiniz.</p>
-                        </div>
-                        <input type="text" id="finalDate" placeholder="GG.AA.YYYY">
-                        <button onclick="checkLevel4()">ONAYLA</button>
-                    `;
-                }
+                if (isOzlem) html = msgBox("analyst", "Binary Kod", "Anahtarları şu sırayla aç:\n\n1 - 0 - 1 - 1\n(Açık - Kapalı - Açık - Açık)");
+                else html = msgBox("agent", "Sunucu Anahtarları", "Hangi şalterler kalkacak?") + 
+                    `<div class="switch-container">
+                        <div id="sw1" class="switch" onclick="toggle(1)">0</div>
+                        <div id="sw2" class="switch" onclick="toggle(2)">0</div>
+                        <div id="sw3" class="switch" onclick="toggle(3)">0</div>
+                        <div id="sw4" class="switch" onclick="toggle(4)">0</div>
+                     </div><button onclick="checkLvl4()">KONTROL ET</button>`;
+            }
+            // LEVEL 5: MORS ALFABESİ (IŞIK)
+            else if (level === 5) {
+                if (isOzlem) html = msgBox("analyst", "Mors Şifresi", "Uzun Yanma = Çizgi (-)\nKısa Yanma = Nokta (.)\n\nŞifre: S O S (... --- ...)") + `<div class="morse-light" id="mlight"></div><button onclick="playMorse()">IŞIĞI GÖNDER</button>`;
+                else html = msgBox("agent", "Işıklı Mesaj", "Özlem sana bir ışık sinyali gönderecek. Ne diyor?") + `<input id="inp5" style="text-transform:uppercase" placeholder="MESAJ"><button onclick="checkLvl5()">ÇÖZ</button>`;
+            }
+            // LEVEL 6: KİMYASAL (SIRA)
+            else if (level === 6) {
+                if (isOzlem) html = msgBox("analyst", "Kimyasal Formül", "Karışım Sırası:\n1. KIRMIZI\n2. YEŞİL\n3. MAVİ\n(Sıra önemli!)");
+                else html = msgBox("agent", "Laboratuvar", "Tüpleri hangi sırayla dökeyim?") + 
+                    `<div class="vial-container" style="justify-content:center">
+                        <div class="vial red" onclick="addMix('K')"></div>
+                        <div class="vial green" onclick="addMix('Y')"></div>
+                        <div class="vial blue" onclick="addMix('M')"></div>
+                     </div><p id="mixRes">Karışım: </p><button onclick="checkLvl6()">KARIŞTIR</button><button onclick="mix=''">SIFIRLA</button>`;
+            }
+            // LEVEL 7: KOORDİNAT (İZGARADA BULMA)
+            else if (level === 7) {
+                if (isOzlem) html = msgBox("analyst", "Hedef Konum", "Uydu görüntüsü:\nHedefimiz B2 karesinde.");
+                else html = msgBox("agent", "Füze Kilitlenmesi", "Hedef hangi kare?") + 
+                    `<div class="grid-container">
+                        <div class="grid-cell" onclick="checkLvl7('A1')">A1</div><div class="grid-cell" onclick="checkLvl7('A2')">A2</div><div class="grid-cell" onclick="checkLvl7('A3')">A3</div>
+                        <div class="grid-cell" onclick="checkLvl7('B1')">B1</div><div class="grid-cell" onclick="checkLvl7('B2')">B2</div><div class="grid-cell" onclick="checkLvl7('B3')">B3</div>
+                    </div>`;
+            }
+            // LEVEL 8: MANTIK (RENK HESABI)
+            else if (level === 8) {
+                if (isOzlem) html = msgBox("analyst", "Renk Hesabı", "Kırmızı = 5\nMavi = 3\nKod = Kırmızı + Mavi");
+                else html = msgBox("agent", "Matematiksel Kilit", "Kod kaç?") + `<input id="inp8" type="number"><button onclick="checkLvl8()">GİR</button>`;
+            }
+            // LEVEL 9: SESLİ KOMUT (YÖN)
+            else if (level === 9) {
+                if (isOzlem) html = msgBox("analyst", "Labirent Haritası", "Çıkış yolu:\nSAĞ - SOL - SAĞ");
+                else html = msgBox("agent", "Karanlık Tünel", "Hangi yöne gitmeliyim?") + 
+                    `<button onclick="addDir('SOL')">SOL ⬅️</button><button onclick="addDir('SAĞ')">SAĞ ➡️</button><p id="dirRes">Yol: </p><button onclick="checkLvl9()">GİT</button><button onclick="dirs=''">SIFIRLA</button>`;
+            }
+            // LEVEL 10: FİNAL (TARİH)
+            else if (level === 10) {
+                if (isOzlem) html = msgBox("analyst", "SON GÖREV", "Dünyayı kurtarmak için o tarihi gir:\n17.03.2025");
+                else html = msgBox("agent", "KIYAMET SAATİ", "Durdurma Kodu (Tarih):") + `<input id="inp10" placeholder="GG.AA.YYYY"><button onclick="checkLvl10()">DURDUR</button>`;
             }
 
             container.innerHTML = html;
         }
 
-        // --- GÖREV KONTROL FONKSİYONLARI (Onur için) ---
+        // --- YARDIMCI FONKSİYONLAR ---
+        function msgBox(type, title, text) {
+            return `<div class="message-box ${type === 'analyst' ? 'analyst-view' : 'agent-view'}"><h3>${title}</h3><pre style="font-family:inherit; white-space:pre-wrap">${text}</pre></div>`;
+        }
+
+        function pass() { nextLevel(); }
+        function fail() { alert("HATA! Sistem Kilitlendi (Tekrar Dene)"); }
         
-        // Level 1: Radyo
-        let currentFreq = 88;
-        function updateFreq(val) {
-            currentFreq = val;
-            document.getElementById('freqDisplay').innerText = val + " MHz";
-        }
-        function checkLevel1() {
-            if (currentFreq == 104.5) {
-                nextLevel();
-            } else {
-                alert("Hatalı Frekans! Sinyal alınamıyor.");
-            }
-        }
-
-        // Level 2: Şifre
-        function checkLevel2() {
-            const pass = document.getElementById('passcode').value;
-            if (pass === "3291") {
-                nextLevel();
-            } else {
-                alert("Erişim Reddedildi! Şifre yanlış.");
-            }
-        }
-
-        // Level 3: Kablo
-        function cutWire(color) {
-            if (color === 'blue') {
-                document.getElementById('wireStatus').innerText = "Bomba İmha Edildi!";
-                setTimeout(nextLevel, 1000);
-            } else {
-                alert("YANLIŞ KABLO! SİSTEM KİLİTLENDİ! (Tekrar dene)");
-            }
-        }
-
-        // Level 4: Son Tarih (Her ikisi de basmalı)
-        function checkLevel4() {
-            const date = document.getElementById('finalDate').value;
-            if (date === "17.03.2025" || date === "17/03/2025") {
-                // Burada basit bir hile yapıyoruz, kim doğru girerse seviyeyi bitirir.
-                // Normalde ikisinin de onayı beklenir ama tek dosya için bu yeterli.
-                nextLevel(); 
-            } else {
-                alert("Tarih eşleşmedi!");
-            }
-        }
-
-        // --- SEVİYE ATLAMA ---
         function nextLevel() {
-            gameRef.child('level').transaction((current) => {
-                return (current || 1) + 1;
+            gameRef.child('level').transaction(c => (c || 1) + 1);
+        }
+
+        function resetGame() {
+            gameRef.set({ level: 1, players: { onur: false, ozlem: false } });
+            location.reload();
+        }
+
+        // --- LEVEL MANTIKLARI ---
+        // L1
+        function checkLvl1(val) { if(val == 92.4) pass(); }
+        // L2
+        function checkLvl2() { if(document.getElementById('inp2').value == "5202") pass(); else fail(); }
+        // L4
+        let swState = [0,0,0,0];
+        function toggle(id) { 
+            swState[id-1] = swState[id-1] ? 0 : 1; 
+            document.getElementById('sw'+id).innerText = swState[id-1];
+            document.getElementById('sw'+id).classList.toggle('active');
+        }
+        function checkLvl4() { if(swState.join('') === "1011") pass(); else fail(); }
+        // L5
+        function playMorse() {
+            const light = document.getElementById('mlight');
+            const pattern = [200, 200, 200, 600, 600, 600, 200, 200, 200]; // SOS Timing
+            let delay = 0;
+            pattern.forEach((dur, i) => {
+                setTimeout(() => { light.classList.add('on'); }, delay);
+                setTimeout(() => { light.classList.remove('on'); }, delay + (i > 2 && i < 6 ? 600 : 200)); // Uzun/Kısa yanma
+                delay += (i > 2 && i < 6 ? 800 : 400);
             });
+        }
+        function checkLvl5() { if(document.getElementById('inp5').value.toUpperCase() === "SOS") pass(); else fail(); }
+        // L6
+        let mix = "";
+        function addMix(c) { mix += c; document.getElementById('mixRes').innerText += c + " > "; }
+        function checkLvl6() { if(mix === "KYM") pass(); else fail(); }
+        // L7
+        function checkLvl7(coord) { if(coord === "B2") pass(); else fail(); }
+        // L8
+        function checkLvl8() { if(document.getElementById('inp8').value == "8") pass(); else fail(); }
+        // L9
+        let dirs = "";
+        function addDir(d) { dirs += d; document.getElementById('dirRes').innerText += d + " "; }
+        function checkLvl9() { if(dirs === "SAĞSOLSAĞ") pass(); else fail(); }
+        // L10
+        function checkLvl10() { 
+            const d = document.getElementById('inp10').value; 
+            if(d === "17.03.2025" || d === "17/03/2025") pass(); else fail(); 
         }
 
     </script>
