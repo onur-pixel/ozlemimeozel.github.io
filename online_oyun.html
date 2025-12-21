@@ -3,146 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GÖREV: SENKRONİZE KAOS ⚡</title>
-    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <title>ZİHİN BAĞI: CO-OP PUZZLE 🧠</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <style>
-        /* --- TEMA: MATRIX / RETRO --- */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        /* --- TEMA: MODERN / FERAH / GLASSMORPHISM --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
         body { 
-            background-color: #000; 
-            color: #33ff00;
-            font-family: 'VT323', monospace;
+            background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
             height: 100vh;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             overflow: hidden;
-            text-transform: uppercase;
-            user-select: none;
+            color: #4a4a4a;
         }
 
-        /* CRT Tarama Çizgileri */
-        body::after {
-            content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            z-index: 2; background-size: 100% 2px, 3px 100%; pointer-events: none;
+        /* Arka Plan Baloncukları */
+        .bg-shape {
+            position: absolute; border-radius: 50%; filter: blur(50px); z-index: 0; animation: float 10s infinite alternate;
         }
+        .shape1 { width: 300px; height: 300px; background: #8ec5fc; top: -50px; left: -50px; }
+        .shape2 { width: 250px; height: 250px; background: #e0c3fc; bottom: -50px; right: -50px; animation-delay: 2s; }
 
+        @keyframes float { 0% { transform: translate(0, 0); } 100% { transform: translate(30px, 50px); } }
+
+        /* Ana Kutu */
         .container {
-            width: 95%; max-width: 600px;
-            border: 2px solid #33ff00;
-            padding: 15px;
-            background: #050505;
-            box-shadow: 0 0 25px rgba(51, 255, 0, 0.2);
-            position: relative;
-            z-index: 10;
-            min-height: 550px;
-            display: flex; flex-direction: column;
-            border-radius: 10px;
+            width: 90%; max-width: 500px;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            position: relative; z-index: 10;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.5);
+            min-height: 500px; display: flex; flex-direction: column; justify-content: space-between;
         }
 
-        h1 { font-size: 2rem; text-align: center; margin-bottom: 15px; text-shadow: 2px 2px #004400; letter-spacing: 3px; }
-
-        .info-bar { 
-            display: flex; justify-content: space-between; 
-            border-bottom: 2px dashed #33ff00; 
-            padding-bottom: 10px; margin-bottom: 20px; 
-            font-size: 1.2rem; 
-        }
+        h1 { color: #6a11cb; font-weight: 800; margin-bottom: 10px; font-size: 1.8rem; }
         
+        /* Level Göstergesi */
+        .level-badge {
+            background: #6a11cb; color: white; padding: 5px 15px; border-radius: 20px;
+            font-size: 0.9rem; font-weight: bold; display: inline-block; margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.3);
+        }
+
+        /* Ekranlar */
         .screen { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; }
         .hidden { display: none !important; }
 
-        /* ROL GÖSTERGESİ */
-        .role-indicator {
-            padding: 10px; width: 100%; text-align: center; font-size: 1.5rem; margin-bottom: 20px;
-            border: 1px solid; animation: pulse 2s infinite;
+        /* İpucu Kutuları */
+        .clue-box {
+            background: #fff; border-radius: 15px; padding: 20px; width: 100%;
+            margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-left: 5px solid; text-align: left;
         }
-        .role-active { border-color: #00ff88; color: #00ff88; background: #001100; }
-        .role-passive { border-color: #ffff00; color: #ffff00; background: #111100; }
-
-        /* Mesaj Kutuları */
-        .msg-box {
-            width: 100%; border: 1px solid #33ff00; padding: 20px; margin-bottom: 20px; text-align: center;
-            font-size: 1.5rem; line-height: 1.4; background: #000; color: #fff;
-        }
+        .clue-onur { border-color: #00e5ff; }
+        .clue-ozlem { border-color: #d000ff; }
         
-        /* Butonlar & Girdiler */
+        .clue-title { font-size: 0.8rem; text-transform: uppercase; color: #888; margin-bottom: 5px; font-weight: bold; }
+        .clue-text { font-size: 1.2rem; font-weight: 600; color: #333; }
+
+        /* Butonlar & Inputlar */
         button {
-            background: #000; color: #33ff00; border: 2px solid #33ff00;
-            padding: 15px; font-family: 'VT323', monospace; font-size: 1.5rem;
-            cursor: pointer; margin-top: 10px; width: 100%; transition: 0.1s;
+            background: linear-gradient(45deg, #6a11cb, #2575fc);
+            color: white; border: none; padding: 15px 30px; border-radius: 50px;
+            font-size: 1.1rem; font-weight: bold; cursor: pointer;
+            width: 100%; transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px; box-shadow: 0 5px 15px rgba(37, 117, 252, 0.3);
         }
-        button:hover { background: #33ff00; color: #000; box-shadow: 0 0 15px #33ff00; }
-        
+        button:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37, 117, 252, 0.4); }
+        button:active { transform: scale(0.98); }
+
         input {
-            background: #000; border: 2px solid #33ff00; color: #33ff00;
-            padding: 10px; width: 100%; font-family: 'VT323', monospace;
-            font-size: 2rem; text-align: center; margin-bottom: 15px; outline: none;
+            width: 100%; padding: 15px; border-radius: 15px; border: 2px solid #ddd;
+            font-size: 1.5rem; text-align: center; margin-bottom: 15px; outline: none;
+            transition: 0.3s; background: rgba(255,255,255,0.9);
         }
+        input:focus { border-color: #6a11cb; box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.1); }
 
-        /* --- BULMACA STİLLERİ --- */
-        .grid-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width: 100%; }
-        .grid-cell { 
-            height: 60px; border: 1px solid #33ff00; display: flex; align-items: center; justify-content: center; 
-            cursor: pointer; font-size: 1.5rem; transition: 0.2s;
+        /* Hata Ekranı (Overlay) */
+        #failOverlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 0, 0, 0.9); z-index: 100; border-radius: 25px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: white; text-align: center; padding: 20px;
+            animation: fadeIn 0.3s;
         }
-        .grid-cell:active { background: #33ff00; color: #000; }
+        
+        .fail-title { font-size: 3rem; margin-bottom: 10px; }
+        .fail-desc { font-size: 1.2rem; }
 
-        .wire-row { display: flex; gap: 15px; justify-content: center; margin: 20px 0; width: 100%; }
-        .wire-btn { width: 60px; height: 60px; border-radius: 50%; border: 3px solid #fff; cursor: pointer; transition: transform 0.1s;}
-        .wire-btn:active { transform: scale(0.9); }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
 
-        .switch-row { display: flex; gap: 10px; justify-content: center; margin: 20px 0; }
-        .switch { 
-            width: 50px; height: 70px; border: 2px solid #555; background: #111; 
-            cursor: pointer; display:flex; align-items:flex-end; justify-content:center; 
-            padding-bottom:5px; color:#555; font-size: 1.2rem;
-        }
-        .switch.on { border-color: #33ff00; background: #002200; color:#33ff00; }
+        .home-icon { position: absolute; top: 20px; right: 20px; text-decoration: none; font-size: 1.8rem; z-index: 20; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.2); }
 
-        /* Animasyonlar */
-        @keyframes pulse { 0% { opacity: 0.8; } 50% { opacity: 1; text-shadow: 0 0 10px; } 100% { opacity: 0.8; } }
-        .shake { animation: shake 0.5s; background-color: #500 !important; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        /* Renk Seçimi İçin */
+        .color-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; width: 100%; }
+        .color-btn { height: 60px; border-radius: 15px; cursor: pointer; border: 3px solid rgba(0,0,0,0.1); transition: 0.2s; }
+        .color-btn:active { transform: scale(0.9); }
 
-        .home-icon { position: absolute; top: 15px; right: 15px; text-decoration: none; font-size: 2rem; z-index: 100; color: #33ff00; }
     </style>
 </head>
 <body>
 
+    <div class="bg-shape shape1"></div>
+    <div class="bg-shape shape2"></div>
+    
     <a href="index.html" class="home-icon">🏠</a>
 
     <div class="container">
-        <h1>GÖREV: 55.SEVİYE</h1>
+        <h1>ZİHİN BAĞI 🧩</h1>
+        <div id="levelBadge" class="level-badge hidden">SEVİYE: 1 / 55</div>
 
-        <div id="infoBar" class="info-bar hidden">
-            <span id="roleText">...</span>
-            <span>BÖLÜM: <span id="lvlNum">1</span>/55</span>
+        <div id="failOverlay" class="hidden">
+            <div class="fail-title">💔</div>
+            <h2>BAĞLANTI KOPTU!</h2>
+            <p class="fail-desc">Yanlış cevap verdiniz.</p>
+            <p style="margin-top: 20px; font-weight: bold;">1. SEVİYEYE DÖNÜLÜYOR...</p>
         </div>
 
         <div id="loginScreen" class="screen">
-            <p style="font-size:1.5rem; margin-bottom:20px;">KİMLİK DOĞRULAMA</p>
-            <button onclick="selectRole('onur')" style="border-color:#00e5ff; color:#00e5ff;">BEN ONUR</button>
-            <button onclick="selectRole('ozlem')" style="border-color:#d000ff; color:#d000ff;">BEN ÖZLEM</button>
+            <p style="margin-bottom: 30px; font-size: 1.1rem; color: #666;">Partnerinizi seçin ve oyuna bağlanın.</p>
+            
+            <button onclick="selectRole('onur')" style="background: linear-gradient(45deg, #00c6ff, #0072ff);">BEN ONUR 👨‍💻</button>
+            <button onclick="selectRole('ozlem')" style="background: linear-gradient(45deg, #bc4e9c, #f80759);">BEN ÖZLEM 👩‍💻</button>
         </div>
 
         <div id="lobbyScreen" class="screen hidden">
-            <p style="animation:pulse 1s infinite">BAĞLANTI KURULUYOR...</p>
-            <p id="lobbyStatus" style="font-size:1rem; color:#888; margin-top:20px;">...</p>
-            <button onclick="resetSystem()" style="margin-top:50px; border-color:#555; color:#555; font-size:1rem;">RESET (HATA VARSA)</button>
+            <div style="font-size: 3rem; margin-bottom: 20px;">⏳</div>
+            <h3>DİĞER OYUNCU BEKLENİYOR...</h3>
+            <p id="lobbyStatus" style="color: #888; margin-top: 10px;">...</p>
+            <button onclick="resetGameManually()" style="background: #ccc; color: #555; margin-top: 40px; font-size: 0.9rem;">Takıldıysa Tıkla (Sıfırla)</button>
         </div>
 
         <div id="gameScreen" class="screen hidden">
             </div>
 
         <div id="winScreen" class="screen hidden">
-            <h1 style="font-size:4rem; color:#33ff00;">BAŞARDINIZ!</h1>
-            <p>TÜM PROTOKOLLER TAMAMLANDI.</p>
-            <p style="margin-top: 20px;">🏆</p>
-            <button onclick="resetSystem()">YENİDEN BAŞLA</button>
+            <div style="font-size: 4rem;">🏆</div>
+            <h2 style="color: #6a11cb;">MUHTEŞEM!</h2>
+            <p>Zihinleriniz birleşti ve 55 seviyeyi tamamladınız.</p>
+            <button onclick="resetGameManually()">TEKRAR OYNA</button>
         </div>
     </div>
 
@@ -165,106 +172,97 @@
         try {
             firebase.initializeApp(firebaseConfig);
             const db = firebase.database();
-        } catch(e) { console.error("Firebase Hatası", e); }
+        } catch(e) { console.error(e); }
 
-        const gameRef = firebase.database().ref('chaos_game');
-        let myRole = "";
+        const gameRef = firebase.database().ref('mind_game');
+        let myRole = ""; 
         let currentPuzzle = null;
-        let isActivePlayer = false; // Sıra bende mi?
+        let isActivePlayer = false; 
 
-        // --- PUZZLE TİPLERİ ---
-        // 'sequence' buraya eklendi (Sayı Dizisi Bulmacası)
-        const PUZZLE_TYPES = ['passcode', 'math', 'wires', 'grid', 'radio', 'binary', 'colors', 'direction', 'sequence'];
-
-        // --- RASTGELE BULMACA ÜRETİCİSİ ---
-        function generateRandomLevelData(level) {
-            const type = PUZZLE_TYPES[Math.floor(Math.random() * PUZZLE_TYPES.length)];
-            const activeRole = Math.random() > 0.5 ? 'onur' : 'ozlem'; // RASTGELE OYUNCU SEÇİMİ
+        // --- BULMACA OLUŞTURUCU (CO-OP MANTIK) ---
+        // Burada cevap kimseye verilmez, ipuçları bölünür.
+        function generateCoopPuzzle(level) {
+            const types = ['math', 'password', 'color_mix', 'sequence', 'logic'];
+            const type = types[Math.floor(Math.random() * types.length)];
+            const activeRole = Math.random() > 0.5 ? 'onur' : 'ozlem'; // Cevabı girecek kişi
+            
             let data = {};
 
-            // 1. ŞİFRE
-            if (type === 'passcode') {
-                data.code = Math.floor(1000 + Math.random() * 9000).toString();
-                data.hint = `GİRİLECEK ŞİFRE: ${data.code}`;
-            } 
-            // 2. MATEMATİK
-            else if (type === 'math') {
-                const a = Math.floor(Math.random() * 50);
-                const b = Math.floor(Math.random() * 50);
-                data.ans = (a + b).toString();
-                data.q = `${a} + ${b} = ?`;
-                data.hint = `CEVAP: ${data.ans}`;
+            // 1. MATEMATİK (TOPLAMA/ÇARPMA)
+            if (type === 'math') {
+                const valA = Math.floor(Math.random() * 20) + 1;
+                const valB = Math.floor(Math.random() * 20) + 1;
+                data.answer = (valA + valB).toString();
+                data.hintOnur = `Benim sayım: ${valA}`;
+                data.hintOzlem = `Benim sayım: ${valB}`;
+                data.question = "Sayılarımızı TOPLAYIN.";
             }
-            // 3. KABLOLAR
-            else if (type === 'wires') {
-                const colors = ['RED', 'BLUE', 'GREEN', 'YELLOW'];
-                const safe = colors[Math.floor(Math.random() * colors.length)];
-                data.safe = safe;
-                data.hint = `KESİLMESİ GEREKEN: ${safe}`;
+            // 2. ŞİFRE (BİRLEŞTİRME)
+            else if (type === 'password') {
+                const partA = Math.floor(10 + Math.random() * 89);
+                const partB = Math.floor(10 + Math.random() * 89);
+                data.answer = `${partA}${partB}`;
+                data.hintOnur = `Şifrenin İLK yarısı: ${partA}`;
+                data.hintOzlem = `Şifrenin İKİNCİ yarısı: ${partB}`;
+                data.question = "Şifreyi BİRLEŞTİRİN.";
             }
-            // 4. İZGARA (KOORDİNAT)
-            else if (type === 'grid') {
-                const rows = ['A','B','C']; const cols = ['1','2','3'];
-                const target = rows[Math.floor(Math.random()*3)] + cols[Math.floor(Math.random()*3)];
-                data.target = target;
-                data.hint = `HEDEF NOKTA: ${target}`;
+            // 3. RENK KARIŞIMI
+            else if (type === 'color_mix') {
+                // Basit renk mantığı: Kırmızı + Mavi = Mor vb.
+                const mixes = [
+                    {a: 'KIRMIZI', b: 'MAVİ', res: 'MOR', hex: '#8e44ad'},
+                    {a: 'SARI', b: 'KIRMIZI', res: 'TURUNCU', hex: '#e67e22'},
+                    {a: 'MAVİ', b: 'SARI', res: 'YEŞİL', hex: '#2ecc71'}
+                ];
+                const selected = mixes[Math.floor(Math.random() * mixes.length)];
+                data.answer = selected.res; // Cevap metin olarak (Butonlarda kullanılacak)
+                data.hintOnur = `Elimde ${selected.a} boya var.`;
+                data.hintOzlem = `Elimde ${selected.b} boya var.`;
+                data.question = "Bu renkleri karıştırırsak ne çıkar?";
+                data.inputType = 'color_select'; // Özel input tipi
             }
-            // 5. RADYO
-            else if (type === 'radio') {
-                data.freq = (88 + Math.random() * 20).toFixed(1);
-                data.hint = `FREKANS: ${data.freq} MHz`;
-            }
-            // 6. BINARY
-            else if (type === 'binary') {
-                data.bin = Array(4).fill(0).map(() => Math.random() > 0.5 ? 1 : 0).join('');
-                data.hint = `ANAHTARLAR: ${data.bin}`;
-            }
-            // 7. RENKLER
-            else if (type === 'colors') {
-                const seq = ['KIRMIZI', 'MAVİ', 'YEŞİL'];
-                const target = seq[Math.floor(Math.random() * 3)];
-                data.target = target;
-                data.hint = `SEÇİLECEK RENK: ${target}`;
-            }
-            // 8. YÖNLER
-            else if (type === 'direction') {
-                const dirs = ['SOL', 'SAĞ', 'YUKARI', 'AŞAĞI'];
-                const target = dirs[Math.floor(Math.random() * 4)];
-                data.target = target;
-                data.hint = `GİDİLECEK YÖN: ${target}`;
-            }
-            // 9. YENİ EKLENEN: SAYI DİZİSİ (SEQUENCE)
+            // 4. SIRALAMA (EKSİK SAYI)
             else if (type === 'sequence') {
-                // 3 ile 5 arası rastgele sayı üret
-                const count = 3 + Math.floor(Math.random() * 3); 
-                const nums = [];
-                for(let i=0; i<count; i++) nums.push(Math.floor(10 + Math.random() * 90));
+                const start = Math.floor(Math.random() * 10);
+                const step = Math.floor(Math.random() * 5) + 1;
+                // Dizi: A, B, C, D
+                const n1 = start; 
+                const n2 = start + step; 
+                const n3 = start + step*2; 
+                const n4 = start + step*3;
                 
-                // Hedef sırayı seç (Örn: 2. sayı)
-                const targetIndex = Math.floor(Math.random() * count); 
-                const targetPos = targetIndex + 1;
-
-                data.sequence = nums.join(' - '); // "45 - 12 - 99"
-                data.question = `${targetPos}. SAYI`; // "2. SAYI"
-                data.answer = nums[targetIndex].toString(); // "12"
-                data.hint = `SIRA: ${data.sequence}`;
+                data.answer = n3.toString();
+                data.hintOnur = `Sıra: ${n1} , ${n2} , ...`;
+                data.hintOzlem = `Sıra: ... , ... , ? , ${n4}`;
+                data.question = "Eksik sayı nedir?";
+            }
+            // 5. MANTIK (İLİŞKİ)
+            else if (type === 'logic') {
+                const words = [
+                    {a: 'GÜNEŞ', b: 'YAĞMUR', res: 'GÖKKUŞAĞI'},
+                    {a: 'UN', b: 'SU', res: 'HAMUR'},
+                    {a: 'DEMİR', b: 'KARBON', res: 'ÇELİK'}
+                ];
+                const selected = words[Math.floor(Math.random() * words.length)];
+                data.answer = selected.res;
+                data.hintOnur = `Kelime 1: ${selected.a}`;
+                data.hintOzlem = `Kelime 2: ${selected.b}`;
+                data.question = "Bu ikisi birleşince ne oluşur?";
+                data.inputType = 'text_input';
             }
 
             return { type: type, data: data, activeRole: activeRole };
         }
 
-        // --- BAĞLANTI VE LOBİ ---
+        // --- GİRİŞ İŞLEMLERİ ---
         function selectRole(role) {
             myRole = role;
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('lobbyScreen').classList.remove('hidden');
-            document.getElementById('infoBar').classList.remove('hidden');
-            document.getElementById('roleText').innerText = role.toUpperCase();
-            document.getElementById('roleText').style.color = role === 'onur' ? '#00e5ff' : '#d000ff';
-
+            
             gameRef.child('players/' + role).set(true);
             
-            // Onur ilk oyunu kurar (Eğer yoksa)
+            // Eğer Onur ise ve oyun başlamamışsa başlat
             if (role === 'onur') {
                 gameRef.child('state').get().then(snap => {
                     if (!snap.exists()) updateGameState(1);
@@ -273,39 +271,32 @@
             listenGame();
         }
 
-        // --- OYUN GÜNCELLEME ---
         function updateGameState(level) {
-            const newPuzzle = generateRandomLevelData(level);
-            // İKİ OYUNCU İÇİN ORTAK VERİTABANINA YAZ
-            gameRef.update({
-                level: level,
-                puzzle: newPuzzle
-            });
+            const puzzle = generateCoopPuzzle(level);
+            gameRef.update({ level: level, puzzle: puzzle });
         }
 
-        // --- DİNLEME (HER İKİ OYUNCU) ---
         function listenGame() {
-            // Oyuncu Kontrolü
+            // Lobi
             gameRef.child('players').on('value', snap => {
                 const p = snap.val();
                 if (p && p.onur && p.ozlem) {
                     document.getElementById('lobbyScreen').classList.add('hidden');
+                    document.getElementById('levelBadge').classList.remove('hidden');
                     document.getElementById('gameScreen').classList.remove('hidden');
                 } else {
                     document.getElementById('lobbyStatus').innerText = 
-                        myRole === 'onur' ? "ÖZLEM BEKLENİYOR..." : "ONUR BEKLENİYOR...";
+                        myRole === 'onur' ? "Özlem Bekleniyor..." : "Onur Bekleniyor...";
                 }
             });
 
-            // Oyun Verisi Dinleme
+            // Oyun Verisi
             gameRef.on('value', snap => {
                 const game = snap.val();
                 if (!game || !game.puzzle) return;
 
-                document.getElementById('lvlNum').innerText = game.level;
+                document.getElementById('levelBadge').innerText = "SEVİYE: " + game.level + " / 55";
                 currentPuzzle = game.puzzle;
-                
-                // Sıra kimde?
                 isActivePlayer = (myRole === game.puzzle.activeRole);
 
                 if (game.level > 55) {
@@ -323,128 +314,85 @@
             container.innerHTML = "";
             let html = "";
 
-            // 1. Durum Göstergesi
-            if (isActivePlayer) {
-                html += `<div class="role-indicator role-active">⚠️ GÖREV SİZDE! ⚠️</div>`;
-                html += `<p style="text-align:center; margin-bottom:20px; color:#aaa;">Diğer ajan size talimat verecek. Bekleyin.</p>`;
-            } else {
-                html += `<div class="role-indicator role-passive">🔍 TALİMAT VERİN 🔍</div>`;
-                html += `<div class="msg-box" style="border-color:#ffff00; color:#ffff00;">
-                            <h3>GİZLİ BİLGİ:</h3>
-                            <p style="font-size:2rem; font-weight:bold;">${puzzle.data.hint}</p>
-                         </div>`;
-                html += `<p style="text-align:center; color:#aaa;">Diğer ajan işlemi yapana kadar bekleyin...</p>`;
-            }
+            // 1. İPUCU KUTUSU (Herkes kendi ipucunu görür)
+            const myHint = myRole === 'onur' ? puzzle.data.hintOnur : puzzle.data.hintOzlem;
+            const roleColor = myRole === 'onur' ? 'clue-onur' : 'clue-ozlem';
+            
+            html += `
+                <div class="clue-box ${roleColor}">
+                    <div class="clue-title">SİZİN İPUCUNUZ</div>
+                    <div class="clue-text">${myHint}</div>
+                </div>
+            `;
 
-            // 2. Aktif Oyuncu İçin Kontroller
+            // 2. ORTAK SORU
+            html += `<p style="margin-bottom: 15px; font-weight:bold; color:#555;">SORU: ${puzzle.data.question}</p>`;
+
+            // 3. GİRİŞ ALANI (Sadece aktif oyuncuda)
             if (isActivePlayer) {
-                if (puzzle.type === 'passcode') {
-                    html += `<input id="inpPass" type="number" placeholder="ŞİFRE">
-                             <button onclick="checkPass()">GİRİŞ</button>`;
-                }
-                else if (puzzle.type === 'math') {
-                    html += `<div class="msg-box">${puzzle.data.q}</div>
-                             <input id="inpMath" type="number" placeholder="SONUÇ">
-                             <button onclick="checkMath()">HESAPLA</button>`;
-                }
-                else if (puzzle.type === 'wires') {
-                    html += `<div class="wire-row">
-                                <div class="wire-btn" style="background:red" onclick="checkWire('RED')"></div>
-                                <div class="wire-btn" style="background:blue" onclick="checkWire('BLUE')"></div>
-                                <div class="wire-btn" style="background:green" onclick="checkWire('GREEN')"></div>
-                                <div class="wire-btn" style="background:yellow" onclick="checkWire('YELLOW')"></div>
+                html += `<div style="background:#eef; padding:10px; border-radius:10px; margin-bottom:10px; color:#6a11cb; font-size:0.8rem;">✍️ CEVABI SEN GİRMELİSİN!</div>`;
+                
+                if (puzzle.data.inputType === 'color_select') {
+                    // Renk Butonları
+                    html += `<div class="color-grid">
+                                <div class="color-btn" style="background:#8e44ad" onclick="checkAnswer('MOR')"></div>
+                                <div class="color-btn" style="background:#e67e22" onclick="checkAnswer('TURUNCU')"></div>
+                                <div class="color-btn" style="background:#2ecc71" onclick="checkAnswer('YEŞİL')"></div>
+                                <div class="color-btn" style="background:#34495e" onclick="checkAnswer('SİYAH')"></div>
                              </div>`;
+                } 
+                else if (puzzle.data.inputType === 'text_input') {
+                    // Metin Girişi
+                    html += `<input id="ansInput" type="text" placeholder="CEVAP" style="text-transform:uppercase">
+                             <button onclick="checkAnswer(document.getElementById('ansInput').value.toUpperCase())">GÖNDER</button>`;
                 }
-                else if (puzzle.type === 'grid') {
-                    html += `<div class="grid-container">
-                                ${['A','B','C'].map(r => ['1','2','3'].map(c => 
-                                    `<div class="grid-cell" onclick="checkGrid('${r+c}')">${r+c}</div>`
-                                ).join('')).join('')}
-                             </div>`;
+                else {
+                    // Sayı Girişi (Varsayılan)
+                    html += `<input id="ansInput" type="number" placeholder="SONUÇ">
+                             <button onclick="checkAnswer(document.getElementById('ansInput').value)">GÖNDER</button>`;
                 }
-                else if (puzzle.type === 'radio') {
-                    html += `<div style="font-size:3rem; text-align:center; margin-bottom:10px;" id="radioVal">88.0</div>
-                             <input type="range" min="88" max="108" step="0.1" value="88" style="accent-color:#33ff00" 
-                             oninput="document.getElementById('radioVal').innerText=this.value">
-                             <button onclick="checkRadio()">FREKANS ONAYLA</button>`;
-                }
-                else if (puzzle.type === 'binary') {
-                    html += `<div class="switch-row">
-                                <div id="s0" class="switch" onclick="toggle(0)">0</div>
-                                <div id="s1" class="switch" onclick="toggle(1)">0</div>
-                                <div id="s2" class="switch" onclick="toggle(2)">0</div>
-                                <div id="s3" class="switch" onclick="toggle(3)">0</div>
-                             </div>
-                             <button onclick="checkBinary()">KONTROL ET</button>`;
-                }
-                else if (puzzle.type === 'colors') {
-                    html += `<div class="wire-row">
-                                <button style="background:red; color:white;" onclick="checkColor('KIRMIZI')">KIRMIZI</button>
-                                <button style="background:blue; color:white;" onclick="checkColor('MAVİ')">MAVİ</button>
-                                <button style="background:green; color:white;" onclick="checkColor('YEŞİL')">YEŞİL</button>
-                             </div>`;
-                }
-                else if (puzzle.type === 'direction') {
-                    html += `<div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                                <button onclick="checkDir('YUKARI')">⬆️</button>
-                                <button onclick="checkDir('AŞAĞI')">⬇️</button>
-                                <button onclick="checkDir('SOL')">⬅️</button>
-                                <button onclick="checkDir('SAĞ')">➡️</button>
-                             </div>`;
-                }
-                // YENİ EKLENEN
-                else if (puzzle.type === 'sequence') {
-                    html += `<div class="msg-box">${puzzle.data.question} NEDİR?</div>
-                             <input id="inpSeq" type="number" placeholder="??">
-                             <button onclick="checkSequence()">GÖNDER</button>`;
-                }
+
+            } else {
+                html += `<div style="background:#fee; padding:10px; border-radius:10px; color:#d63031; font-size:0.8rem;">⏳ EŞİNİN CEVABI GİRMESİNİ BEKLE...</div>`;
+                html += `<div style="opacity:0.5; filter:blur(2px); margin-top:20px;">
+                            <input type="text" disabled placeholder="KİLİTLİ">
+                            <button disabled>BEKLENİYOR</button>
+                         </div>`;
             }
 
             container.innerHTML = html;
         }
 
-        // --- KONTROLLER (SADECE AKTİF OYUNCUDA ÇALIŞIR) ---
-        function fail() {
-            document.body.classList.add('shake');
+        // --- KONTROL SİSTEMİ ---
+        function checkAnswer(val) {
+            // Cevabı string'e çevirip karşılaştır (boşlukları sil)
+            const correct = currentPuzzle.data.answer.toString().trim();
+            const given = val.toString().trim();
+
+            if (given === correct) {
+                // DOĞRU -> Sonraki Level
+                gameRef.child('level').get().then(snap => {
+                    let lvl = snap.val() || 1;
+                    updateGameState(lvl + 1);
+                });
+            } else {
+                // YANLIŞ -> Fail Ekranı & Reset
+                triggerFail();
+            }
+        }
+
+        function triggerFail() {
+            // Ekranda uyarı göster (Lokal olarak)
+            document.getElementById('failOverlay').classList.remove('hidden');
+            
+            // 3 Saniye sonra sunucuyu resetle
             setTimeout(() => {
-                document.body.classList.remove('shake');
-                updateGameState(1); // 50 LEVEL OLSA BİLE 1'E DÖNER! HARDCORE!
-            }, 500);
+                document.getElementById('failOverlay').classList.add('hidden');
+                updateGameState(1); // LEVEL 1'e DÖNÜŞ
+            }, 3000);
         }
 
-        function pass() {
-            // Şuan ki level'ı al ve 1 artır
-            gameRef.child('level').get().then(snap => {
-                let lvl = snap.val() || 1;
-                updateGameState(lvl + 1);
-            });
-        }
-
-        // --- BULMACA KONTROLLERİ ---
-        function checkPass() { if(document.getElementById('inpPass').value === currentPuzzle.data.code) pass(); else fail(); }
-        function checkMath() { if(document.getElementById('inpMath').value === currentPuzzle.data.ans) pass(); else fail(); }
-        function checkWire(color) { if(color === currentPuzzle.data.safe) pass(); else fail(); }
-        function checkGrid(coord) { if(coord === currentPuzzle.data.target) pass(); else fail(); }
-        function checkRadio() { if(document.getElementById('radioVal').innerText === currentPuzzle.data.freq) pass(); else fail(); }
-        
-        let binState = [0,0,0,0];
-        function toggle(idx) {
-            binState[idx] = binState[idx] ? 0 : 1;
-            const el = document.getElementById('s'+idx);
-            el.innerText = binState[idx];
-            el.classList.toggle('on');
-        }
-        function checkBinary() { if(binState.join('') === currentPuzzle.data.bin) pass(); else fail(); }
-        function checkColor(col) { if(col === currentPuzzle.data.target) pass(); else fail(); }
-        function checkDir(dir) { if(dir === currentPuzzle.data.target) pass(); else fail(); }
-        
-        // YENİ EKLENEN
-        function checkSequence() {
-            if (document.getElementById('inpSeq').value === currentPuzzle.data.answer) pass();
-            else fail();
-        }
-
-        function resetSystem() {
+        function resetGameManually() {
             gameRef.set({ level: 1, players: { onur: false, ozlem: false }, puzzle: null });
             location.reload();
         }
