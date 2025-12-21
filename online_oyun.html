@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GİZLİ GÖREV: MEGA PAKET 🕵️‍♂️</title>
+    <title>GİZLİ GÖREV: HARDCORE 💀</title>
     <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Black+Ops+One&family=Share+Tech+Mono&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <style>
-        /* --- TEMA: CYBERPUNK / HACKER --- */
+        /* --- TEMA: CYBERPUNK / HARDCORE --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
             background-color: #050505; 
@@ -19,19 +19,23 @@
             height: 100vh;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             overflow: hidden;
-            background-image: linear-gradient(rgba(0, 255, 0, 0.03) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0, 255, 0, 0.03) 1px, transparent 1px);
-            background-size: 20px 20px;
+            transition: background-color 0.2s;
         }
 
-        /* Glitch Efekti */
-        @keyframes glitch {
-            0% { transform: translate(0) }
-            20% { transform: translate(-2px, 2px) }
-            40% { transform: translate(-2px, -2px) }
-            60% { transform: translate(2px, 2px) }
-            80% { transform: translate(2px, -2px) }
-            100% { transform: translate(0) }
+        /* Hata Efekti */
+        .fail-shake { animation: shake 0.5s; background-color: #500 !important; }
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
         }
 
         .container {
@@ -50,7 +54,6 @@
             font-family: 'Black Ops One', cursive;
             color: #e63946; text-align: center; letter-spacing: 2px;
             margin-bottom: 10px; text-shadow: 0 0 10px rgba(230, 57, 70, 0.5);
-            animation: glitch 2s infinite;
         }
 
         .status-bar {
@@ -73,7 +76,7 @@
         .agent-view { border-left: 4px solid #00e5ff; } 
         .analyst-view { border-left: 4px solid #d000ff; } 
 
-        /* Butonlar & Girdiler */
+        /* Butonlar */
         button {
             background: #1a1a1a; color: #0f0; border: 1px solid #0f0;
             padding: 15px; font-family: 'Share Tech Mono', monospace;
@@ -89,9 +92,7 @@
             font-size: 1.5rem; text-align: center; letter-spacing: 3px; margin-bottom: 15px;
         }
 
-        /* --- ÖZEL OYUN ELEMENTLERİ --- */
-        
-        /* 1. Binary Anahtarlar */
+        /* --- ÖZEL ELEMENTLER --- */
         .switch-container { display: flex; gap: 10px; margin: 20px 0; }
         .switch { 
             width: 50px; height: 50px; border: 2px solid #555; 
@@ -99,9 +100,8 @@
             font-size: 1.5rem; cursor: pointer; user-select: none;
             background: #222; color: #555;
         }
-        .switch.active { border-color: #0f0; color: #0f0; background: #001a00; text-shadow: 0 0 10px #0f0; }
+        .switch.active { border-color: #0f0; color: #0f0; background: #001a00; }
 
-        /* 2. Renk Tüpleri */
         .vial-container { display: flex; gap: 15px; margin: 20px 0; }
         .vial { 
             width: 40px; height: 80px; border: 2px solid #fff; border-radius: 0 0 20px 20px;
@@ -113,7 +113,6 @@
         .vial.blue::after { background: #00e5ff; }
         .vial.filled::after { height: 80%; }
 
-        /* 3. Mors Işığı */
         .morse-light {
             width: 50px; height: 50px; border-radius: 50%; background: #333;
             margin: 20px auto; border: 2px solid #555;
@@ -121,7 +120,6 @@
         }
         .morse-light.on { background: #fff; box-shadow: 0 0 30px #fff; border-color: #fff; }
 
-        /* 4. Koordinat Izgarası */
         .grid-container { 
             display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin: 20px auto; width: 200px; 
         }
@@ -130,13 +128,11 @@
             cursor: pointer; font-size: 1.2rem;
         }
         .grid-cell:hover { background: rgba(0, 255, 0, 0.2); }
-        .grid-cell.selected { background: #0f0; color: #000; }
 
         .home-icon { position: absolute; top: 15px; right: 15px; text-decoration: none; font-size: 1.5rem; z-index: 100; filter: grayscale(100%); transition: 0.3s; }
-        .home-icon:hover { filter: grayscale(0%); transform: scale(1.1); }
         
-        .success-anim { animation: pop 0.5s ease-out; color: #0f0; font-size: 2rem; position: absolute; }
-        @keyframes pop { 0% { transform: scale(0); opacity: 0; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1); opacity: 0; } }
+        /* Radyo Slider */
+        input[type=range] { width: 100%; accent-color: #e63946; }
 
     </style>
 </head>
@@ -144,8 +140,8 @@
 
     <a href="index.html" class="home-icon">🏠</a>
 
-    <div class="container">
-        <h1>GİZLİ DOSYA: MEGA</h1>
+    <div class="container" id="mainContainer">
+        <h1>GİZLİ DOSYA: HARDCORE</h1>
 
         <div id="statusBar" class="status-bar hidden">
             <span>AJAN: <span id="playerRole" class="role-badge">...</span></span>
@@ -153,7 +149,7 @@
         </div>
 
         <div id="loginScreen" class="game-screen">
-            <p style="margin-bottom: 20px; font-size: 1.1rem; color:#0f0;">SİSTEME BAĞLANILIYOR...</p>
+            <p style="margin-bottom: 20px; font-size: 1.1rem; color:#ff3b3b;">DİKKAT: HATA AFFEDİLMEZ.</p>
             
             <button onclick="selectRole('onur')" style="border-left: 5px solid #00e5ff;">BEN ONUR (SAHA AJANI)</button>
             <p style="font-size: 0.7rem; color:#666; margin: 5px 0 20px;">Fiziksel müdahale yetkisi.</p>
@@ -166,7 +162,7 @@
             <h2 style="color: #fca311;">AĞ BEKLENİYOR...</h2>
             <div style="width: 50px; height: 50px; border: 5px solid #333; border-top-color: #fca311; border-radius: 50%; animation: spin 1s infinite; margin: 20px auto;"></div>
             <p id="lobbyStatus" style="margin-top: 10px; font-size: 0.8rem; color: #00e5ff;">...</p>
-            <button onclick="resetGame()" style="margin-top: 50px; border-color: #333; color: #555; font-size: 0.7rem;">Sistemi Resetle (Acil)</button>
+            <button onclick="resetGame()" style="margin-top: 50px; border-color: #333; color: #555; font-size: 0.7rem;">Sistemi Resetle</button>
         </div>
         <style>@keyframes spin { 100% { transform: rotate(360deg); } }</style>
 
@@ -174,20 +170,17 @@
 
         <div id="victoryScreen" class="game-screen hidden">
             <h1 style="color: #00ff88; text-shadow: 0 0 20px #00ff88;">GÖREV TAMAMLANDI</h1>
-            <p>10 Bölümlük İmkansız Görev Başarıldı.</p>
+            <p>İmkansızı başardınız.</p>
             <p style="margin-top: 20px; font-size: 2rem;">🏆</p>
-            <p style="margin-top: 20px; color: #ccc;">Onur & Özlem: Efsane Takım</p>
             <button onclick="resetGame()">BAŞA SAR</button>
         </div>
     </div>
 
     <script>
         // ============================================================
-        // 🔥 BURAYA KENDİ FIREBASE AYARLARINI YAPIŞTIRMAYI UNUTMA! 🔥
-        // (Eski dosyadaki const firebaseConfig = {...} kısmını al)
+        // 🔥 BURAYA KENDİ FIREBASE AYARLARINI YAPIŞTIR! 🔥
         // ============================================================
         
-        // EĞER YAPISTIRMAZSAN ÇALIŞMAZ! AŞAĞIDAKİ ÖRNEKTİR:
         const firebaseConfig = {
             apiKey: "AIzaSyBHejjQe2dHnwDYES3Qd30HKO94-_D5lVA",
             authDomain: "ask-oyunu-5d368.firebaseapp.com",
@@ -198,15 +191,11 @@
             appId: "1:550862375128:web:fb49cef5e3c5440d996fad",
             measurementId: "G-T1GCW04QD0"
         };
-        // ============================================================
 
         try {
             firebase.initializeApp(firebaseConfig);
             const db = firebase.database();
-            console.log("Bağlandı");
-        } catch(e) {
-            console.error(e);
-        }
+        } catch(e) { console.error(e); }
 
         const gameRef = firebase.database().ref('mega_game');
         let myRole = ""; 
@@ -229,7 +218,10 @@
                 const level = snapshot.val() || 1;
                 currentLevel = level;
                 document.getElementById('levelIndicator').innerText = level;
-                if (level > 10) showScreen('victoryScreen'); // 10 BÖLÜM
+                
+                // Eğer seviye 1 ise ve önceki seviye yüksekse, fail efekti verilebilir.
+                // Basitlik için sadece render yapıyoruz.
+                if (level > 10) showScreen('victoryScreen'); 
                 else renderLevel(level);
             });
 
@@ -251,32 +243,56 @@
             document.getElementById(screenId).classList.remove('hidden');
         }
 
-        // --- BÖLÜM TASARIMLARI (MEGA PAKET) ---
+        // --- HARDCORE FAIL SYSTEM ---
+        function fail() {
+            // Ekrana kırmızı sarsıntı efekti ver
+            document.body.classList.add('fail-shake');
+            setTimeout(() => {
+                document.body.classList.remove('fail-shake');
+                // SEVİYEYİ 1 YAP (HERKES İÇİN)
+                gameRef.update({ level: 1 });
+            }, 500);
+        }
+
+        function pass() {
+            gameRef.child('level').transaction(c => (c || 1) + 1);
+        }
+
+        function resetGame() {
+            gameRef.set({ level: 1, players: { onur: false, ozlem: false } });
+            location.reload();
+        }
+
+        // --- BÖLÜM TASARIMLARI ---
         function renderLevel(level) {
             const container = document.getElementById('gameContent');
             let html = "";
             const isOzlem = myRole === 'ozlem';
 
-            // LEVEL 1: RADYO (KLASİK)
+            // LEVEL 1: RADYO (BUTONLU SİSTEM)
             if (level === 1) {
-                if (isOzlem) html = msgBox("analyst", "Radyo Frekansı: 92.4 MHz", "Onur'a söyle ayarlaması lazım.");
-                else html = msgBox("agent", "Radyo Sinyali Gerekli", "Frekans kaç?") + 
-                    `<div style="font-size:2rem; color:#e63946" id="val1">88.0</div><input type="range" min="88" max="108" step="0.1" oninput="document.getElementById('val1').innerText=this.value; checkLvl1(this.value)">`;
+                if (isOzlem) html = msgBox("analyst", "Radyo Frekansı: 92.4 MHz", "Onur frekansı ayarlayıp 'GÖNDER'e basmalı. Yanlış basarsa baştan başlarsınız!");
+                else {
+                    html = msgBox("agent", "Radyo Sinyali Gerekli", "Frekansı ayarla ve GÖNDER. Hata yapma!") + 
+                    `<div style="font-size:2rem; color:#e63946" id="val1">88.0</div>
+                     <input type="range" id="rng1" min="88" max="108" step="0.1" value="88" oninput="document.getElementById('val1').innerText=this.value">
+                     <button onclick="checkLvl1()">SİNYALİ GÖNDER</button>`;
+                }
             }
-            // LEVEL 2: ŞİFRE (TERS)
+            // LEVEL 2: ŞİFRE
             else if (level === 2) {
-                if (isOzlem) html = msgBox("analyst", "Şifre: 2025", "Ama klavye bozuk! Rakamları tersten girmeli.");
-                else html = msgBox("agent", "Kapı Şifresi", "Özlem kod nedir? (Dikkatli ol)") + `<input id="inp2" type="number" placeholder="____"><button onclick="checkLvl2()">GİRİŞ</button>`;
+                if (isOzlem) html = msgBox("analyst", "Şifre: 2025", "Klavye ters basıyor! Rakamları tersten girmeli.");
+                else html = msgBox("agent", "Kapı Şifresi", "Kodu gir. Yanlış girersen yanarız.") + `<input id="inp2" type="number" placeholder="____"><button onclick="checkLvl2()">GİRİŞ</button>`;
             }
-            // LEVEL 3: KABLO (RENK)
+            // LEVEL 3: KABLO
             else if (level === 3) {
-                if (isOzlem) html = msgBox("analyst", "Bomba İmha", "1. Kırmızı YASAK.\n2. Yeşil KESİLMEZ.\n3. HEDEF: MAVİ.");
-                else html = msgBox("agent", "Bomba Kabloları", "Hangisini keseyim?") + `<div class="vial-container" style="justify-content:center"><button style="background:red;width:50px;" onclick="fail()">X</button><button style="background:blue;width:50px;" onclick="pass()">X</button><button style="background:green;width:50px;" onclick="fail()">X</button></div>`;
+                if (isOzlem) html = msgBox("analyst", "Bomba İmha", "1. Kırmızı YASAK.\n2. Yeşil YASAK.\n3. MAVİYİ KES.");
+                else html = msgBox("agent", "Bomba Kabloları", "Tek hakkın var. Hangisi?") + `<div class="vial-container" style="justify-content:center"><button style="background:red;width:50px;" onclick="fail()">X</button><button style="background:blue;width:50px;" onclick="pass()">X</button><button style="background:green;width:50px;" onclick="fail()">X</button></div>`;
             }
-            // LEVEL 4: BINARY (MATRİX)
+            // LEVEL 4: BINARY
             else if (level === 4) {
-                if (isOzlem) html = msgBox("analyst", "Binary Kod", "Anahtarları şu sırayla aç:\n\n1 - 0 - 1 - 1\n(Açık - Kapalı - Açık - Açık)");
-                else html = msgBox("agent", "Sunucu Anahtarları", "Hangi şalterler kalkacak?") + 
+                if (isOzlem) html = msgBox("analyst", "Sunucu Anahtarları", "Sıralama: 1 - 0 - 1 - 1\n(Açık - Kapalı - Açık - Açık)");
+                else html = msgBox("agent", "Güç Paneli", "Anahtarları ayarla ve KONTROL ET'e bas.") + 
                     `<div class="switch-container">
                         <div id="sw1" class="switch" onclick="toggle(1)">0</div>
                         <div id="sw2" class="switch" onclick="toggle(2)">0</div>
@@ -284,45 +300,45 @@
                         <div id="sw4" class="switch" onclick="toggle(4)">0</div>
                      </div><button onclick="checkLvl4()">KONTROL ET</button>`;
             }
-            // LEVEL 5: MORS ALFABESİ (IŞIK)
+            // LEVEL 5: MORS
             else if (level === 5) {
-                if (isOzlem) html = msgBox("analyst", "Mors Şifresi", "Uzun Yanma = Çizgi (-)\nKısa Yanma = Nokta (.)\n\nŞifre: S O S (... --- ...)") + `<div class="morse-light" id="mlight"></div><button onclick="playMorse()">IŞIĞI GÖNDER</button>`;
-                else html = msgBox("agent", "Işıklı Mesaj", "Özlem sana bir ışık sinyali gönderecek. Ne diyor?") + `<input id="inp5" style="text-transform:uppercase" placeholder="MESAJ"><button onclick="checkLvl5()">ÇÖZ</button>`;
+                if (isOzlem) html = msgBox("analyst", "Mors Şifresi", "Mesaj: S O S (... --- ...)") + `<div class="morse-light" id="mlight"></div><button onclick="playMorse()">IŞIĞI GÖNDER</button>`;
+                else html = msgBox("agent", "Işıklı Mesaj", "Özlem ışığı yaksın. Mesaj ne?") + `<input id="inp5" style="text-transform:uppercase" placeholder="MESAJ"><button onclick="checkLvl5()">ÇÖZ</button>`;
             }
-            // LEVEL 6: KİMYASAL (SIRA)
+            // LEVEL 6: KİMYASAL
             else if (level === 6) {
-                if (isOzlem) html = msgBox("analyst", "Kimyasal Formül", "Karışım Sırası:\n1. KIRMIZI\n2. YEŞİL\n3. MAVİ\n(Sıra önemli!)");
-                else html = msgBox("agent", "Laboratuvar", "Tüpleri hangi sırayla dökeyim?") + 
+                if (isOzlem) html = msgBox("analyst", "Kimyasal Formül", "Sıra: KIRMIZI -> YEŞİL -> MAVİ");
+                else html = msgBox("agent", "Laboratuvar", "Sırayla karıştır. Yanlış sıra = Patlama.") + 
                     `<div class="vial-container" style="justify-content:center">
                         <div class="vial red" onclick="addMix('K')"></div>
                         <div class="vial green" onclick="addMix('Y')"></div>
                         <div class="vial blue" onclick="addMix('M')"></div>
-                     </div><p id="mixRes">Karışım: </p><button onclick="checkLvl6()">KARIŞTIR</button><button onclick="mix=''">SIFIRLA</button>`;
+                     </div><p id="mixRes" style="height:20px"></p><button onclick="checkLvl6()">KARIŞTIR</button><button onclick="resetMix()">SIFIRLA</button>`;
             }
-            // LEVEL 7: KOORDİNAT (İZGARADA BULMA)
+            // LEVEL 7: KOORDİNAT
             else if (level === 7) {
-                if (isOzlem) html = msgBox("analyst", "Hedef Konum", "Uydu görüntüsü:\nHedefimiz B2 karesinde.");
-                else html = msgBox("agent", "Füze Kilitlenmesi", "Hedef hangi kare?") + 
+                if (isOzlem) html = msgBox("analyst", "Hedef Konum", "Uydu görüntüsü: B2 karesi.");
+                else html = msgBox("agent", "Füze Kilitlenmesi", "Hedef kareye tıkla. Yanlış kare = Fail.") + 
                     `<div class="grid-container">
-                        <div class="grid-cell" onclick="checkLvl7('A1')">A1</div><div class="grid-cell" onclick="checkLvl7('A2')">A2</div><div class="grid-cell" onclick="checkLvl7('A3')">A3</div>
-                        <div class="grid-cell" onclick="checkLvl7('B1')">B1</div><div class="grid-cell" onclick="checkLvl7('B2')">B2</div><div class="grid-cell" onclick="checkLvl7('B3')">B3</div>
+                        <div class="grid-cell" onclick="fail()">A1</div><div class="grid-cell" onclick="fail()">A2</div><div class="grid-cell" onclick="fail()">A3</div>
+                        <div class="grid-cell" onclick="fail()">B1</div><div class="grid-cell" onclick="pass()">B2</div><div class="grid-cell" onclick="fail()">B3</div>
                     </div>`;
             }
-            // LEVEL 8: MANTIK (RENK HESABI)
+            // LEVEL 8: MANTIK
             else if (level === 8) {
                 if (isOzlem) html = msgBox("analyst", "Renk Hesabı", "Kırmızı = 5\nMavi = 3\nKod = Kırmızı + Mavi");
                 else html = msgBox("agent", "Matematiksel Kilit", "Kod kaç?") + `<input id="inp8" type="number"><button onclick="checkLvl8()">GİR</button>`;
             }
-            // LEVEL 9: SESLİ KOMUT (YÖN)
+            // LEVEL 9: YÖN
             else if (level === 9) {
-                if (isOzlem) html = msgBox("analyst", "Labirent Haritası", "Çıkış yolu:\nSAĞ - SOL - SAĞ");
-                else html = msgBox("agent", "Karanlık Tünel", "Hangi yöne gitmeliyim?") + 
-                    `<button onclick="addDir('SOL')">SOL ⬅️</button><button onclick="addDir('SAĞ')">SAĞ ➡️</button><p id="dirRes">Yol: </p><button onclick="checkLvl9()">GİT</button><button onclick="dirs=''">SIFIRLA</button>`;
+                if (isOzlem) html = msgBox("analyst", "Labirent", "Yol: SAĞ - SOL - SAĞ");
+                else html = msgBox("agent", "Karanlık Tünel", "Yönleri seç ve GİT.") + 
+                    `<button onclick="addDir('SOL')">SOL ⬅️</button><button onclick="addDir('SAĞ')">SAĞ ➡️</button><p id="dirRes" style="height:20px"></p><button onclick="checkLvl9()">GİT</button><button onclick="resetDir()">SIFIRLA</button>`;
             }
-            // LEVEL 10: FİNAL (TARİH)
+            // LEVEL 10: FİNAL
             else if (level === 10) {
-                if (isOzlem) html = msgBox("analyst", "SON GÖREV", "Dünyayı kurtarmak için o tarihi gir:\n17.03.2025");
-                else html = msgBox("agent", "KIYAMET SAATİ", "Durdurma Kodu (Tarih):") + `<input id="inp10" placeholder="GG.AA.YYYY"><button onclick="checkLvl10()">DURDUR</button>`;
+                if (isOzlem) html = msgBox("analyst", "SON GÖREV", "Tarih: 17.03.2025");
+                else html = msgBox("agent", "KIYAMET SAATİ", "Tarihi gir ve Durdur.") + `<input id="inp10" placeholder="GG.AA.YYYY"><button onclick="checkLvl10()">DURDUR</button>`;
             }
 
             container.innerHTML = html;
@@ -333,21 +349,11 @@
             return `<div class="message-box ${type === 'analyst' ? 'analyst-view' : 'agent-view'}"><h3>${title}</h3><pre style="font-family:inherit; white-space:pre-wrap">${text}</pre></div>`;
         }
 
-        function pass() { nextLevel(); }
-        function fail() { alert("HATA! Sistem Kilitlendi (Tekrar Dene)"); }
-        
-        function nextLevel() {
-            gameRef.child('level').transaction(c => (c || 1) + 1);
-        }
-
-        function resetGame() {
-            gameRef.set({ level: 1, players: { onur: false, ozlem: false } });
-            location.reload();
-        }
-
-        // --- LEVEL MANTIKLARI ---
         // L1
-        function checkLvl1(val) { if(val == 92.4) pass(); }
+        function checkLvl1() { 
+            const val = document.getElementById('rng1').value;
+            if(val == 92.4) pass(); else fail(); 
+        }
         // L2
         function checkLvl2() { if(document.getElementById('inp2').value == "5202") pass(); else fail(); }
         // L4
@@ -361,11 +367,11 @@
         // L5
         function playMorse() {
             const light = document.getElementById('mlight');
-            const pattern = [200, 200, 200, 600, 600, 600, 200, 200, 200]; // SOS Timing
+            const pattern = [200, 200, 200, 600, 600, 600, 200, 200, 200];
             let delay = 0;
             pattern.forEach((dur, i) => {
                 setTimeout(() => { light.classList.add('on'); }, delay);
-                setTimeout(() => { light.classList.remove('on'); }, delay + (i > 2 && i < 6 ? 600 : 200)); // Uzun/Kısa yanma
+                setTimeout(() => { light.classList.remove('on'); }, delay + (i > 2 && i < 6 ? 600 : 200));
                 delay += (i > 2 && i < 6 ? 800 : 400);
             });
         }
@@ -373,14 +379,14 @@
         // L6
         let mix = "";
         function addMix(c) { mix += c; document.getElementById('mixRes').innerText += c + " > "; }
+        function resetMix() { mix = ""; document.getElementById('mixRes').innerText = ""; }
         function checkLvl6() { if(mix === "KYM") pass(); else fail(); }
-        // L7
-        function checkLvl7(coord) { if(coord === "B2") pass(); else fail(); }
         // L8
         function checkLvl8() { if(document.getElementById('inp8').value == "8") pass(); else fail(); }
         // L9
         let dirs = "";
         function addDir(d) { dirs += d; document.getElementById('dirRes').innerText += d + " "; }
+        function resetDir() { dirs = ""; document.getElementById('dirRes').innerText = ""; }
         function checkLvl9() { if(dirs === "SAĞSOLSAĞ") pass(); else fail(); }
         // L10
         function checkLvl10() { 
