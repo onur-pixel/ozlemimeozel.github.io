@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Cyber Love: Online 🌐</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; font-family: 'Orbitron', sans-serif; }
+        body { background-color: #05000a; overflow: hidden; touch-action: none; }
+        
+        #gameCanvas { display: block; width: 100%; height: 100%; cursor: crosshair; }
+
+        /* HUD KATMANI */
+        .ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; padding: 20px; display: flex; flex-direction: column; justify-content: space-between; }
+        .top-bar { display: flex; justify-content: space-between; align-items: flex-start; }
+        
+        .player-card { display: flex; flex-direction: column; text-shadow: 0 0 10px #00e5ff; }
+        .score-val { font-size: 2.5rem; font-weight: 900; line-height: 1; color: #00e5ff; }
+        .score-label { font-size: 0.8rem; letter-spacing: 2px; color: #fff; opacity: 0.8; }
+
+        /* RAKİP KARTI */
+        .rival-card { 
+            display: flex; align-items: center; gap: 15px; 
+            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); 
+            border: 1px solid #d000ff; border-right: 4px solid #d000ff; 
+            padding: 10px 20px; border-radius: 10px 0 0 10px; 
+            position: relative; overflow: hidden; 
+            box-shadow: 0 0 20px rgba(208, 0, 255, 0.2); 
+            transform: skewX(-10deg); 
+        }
+        
+        .rival-info { display: flex; flex-direction: column; align-items: flex-end; transform: skewX(10deg); }
+        .rival-title { font-size: 0.65rem; color: #aaa; letter-spacing: 1px; }
+        .rival-val { font-size: 1.4rem; color: #d000ff; font-weight: bold; text-shadow: 0 0 8px #d000ff; }
+
+        /* EKRANLAR */
+        .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 5, 10, 0.95); backdrop-filter: blur(10px); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 100; pointer-events: auto; }
+        .hidden { display: none !important; }
+        
+        h1 { font-size: 2.5rem; color: #00e5ff; text-shadow: 0 0 30px #00e5ff; margin-bottom: 20px; text-align: center; }
+        
+        .btn { 
+            background: transparent; border: 2px solid #00e5ff; color: #00e5ff; 
+            padding: 15px 40px; font-size: 1.2rem; font-weight: bold; cursor: pointer; 
+            margin-top: 10px; transition: 0.2s; box-shadow: 0 0 10px #00e5ff;
+        }
+        .btn:hover { background: #00e5ff; color: #000; transform: scale(1.05); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; border-color: #555; color: #555; box-shadow: none; }
+
+        .home-icon { position: absolute; top: 20px; right: 20px; font-size: 2rem; text-decoration: none; pointer-events: auto; z-index: 200; filter: drop-shadow(0 0 5px #fff); }
+        
+        /* BAĞLANTI DURUMU */
+        #connectionStatus { margin-bottom: 20px; font-size: 1rem; color: #ff3b3b; display: flex; align-items: center; gap: 10px; }
+        .online-dot { width: 12px; height: 12px; background: red; border-radius: 50%; display: inline-block; box-shadow: 0 0 10px red; }
+        .connected .online-dot { background: #00ff88; box-shadow: 0 0 10px #00ff88; }
+        .connected { color: #00ff88 !important; }
+
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="home-icon">🏠</a>
+    <canvas id="gameCanvas"></canvas>
+
+    <div class="ui-layer">
+        <div class="top-bar">
+            <div class="player-card">
+                <div class="score-label">SEN</div>
+                <div class="score-val" id="scoreDisp">0</div>
+            </div>
+            <div class="rival-card">
+                <div class="rival-info">
+                    <div class="rival-title" id="rivalNameDisp">RAKİP</div>
+                    <div class="rival-val" id="rivalDisp">Bekleniyor...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loginScreen" class="screen">
+        <h1>ONLINE SAVAŞ ⚔️</h1>
+        <p style="color:#ccc; text-align:center; max-width:80%; margin-bottom: 30px;">
+            Önce kim olduğunu seç,<br>sonra sunucuya bağlan.
+        </p>
+        <div style="display: flex; gap: 20px;">
+            <button class="btn" style="border-color: #00e5ff; color: #00e5ff;" onclick="selectPlayer('onur')">BEN ONUR 🔵</button>
+            <button class="btn" style="border-color: #d000ff; color: #d000ff;" onclick="selectPlayer('ozlem')">BEN ÖZLEM 🟣</button>
+        </div>
+    </div>
+
+    <div id="lobbyScreen" class="screen hidden">
+        <h1 id="lobbyTitle">BAĞLANIYOR...</h1>
+        
+        <div id="connectionStatus">
+            <span class="online-dot"></span> 
+            <span id="statusText">Sunucuya Bağlanılıyor...</span>
+        </div>
+
+        <button class="btn" id="startBtn" onclick="startGameLoop()" disabled>BAŞLA</button>
+        <p style="color: #aaa; font-size: 0.8rem; margin-top: 10px;">(Rakip bağlanınca buton açılır)</p>
+    </div>
+
+    <script>
+        // --- 1. FIREBASE AYARLARI (Görselinden Alındı) ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBHejjQe2dHnwDYES3Qd30HKO94-_D5lVA",
+            authDomain: "ask-oyunu-5d368.firebaseapp.com",
+            databaseURL: "https://ask-oyunu-5d368-default-rtdb.firebaseio.com",
+            projectId: "ask-oyunu-5d368",
+            storageBucket: "ask-oyunu-5d368.firebasestorage.app",
+            messagingSenderId: "550862375128",
+            appId: "1:550862375128:web:fb49cef5e3c5440d996fad",
+            measurementId: "G-T1GCW04QD0"
+        };
+
+        // Firebase Başlat
+        try {
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.database();
+            console.log("Firebase Bağlantısı Başarılı");
+        } catch(e) {
+            alert("Firebase Hatası: " + e.message);
+        }
+
+        // --- 2. OYUN DEĞİŞKENLERİ ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let W, H;
+        
+        let me = ""; // 'onur' veya 'ozlem'
+        let rival = "";
+        let myScore = 0;
+        let gameActive = false;
+        let enemies = [];
+        let particles = [];
+        let mouse = {x:0, y:0};
+
+        function resize() { 
+            W = canvas.width = window.innerWidth; 
+            H = canvas.height = window.innerHeight; 
+        }
+        window.addEventListener('resize', resize); 
+        resize();
+        window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+
+        // --- 3. OYUNCU SEÇİMİ VE BAĞLANTI ---
+        function selectPlayer(player) {
+            me = player;
+            rival = (player === 'onur') ? 'ozlem' : 'onur';
+            
+            // Renkleri ayarla (Özlem seçilirse mor yap)
+            if (me === 'ozlem') {
+                document.querySelector('.score-val').style.color = '#d000ff';
+                document.querySelector('.rival-card').style.borderColor = '#00e5ff';
+                document.querySelector('.rival-val').style.color = '#00e5ff';
+            }
+
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('lobbyScreen').classList.remove('hidden');
+            document.getElementById('lobbyTitle').innerText = "MERHABA " + me.toUpperCase();
+            document.getElementById('rivalNameDisp').innerText = "RAKİP: " + rival.toUpperCase();
+
+            connectToRoom();
+        }
+
+        function connectToRoom() {
+            const db = firebase.database();
+            const myRef = db.ref('game_room/' + me);
+            const rivalRef = db.ref('game_room/' + rival);
+
+            // Bağlantı durumunu izle (.info/connected)
+            const connectedRef = db.ref(".info/connected");
+            connectedRef.on("value", (snap) => {
+                if (snap.val() === true) {
+                    const statusDiv = document.getElementById('connectionStatus');
+                    statusDiv.classList.add('connected');
+                    document.getElementById('statusText').innerText = "ONLINE - Rakip Bekleniyor";
+                    
+                    // Kendimizi 'active: true' olarak işaretle
+                    myRef.set({ score: 0, active: true });
+                    
+                    // Oyundan çıkarsak 'active: false' olsun
+                    myRef.onDisconnect().update({ active: false });
+                } else {
+                    document.getElementById('connectionStatus').classList.remove('connected');
+                    document.getElementById('statusText').innerText = "Bağlantı Koptu...";
+                }
+            });
+
+            // Rakibi Dinle (Puan veya Durum Değişirse)
+            rivalRef.on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    // Rakip puanını güncelle
+                    document.getElementById('rivalDisp').innerText = data.score;
+                    
+                    // Rakip aktif mi?
+                    if (data.active) {
+                        document.getElementById('statusText').innerText = "RAKİP BAĞLI! SAVAŞ HAZIR!";
+                        document.getElementById('startBtn').disabled = false;
+                        document.getElementById('startBtn').style.background = "#00ff88";
+                        document.getElementById('startBtn').style.color = "#000";
+                        document.getElementById('startBtn').style.boxShadow = "0 0 20px #00ff88";
+                    } else {
+                        // Rakip çıkarsa butonu kapat
+                        document.getElementById('statusText').innerText = "Rakip Bekleniyor...";
+                        document.getElementById('startBtn').disabled = true;
+                    }
+                }
+            });
+        }
+
+        // --- 4. OYUN MOTORU ---
+        function startGameLoop() {
+            document.getElementById('lobbyScreen').classList.add('hidden');
+            gameActive = true;
+            myScore = 0;
+            updateScore(0);
+            animate();
+        }
+
+        function updateScore(newVal) {
+            myScore = newVal;
+            document.getElementById('scoreDisp').innerText = myScore;
+            
+            // Puanı sunucuya gönder
+            if(gameActive) {
+                firebase.database().ref('game_room/' + me).update({
+                    score: myScore
+                });
+            }
+        }
+
+        function spawnEnemy() {
+            if(Math.random() < 0.05) { // Düşman çıkma sıklığı
+                enemies.push({
+                    x: Math.random() * (W - 50),
+                    y: H + 50,
+                    vy: -(Math.random() * 5 + 3), // Yukarı fırla
+                    size: 40 + Math.random() * 20,
+                    color: me === 'onur' ? '#d000ff' : '#00e5ff' // Rakip renginde düşman
+                });
+            }
+        }
+
+        function animate() {
+            if(!gameActive) return;
+            
+            // Hafif iz efekti
+            ctx.fillStyle = 'rgba(0,0,0,0.3)';
+            ctx.fillRect(0, 0, W, H);
+
+            spawnEnemy();
+
+            // Düşmanları çiz
+            enemies.forEach((e, i) => {
+                e.y += e.vy;
+                
+                ctx.fillStyle = e.color;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = e.color;
+                ctx.fillRect(e.x, e.y, e.size, e.size);
+                ctx.shadowBlur = 0; // Performans için kapat
+
+                // Ekran üstünden çıkarsa sil
+                if(e.y < -100) enemies.splice(i, 1);
+            });
+
+            // Fare İmleci (Nişangah)
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.beginPath(); 
+            ctx.arc(mouse.x, mouse.y, 15, 0, Math.PI*2); 
+            ctx.stroke();
+
+            requestAnimationFrame(animate);
+        }
+
+        // Ateş Etme
+        function shoot(e) {
+            if(!gameActive) return;
+            let cx, cy;
+            if(e.type === 'touchstart') { 
+                cx = e.touches[0].clientX; cy = e.touches[0].clientY; e.preventDefault(); 
+            } else { 
+                cx = e.clientX; cy = e.clientY; 
+            }
+
+            // Düşmanları kontrol et
+            for(let i = enemies.length - 1; i >= 0; i--) {
+                let ent = enemies[i];
+                // Basit çarpışma
+                if(cx > ent.x && cx < ent.x + ent.size && cy > ent.y && cy < ent.y + ent.size) {
+                    enemies.splice(i, 1); // Düşmanı sil
+                    updateScore(myScore + 10); // Puan ekle
+                    break; // Tek mermi tek düşman
+                }
+            }
+        }
+
+        window.addEventListener('mousedown', shoot);
+        window.addEventListener('touchstart', shoot, {passive: false});
+
+    </script>
+</body>
+</html>

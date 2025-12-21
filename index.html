@@ -2,279 +2,417 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sonsuza Dek Biz | 17.03.2025</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>GİZLİ GÖREV: 1923 🕵️‍♂️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&family=Black+Ops+One&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+        /* --- TEMA: GİZLİ AJAN / HACKER --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background-color: #0d0d0d; 
+            color: #ccc;
+            font-family: 'Courier Prime', monospace;
+            height: 100vh;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            overflow: hidden;
+            background-image: linear-gradient(0deg, transparent 24%, rgba(0, 255, 0, .03) 25%, rgba(0, 255, 0, .03) 26%, transparent 27%, transparent 74%, rgba(0, 255, 0, .03) 75%, rgba(0, 255, 0, .03) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(0, 255, 0, .03) 25%, rgba(0, 255, 0, .03) 26%, transparent 27%, transparent 74%, rgba(0, 255, 0, .03) 75%, rgba(0, 255, 0, .03) 76%, transparent 77%, transparent);
+            background-size: 50px 50px;
         }
 
-        body {
-            /* Mor geçişli arka plan */
-            background: linear-gradient(135deg, #1a0b2e 0%, #31135e 50%, #1a0b2e 100%);
-            color: #ffffff;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            overflow-x: hidden;
-        }
-
-        /* Cam Efekti Kartı */
         .container {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 30px;
-            padding: 40px;
-            width: 100%;
-            max-width: 500px; /* Bilgisayarda çok yayılmasın */
-            text-align: center;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
-            transition: transform 0.3s ease;
-        }
-
-        /* Başlıklar */
-        h1 {
-            font-size: 1.8rem;
-            margin-bottom: 30px;
-            letter-spacing: 2px;
-            color: #bb86fc;
-            text-shadow: 0 0 15px rgba(187, 134, 252, 0.4);
-        }
-
-        /* Sayaç Kutuları */
-        .counter-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-
-        .stat-card {
-            background: rgba(187, 134, 252, 0.1);
+            width: 90%; max-width: 600px;
+            background: rgba(20, 20, 20, 0.95);
+            border: 2px solid #333;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
             padding: 20px;
-            border-radius: 20px;
-            border-left: 4px solid #bb86fc;
+            border-radius: 10px;
+            position: relative;
+            min-height: 400px;
+            display: flex; flex-direction: column;
         }
 
-        .label {
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            color: #d1d1d1;
-            margin-bottom: 5px;
-            display: block;
-        }
-
-        .value {
-            font-size: 2.8rem;
-            font-weight: 700;
-            color: #fff;
-            line-height: 1;
-        }
-
-        .unit {
-            font-size: 1rem;
-            color: #bb86fc;
-            margin-left: 5px;
-        }
-
-        /* Kalp Efekti */
-        .heart-icon {
-            font-size: 40px;
-            color: #ff4d6d;
+        /* Başlık */
+        h1 {
+            font-family: 'Black Ops One', cursive;
+            color: #e63946;
+            text-align: center;
+            letter-spacing: 2px;
             margin-bottom: 10px;
-            display: inline-block;
-            animation: pulse 1.5s infinite;
+            text-shadow: 0 0 10px rgba(230, 57, 70, 0.5);
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); filter: drop-shadow(0 0 0px #ff4d6d); }
-            50% { transform: scale(1.15); filter: drop-shadow(0 0 15px #ff4d6d); }
-            100% { transform: scale(1); filter: drop-shadow(0 0 0px #ff4d6d); }
+        /* Durum Çubuğu */
+        .status-bar {
+            display: flex; justify-content: space-between;
+            border-bottom: 1px dashed #555;
+            padding-bottom: 10px; margin-bottom: 20px;
+            font-size: 0.8rem; color: #888;
+        }
+        .role-badge { color: #00e5ff; font-weight: bold; text-transform: uppercase; }
+
+        /* Oyun Alanı */
+        .game-screen { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .hidden { display: none !important; }
+
+        /* Mesaj Kutuları */
+        .message-box {
+            background: #1a1a1a; border-left: 4px solid #fca311;
+            padding: 15px; margin-bottom: 20px; text-align: left;
+            width: 100%; color: #eee; font-size: 1rem; line-height: 1.5;
+        }
+        .agent-view { border-color: #00e5ff; } /* Mavi: Onur */
+        .analyst-view { border-color: #d000ff; } /* Mor: Özlem */
+
+        /* Girdiler ve Butonlar */
+        button {
+            background: #333; color: #fff; border: 1px solid #555;
+            padding: 12px 25px; font-family: 'Courier Prime', monospace;
+            font-size: 1rem; font-weight: bold; cursor: pointer;
+            transition: 0.3s; margin-top: 10px; width: 100%;
+        }
+        button:hover { background: #e63946; border-color: #e63946; color: #fff; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; background: #222; border-color: #333; }
+
+        input {
+            background: #000; border: 1px solid #444; color: #00e5ff;
+            padding: 10px; width: 100%; font-family: 'Courier Prime', monospace;
+            font-size: 1.5rem; text-align: center; letter-spacing: 5px; margin-bottom: 15px;
         }
 
-        /* Mobil Ayarlar (Responsive) */
-        @media (max-width: 480px) {
-            .container {
-                padding: 25px 15px;
-            }
-            h1 {
-                font-size: 1.4rem;
-            }
-            .value {
-                font-size: 2.2rem;
-            }
+        /* --- BULMACA ÖZEL EFEKTLERİ --- */
+        /* Kablo Kesme */
+        .wires-container { display: flex; gap: 15px; justify-content: center; margin: 20px 0; }
+        .wire { width: 30px; height: 100px; border-radius: 5px; cursor: pointer; position: relative; border: 2px solid rgba(255,255,255,0.2); }
+        .wire::after { content: ''; position: absolute; width: 100%; height: 100%; background: inherit; opacity: 0.6; }
+        .wire.cut { height: 40px; margin-top: 30px; opacity: 0.3; cursor: default; }
+        
+        /* Radyo */
+        .radio-display { font-size: 2.5rem; color: #e63946; font-family: 'Black Ops One'; margin-bottom: 10px; }
+        input[type=range] { width: 100%; accent-color: #e63946; }
+
+        .scan-line {
+            width: 100%; height: 2px; background: rgba(0, 255, 0, 0.3);
+            position: absolute; top: 0; left: 0; animation: scan 3s linear infinite; pointer-events: none;
         }
+        @keyframes scan { 0% { top: 0%; } 100% { top: 100%; } }
+        
+        .home-icon { position: absolute; top: 15px; right: 15px; text-decoration: none; font-size: 1.5rem; z-index: 100; filter: grayscale(100%); transition: 0.3s; }
+        .home-icon:hover { filter: grayscale(0%); transform: scale(1.1); }
+
     </style>
 </head>
 <body>
-    <a href="ozur.html" style="position: fixed; bottom: 20px; right: 20px; z-index: 999; text-decoration: none;">
-    <button style="
-        background: #bc13fe; 
-        color: white; 
-        border: none; 
-        padding: 15px 25px; 
-        border-radius: 50px; 
-        font-weight: bold; 
-        box-shadow: 0 0 20px rgba(188, 19, 254, 0.6);
-        cursor: pointer;
-        font-family: 'Poppins', sans-serif;
-        animation: shake 3s infinite;">
-        🎁 Sürpriz
-    </button>
-</a>
-<a href="doktor.html" style="position: fixed; bottom: 90px; right: 20px; z-index: 1000; text-decoration: none;">
-    <button style="
-        background: #00e676; 
-        color: #0f051d; 
-        border: none; 
-        padding: 12px 25px; 
-        border-radius: 50px; 
-        font-weight: 800; 
-        box-shadow: 0 0 15px rgba(0, 230, 118, 0.4); 
-        cursor: pointer; 
-        font-family: 'Poppins', sans-serif;
-        display: flex; 
-        align-items: center; 
-        gap: 8px;
-        transition: transform 0.2s;"
-        onmouseover="this.style.transform='scale(1.05)'"
-        onmouseout="this.style.transform='scale(1)'">
-        🩺 Dr. Hedef
-    </button>
-</a>
-<a href="hedef.html" style="position: fixed; bottom: 160px; right: 20px; z-index: 1001; text-decoration: none;">
-    <button style="
-        background: linear-gradient(45deg, #ff9a9e, #fecfef); 
-        color: #880e4f; 
-        border: none; 
-        padding: 12px 25px; 
-        border-radius: 50px; 
-        font-weight: 800; 
-        box-shadow: 0 0 15px rgba(255, 154, 158, 0.6); 
-        cursor: pointer; 
-        font-family: 'Poppins', sans-serif;
-        display: flex; 
-        align-items: center; 
-        gap: 8px;
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);"
-        onmouseover="this.style.transform='scale(1.1) rotate(-3deg)'"
-        onmouseout="this.style.transform='scale(1) rotate(0deg)'">
-        🎀 2026 Panosu
-    </button>
-</a>
-<a href="oyun.html" style="position: fixed; bottom: 230px; right: 20px; z-index: 1002; text-decoration: none;">
-    <button style="
-        background: linear-gradient(45deg, #00c6ff, #0072ff); 
-        color: white; 
-        border: none; 
-        padding: 12px 25px; 
-        border-radius: 50px; 
-        font-weight: 800; 
-        box-shadow: 0 0 15px rgba(0, 198, 255, 0.6); 
-        cursor: pointer; 
-        font-family: 'Poppins', sans-serif;
-        display: flex; 
-        align-items: center; 
-        gap: 8px;
-        transition: all 0.3s;"
-        onmouseover="this.style.transform='scale(1.1)'"
-        onmouseout="this.style.transform='scale(1)'">
-        🎮 Stres At
-    </button>
-</a>
-<a href="ay.html" style="position: fixed; bottom: 370px; right: 20px; z-index: 1004; text-decoration: none;">
-    <button style="
-        background: linear-gradient(45deg, #667eea, #764ba2); 
-        color: white; 
-        border: none; 
-        padding: 12px 25px; 
-        border-radius: 50px; 
-        font-weight: 800; 
-        box-shadow: 0 0 15px rgba(118, 75, 162, 0.6); 
-        cursor: pointer; 
-        font-family: 'Poppins', sans-serif;
-        display: flex; 
-        align-items: center; 
-        gap: 8px;
-        transition: all 0.3s;"
-        onmouseover="this.style.transform='scale(1.1)'"
-        onmouseout="this.style.transform='scale(1)'">
-        🌙 Ay Işığım
-    </button>
-</a>
-<style>
-@keyframes shake {
-    0%, 100% { transform: rotate(0deg); }
-    10%, 30%, 50%, 70%, 90% { transform: rotate(-5deg); }
-    20%, 40%, 60%, 80% { transform: rotate(5deg); }
-}
-</style>
+
+    <a href="index.html" class="home-icon">🏠</a>
 
     <div class="container">
-        <div class="heart-icon">💜</div>
-        <h1>BİRLİKTELİĞİMİZ</h1>
+        <div class="scan-line"></div>
+        <h1>GİZLİ DOSYA: 1923</h1>
 
-        <div class="counter-wrapper">
-            <div class="stat-card">
-                <span class="label">İlk Karşılaşma (02/03/2025)</span>
-                <div>
-                    <span id="tanisma-gun" class="value">0</span>
-                    <span class="unit">Gündür Seni Tanıyorum</span>
-                </div>
-            </div>
-
-            <div class="stat-card">
-                <span class="label">Sonsuzluğa Adım (17/03/2025)</span>
-                <div>
-                    <span id="sevgili-gun" class="value">0</span>
-                    <span class="unit">Gündür Sevgiliyiz</span>
-                </div>
-            </div>
+        <div id="statusBar" class="status-bar hidden">
+            <span>AJAN: <span id="playerRole" class="role-badge">...</span></span>
+            <span>GÖREV: <span id="levelIndicator">1</span>/4</span>
         </div>
 
-        <p style="margin-top: 30px; font-size: 0.8rem; opacity: 0.5;">
-            Seni her geçen gün daha çok seviyorum...
-        </p>
+        <div id="loginScreen" class="game-screen">
+            <p style="margin-bottom: 20px; font-size: 1.1rem;">GÜVENLİK PROTOKOLÜ BAŞLATILIYOR...</p>
+            <p style="color: #666; font-size: 0.8rem; margin-bottom: 30px;">Lütfen kimlik doğrulaması yapın.</p>
+            
+            <button onclick="selectRole('onur')" style="border-left: 5px solid #00e5ff;">BEN ONUR (SAHA AJANI)</button>
+            <p style="font-size: 0.7rem; color:#444; margin: 5px 0 20px;">Görev: Kilitleri açmak, bombaları imha etmek.</p>
+
+            <button onclick="selectRole('ozlem')" style="border-left: 5px solid #d000ff;">BEN ÖZLEM (İSTİHBARAT)</button>
+            <p style="font-size: 0.7rem; color:#444; margin: 5px 0;">Görev: Şifreleri çözmek, ajanı yönlendirmek.</p>
+        </div>
+
+        <div id="lobbyScreen" class="game-screen hidden">
+            <h2 style="color: #fca311;">BAĞLANTI KURULUYOR...</h2>
+            <p class="blink" style="margin-top: 20px; color: #888;">Diğer ajan bekleniyor.</p>
+            <p id="lobbyStatus" style="margin-top: 10px; font-size: 0.8rem; color: #00e5ff;">...</p>
+        </div>
+
+        <div id="gameContent" class="game-screen hidden">
+            </div>
+
+        <div id="victoryScreen" class="game-screen hidden">
+            <h1 style="color: #00ff88; text-shadow: 0 0 20px #00ff88;">GÖREV BAŞARILI!</h1>
+            <p>Dünyayı kurtardınız ajanlar.</p>
+            <p style="margin-top: 20px; color: #ccc;">Harika bir takımsınız! 💜💙</p>
+            <button onclick="location.reload()">YENİ GÖREV BAŞLAT</button>
+        </div>
+
     </div>
 
     <script>
-        function hesapla(tarihStr) {
-            // 1. Gelen tarihi al (Örn: 2025-03-02)
-            const baslangic = new Date(tarihStr);
+        // --- FIREBASE AYARLARI (Senin Kodların) ---
+        const firebaseConfig = {
+          apiKey: "AIzaSyBHejjQe2dHnwDYES3Qd30HKO94-_D5lVA",
+          authDomain: "ask-oyunu-5d368.firebaseapp.com",
+          databaseURL: "https://ask-oyunu-5d368-default-rtdb.firebaseio.com",
+          projectId: "ask-oyunu-5d368",
+          storageBucket: "ask-oyunu-5d368.firebasestorage.app",
+          messagingSenderId: "550862375128",
+          appId: "1:550862375128:web:fb49cef5e3c5440d996fad",
+          measurementId: "G-T1GCW04QD0"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const gameRef = db.ref('detective_game');
+
+        // --- OYUN DEĞİŞKENLERİ ---
+        let myRole = ""; // 'onur' veya 'ozlem'
+        let currentLevel = 1;
+
+        // --- 1. ROL SEÇİMİ ---
+        function selectRole(role) {
+            myRole = role;
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('lobbyScreen').classList.remove('hidden');
             
-            // 2. Şu anki tarihi TÜRKİYE saat dilimine (Europe/Istanbul) çevirerek al
-            // Bu kısım kullanıcının saati yanlış olsa bile veya farklı ülkede olsa bile
-            // Türkiye saatine göre 00:00'da günün değişmesini sağlar.
-            const simdi = new Date(new Date().toLocaleString("en-US", { timeZone: "Europe/Istanbul" }));
+            document.getElementById('statusBar').classList.remove('hidden');
+            document.getElementById('playerRole').innerText = role.toUpperCase();
+            document.getElementById('playerRole').style.color = role === 'onur' ? '#00e5ff' : '#d000ff';
 
-            // 3. Saat farklarını sıfırla ki sadece takvim günü farkını alalım
-            // Böylece gece yarısı 00:00 olduğu an gün sayısı artar.
-            baslangic.setHours(0, 0, 0, 0);
-            simdi.setHours(0, 0, 0, 0);
+            // Firebase'e bağlandığını bildir
+            gameRef.child('players/' + role).set(true);
 
-            // 4. Farkı hesapla (Milisaniye -> Gün)
-            const farkMiliSaniye = simdi - baslangic;
-            return Math.floor(farkMiliSaniye / (1000 * 60 * 60 * 24));
+            // Oyunu dinle
+            listenToGame();
         }
 
-        function guncelle() {
-            // JS formatı YYYY-MM-DD
-            document.getElementById('tanisma-gun').innerText = hesapla('2025-03-02');
-            document.getElementById('sevgili-gun').innerText = hesapla('2025-03-17');
+        // --- 2. OYUN DÖNGÜSÜ ---
+        function listenToGame() {
+            // Seviye takibi
+            gameRef.child('level').on('value', (snapshot) => {
+                const level = snapshot.val() || 1;
+                currentLevel = level;
+                document.getElementById('levelIndicator').innerText = level;
+
+                // Eğer 5. seviyeye gelindiyse oyun bitti
+                if (level > 4) {
+                    showScreen('victoryScreen');
+                } else {
+                    renderLevel(level);
+                }
+            });
+
+            // Lobi kontrolü (İki oyuncu da geldi mi?)
+            gameRef.child('players').on('value', (snapshot) => {
+                const players = snapshot.val();
+                if (players && players.onur && players.ozlem) {
+                    // İkisi de hazırsa oyunu başlat (seviye 1 değilse bile mevcut seviyeden devam et)
+                    gameRef.child('level').get().then((snap) => {
+                         if(!snap.exists()) gameRef.child('level').set(1);
+                    });
+                    showScreen('gameContent');
+                } else {
+                    document.getElementById('lobbyStatus').innerText = 
+                        myRole === 'onur' ? "Özlem bekleniyor..." : "Onur bekleniyor...";
+                }
+            });
         }
 
-        // Sayfa açıldığında çalıştır
-        guncelle();
+        function showScreen(screenId) {
+            ['loginScreen', 'lobbyScreen', 'gameContent', 'victoryScreen'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+        }
+
+        // --- 3. SEVİYE TASARIMLARI (Senaryolar) ---
+        function renderLevel(level) {
+            const container = document.getElementById('gameContent');
+            container.innerHTML = ""; // Temizle
+
+            let html = "";
+
+            // ---------------------------------------------------------
+            // SEVİYE 1: RADYO FREKANSI
+            // ---------------------------------------------------------
+            if (level === 1) {
+                if (myRole === 'ozlem') {
+                    // Özlem (Analist) Görünümü
+                    html = `
+                        <div class="message-box analyst-view">
+                            <h3>📜 İSTİHBARAT RAPORU #1</h3>
+                            <p>Düşman sığınağına sızdık. Ajan Onur bir radyo vericisi bulacak.</p>
+                            <p>Doğru frekans kodunu ona söylemelisin:</p>
+                            <h2 style="color:#d000ff; text-align:center; font-size:2rem; margin-top:10px;">104.5 MHz</h2>
+                            <p style="font-size:0.8rem; margin-top:10px;">(Sakın yanlış frekansı ayarlamasına izin verme!)</p>
+                        </div>
+                        <p>Ajanın frekansı ayarlamasını bekle...</p>
+                    `;
+                } else {
+                    // Onur (Ajan) Görünümü
+                    html = `
+                        <div class="message-box agent-view">
+                            <h3>📻 SAHA GÖREVİ</h3>
+                            <p>Eski bir radyo cihazı buldun. Sinyal karıştırılıyor.</p>
+                            <p>İstihbarat şefine (Özlem) sor: Hangi frekansa ayarlamalıyım?</p>
+                        </div>
+                        <div class="radio-display" id="freqDisplay">88.0 MHz</div>
+                        <input type="range" min="88" max="108" step="0.5" value="88" oninput="updateFreq(this.value)">
+                        <button onclick="checkLevel1()">FREKANSI ONAYLA</button>
+                    `;
+                }
+            }
+            
+            // ---------------------------------------------------------
+            // SEVİYE 2: ŞİFRELİ KASA
+            // ---------------------------------------------------------
+            else if (level === 2) {
+                if (myRole === 'ozlem') {
+                    html = `
+                        <div class="message-box analyst-view">
+                            <h3>📜 İSTİHBARAT RAPORU #2</h3>
+                            <p>Ajan kilitli bir kapı buldu. Şifre, Cumhuriyetimizin ilan edildiği yıldır.</p>
+                            <p>Ama dikkatli ol, şifreyi tersten girmesi gerekiyor!</p>
+                            <h2 style="color:#d000ff; text-align:center; margin-top:10px;">Şifre: 1923</h2>
+                            <p style="color:#ff3b3b; font-weight:bold; text-align:center;">GİRİLECEK KOD: 3291</p>
+                        </div>
+                        <p>Ajanın şifreyi girmesini bekle...</p>
+                    `;
+                } else {
+                    html = `
+                        <div class="message-box agent-view">
+                            <h3>🔒 DİJİTAL KİLİT</h3>
+                            <p>Kapıda 4 haneli bir şifre paneli var.</p>
+                            <p>Özlem'e sor: Şifre nedir? (Ters girilmesi gerekebilir!)</p>
+                        </div>
+                        <input type="number" id="passcode" placeholder="____" maxlength="4">
+                        <button onclick="checkLevel2()">KİLİDİ AÇ</button>
+                    `;
+                }
+            }
+
+            // ---------------------------------------------------------
+            // SEVİYE 3: BOMBA İMHASI (KABLOLAR)
+            // ---------------------------------------------------------
+            else if (level === 3) {
+                if (myRole === 'ozlem') {
+                    html = `
+                        <div class="message-box analyst-view">
+                            <h3>💣 BOMBA İMHA KILAVUZU</h3>
+                            <p>Sakin ol! Onur bir bomba mekanizmasıyla karşı karşıya.</p>
+                            <p>Talimatları sırasıyla okumalısın:</p>
+                            <ul style="margin-left:20px; margin-top:10px;">
+                                <li>1. ASLA Kırmızı kabloyu kesme.</li>
+                                <li>2. Eğer Sarı kablo varsa, Mavi kabloyu kes.</li>
+                                <li>3. Sadece MAVİ kabloyu kesmelisin.</li>
+                            </ul>
+                        </div>
+                        <p>Ajanın doğru kabloyu kesmesini bekle...</p>
+                    `;
+                } else {
+                    html = `
+                        <div class="message-box agent-view">
+                            <h3>⚠️ TEHLİKE: BOMBA</h3>
+                            <p>Zamanlayıcı işliyor! Hangi kabloyu kesmeliyim?</p>
+                            <p>Özlem'in talimatlarını bekle. Yanlış kablo = BOOM.</p>
+                        </div>
+                        <div class="wires-container">
+                            <div class="wire" style="background:red;" onclick="cutWire('red')"></div>
+                            <div class="wire" style="background:blue;" onclick="cutWire('blue')"></div>
+                            <div class="wire" style="background:yellow;" onclick="cutWire('yellow')"></div>
+                            <div class="wire" style="background:green;" onclick="cutWire('green')"></div>
+                        </div>
+                        <p id="wireStatus" style="color:red; height:20px;"></p>
+                    `;
+                }
+            }
+            
+            // ---------------------------------------------------------
+            // SEVİYE 4: SON DOĞRULAMA (SEVGİ TESTİ)
+            // ---------------------------------------------------------
+            else if (level === 4) {
+                 if (myRole === 'ozlem') {
+                    html = `
+                        <div class="message-box analyst-view">
+                            <h3>❤️ SON GÜVENLİK DUVARI</h3>
+                            <p>Sistem son bir sesli doğrulama istiyor.</p>
+                            <p>Onur'a şunu sor: "Bizim sonsuzluk tarihimiz ne?"</p>
+                            <p>Cevabı sen de girmelisin, o da girmeli!</p>
+                            <h2 style="color:#d000ff; text-align:center;">17.03.2025</h2>
+                        </div>
+                        <input type="text" id="finalDate" placeholder="GG.AA.YYYY">
+                        <button onclick="checkLevel4()">ONAYLA</button>
+                    `;
+                } else {
+                    html = `
+                        <div class="message-box agent-view">
+                            <h3>❤️ SİSTEM KİLİDİ</h3>
+                            <p>Ana bilgisayara eriştin. Son şifre "Sonsuzluk Tarihiniz".</p>
+                            <p>Özlem ile aynı anda doğru tarihi girmelisiniz.</p>
+                        </div>
+                        <input type="text" id="finalDate" placeholder="GG.AA.YYYY">
+                        <button onclick="checkLevel4()">ONAYLA</button>
+                    `;
+                }
+            }
+
+            container.innerHTML = html;
+        }
+
+        // --- GÖREV KONTROL FONKSİYONLARI (Onur için) ---
         
-        // Gece 00:00'ı yakalamak için periyodik kontrol (her dakika)
-        setInterval(guncelle, 60000);
+        // Level 1: Radyo
+        let currentFreq = 88;
+        function updateFreq(val) {
+            currentFreq = val;
+            document.getElementById('freqDisplay').innerText = val + " MHz";
+        }
+        function checkLevel1() {
+            if (currentFreq == 104.5) {
+                nextLevel();
+            } else {
+                alert("Hatalı Frekans! Sinyal alınamıyor.");
+            }
+        }
+
+        // Level 2: Şifre
+        function checkLevel2() {
+            const pass = document.getElementById('passcode').value;
+            if (pass === "3291") {
+                nextLevel();
+            } else {
+                alert("Erişim Reddedildi! Şifre yanlış.");
+            }
+        }
+
+        // Level 3: Kablo
+        function cutWire(color) {
+            if (color === 'blue') {
+                document.getElementById('wireStatus').innerText = "Bomba İmha Edildi!";
+                setTimeout(nextLevel, 1000);
+            } else {
+                alert("YANLIŞ KABLO! SİSTEM KİLİTLENDİ! (Tekrar dene)");
+            }
+        }
+
+        // Level 4: Son Tarih (Her ikisi de basmalı)
+        function checkLevel4() {
+            const date = document.getElementById('finalDate').value;
+            if (date === "17.03.2025" || date === "17/03/2025") {
+                // Burada basit bir hile yapıyoruz, kim doğru girerse seviyeyi bitirir.
+                // Normalde ikisinin de onayı beklenir ama tek dosya için bu yeterli.
+                nextLevel(); 
+            } else {
+                alert("Tarih eşleşmedi!");
+            }
+        }
+
+        // --- SEVİYE ATLAMA ---
+        function nextLevel() {
+            gameRef.child('level').transaction((current) => {
+                return (current || 1) + 1;
+            });
+        }
+
     </script>
 </body>
 </html>
