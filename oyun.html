@@ -3,251 +3,229 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dr. Özlem: Hızlı ve Öfkeli 🛍️</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@400;900&display=swap" rel="stylesheet">
+    <title>Dr. Özlem Koşuyor: Final 🏃‍♀️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@600;900&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <style>
+        /* --- RESET VE TEMEL --- */
         * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
         
         body {
-            background-color: #222;
-            overflow: hidden;
-            touch-action: none;
-            font-family: 'Poppins', sans-serif;
+            background-color: #333; overflow: hidden; font-family: 'Poppins', sans-serif;
+            touch-action: none; /* Mobilde kaydırmayı kilitler */
         }
 
-        #gameCanvas {
-            display: block;
-            width: 100%;
-            height: 100%;
+        /* Oyun Alanı Arka Planı (CSS ile - Performans İçin) */
+        #gameWrapper {
+            position: relative; width: 100%; height: 100vh;
+            background: linear-gradient(180deg, #87CEEB 0%, #B3E5FC 100%);
+            display: flex; justify-content: center; align-items: center;
         }
 
-        /* --- ARAYÜZ KATMANI --- */
+        canvas { 
+            display: block; 
+            max-width: 100%; max-height: 100%; 
+            /* PC'de çok yayılmasın diye sınır koyuyoruz */
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        }
+
+        /* --- ARAYÜZ (HUD) --- */
         .ui-layer {
-            position: absolute; top: 15px; left: 15px; right: 15px; pointer-events: none;
-            display: flex; justify-content: space-between; z-index: 20;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 10;
         }
 
-        .hud-group { display: flex; gap: 8px; }
-
-        .hud-box {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 8px 18px; border-radius: 50px;
-            border-bottom: 4px solid #bbb;
-            color: #333; font-size: 1rem; font-weight: 800;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            display: flex; align-items: center; gap: 6px;
+        /* Üst Bilgi Çubuğu */
+        .top-bar {
+            position: absolute; top: 15px; left: 15px; right: 15px;
+            display: flex; justify-content: space-between; align-items: flex-start;
             pointer-events: auto;
         }
 
-        /* --- LİDER TABLOSU (SAĞ ORTA - ESKİ YERİNDE) --- */
+        .stats { display: flex; flex-direction: column; gap: 8px; }
+
+        .hud-box {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 8px 15px; border-radius: 30px;
+            border: 3px solid #333; color: #333;
+            font-size: 0.9rem; font-weight: 900;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+            display: flex; align-items: center; gap: 8px; width: fit-content;
+        }
+
+        #btnPause {
+            width: 45px; height: 45px; border-radius: 50%;
+            background: #fff; border: 3px solid #333;
+            font-size: 1.2rem; display: flex; align-items: center; justify-content: center;
+            cursor: pointer; box-shadow: 0 4px 0 rgba(0,0,0,0.1);
+            transition: transform 0.1s;
+        }
+        #btnPause:active { transform: scale(0.9); }
+
+        /* Lider Tablosu */
         #leaderboard {
-            position: absolute; top: 50%; right: 15px; transform: translateY(-50%);
-            background: #fff; border-radius: 15px; padding: 12px; width: 170px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.3); z-index: 50; border: 4px solid #4facfe;
+            position: absolute; top: 80px; right: 15px;
+            background: rgba(255, 255, 255, 0.9); border: 3px solid #4facfe;
+            border-radius: 15px; padding: 10px; width: 160px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
-        #leaderboard h3 { 
-            text-align: center; margin-bottom: 8px; color: #0072ff; 
-            font-family: 'Fredoka One', cursive; font-size: 0.9rem; letter-spacing: 1px;
-            border-bottom: 2px dashed #ccc; padding-bottom: 5px;
+        #leaderboard h3 {
+            margin: 0 0 5px 0; text-align: center; font-size: 0.8rem; color: #0072ff;
+            border-bottom: 2px dashed #ccc;
         }
-        .score-item { display: flex; justify-content: space-between; padding: 5px; font-weight: bold; border-radius: 6px; margin-bottom: 4px; font-size: 0.8rem; }
-        .score-item:nth-child(2) { background: #FFD700; } /* 1. Altın */
-        .score-item:nth-child(3) { background: #C0C0C0; } /* 2. Gümüş */
-        .score-item:nth-child(4) { background: #CD7F32; } /* 3. Bronz */
-
-        /* --- MAĞAZA EKRANI --- */
-        #shopScreen {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(255, 255, 255, 0.98); z-index: 150;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
-        
-        .shop-header {
-            display: flex; justify-content: space-between; width: 90%; max-width: 400px;
-            align-items: center; margin-bottom: 15px;
-        }
-
-        .shop-grid {
-            display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
-            max-height: 55vh; overflow-y: auto; padding: 10px; width: 95%; max-width: 450px;
-        }
-
-        .shop-item {
-            background: #fff; border: 3px solid #eee; border-radius: 15px;
-            padding: 5px; text-align: center; cursor: pointer; transition: 0.1s;
-            position: relative; height: 110px; display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-            box-shadow: 0 4px 0 #ddd;
-        }
-        .shop-item:active { transform: translateY(3px); box-shadow: 0 2px 0 #ddd; }
-        .shop-item.selected { border-color: #00f260; background: #e8f5e9; border-width: 4px; transform: scale(1.03); }
-        .shop-item.locked { opacity: 0.6; filter: grayscale(1); }
-        
-        .shop-emoji { font-size: 2.2rem; margin-bottom: 5px; }
-        .shop-price { font-size: 0.8rem; font-weight: bold; color: #fff; background: #555; padding: 2px 8px; border-radius: 10px; }
-        .shop-owned { font-size: 0.7rem; color: #27ae60; font-weight: 900; display: none; text-transform: uppercase; }
-        
-        .shop-item.owned .shop-price { display: none; }
-        .shop-item.owned .shop-owned { display: block; }
+        .lb-row { font-size: 0.75rem; font-weight: bold; display: flex; justify-content: space-between; margin-bottom: 2px; }
+        .lb-row:nth-child(2) { color: #d35400; }
 
         /* --- MENÜLER --- */
         .screen {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            text-align: center; background: #ffffff; padding: 30px;
-            border-radius: 30px; border: 5px solid #4facfe;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
-            width: 90%; max-width: 400px; z-index: 100;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7); z-index: 100;
+            display: flex; align-items: center; justify-content: center;
+            pointer-events: auto;
         }
         .hidden { display: none !important; }
 
-        h1 { font-family: 'Fredoka One', cursive; font-size: 1.8rem; margin-bottom: 10px; color: #333; }
-        
+        .panel {
+            background: #fff; padding: 25px; width: 90%; max-width: 380px;
+            border-radius: 25px; border: 5px solid #333;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: center;
+        }
+
+        h1 { font-family: 'Fredoka One', cursive; font-size: 1.8rem; color: #333; margin-bottom: 15px; }
+        p { margin-bottom: 15px; color: #555; font-size: 0.9rem; }
+
+        /* Butonlar */
+        .btn {
+            background: linear-gradient(180deg, #4facfe 0%, #00f2fe 100%);
+            border: 3px solid #333; padding: 12px; border-radius: 50px;
+            font-size: 1rem; font-weight: 900; color: #fff; cursor: pointer;
+            width: 100%; margin-top: 10px; box-shadow: 0 5px 0 #0056b3;
+            transition: transform 0.1s; text-transform: uppercase;
+        }
+        .btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #0056b3; }
+        .btn-shop { background: linear-gradient(180deg, #ff9966 0%, #ff5e62 100%); box-shadow: 0 5px 0 #c0392b; }
+        .btn-shop:active { transform: translateY(3px); box-shadow: 0 2px 0 #c0392b; }
+        .btn-red { background: #ff4757; box-shadow: 0 5px 0 #c0392b; }
+        .btn-close { width: auto; padding: 8px 30px; margin: 15px auto 0; background: #555; box-shadow: 0 5px 0 #222; }
+
         input {
-            width: 100%; padding: 12px; font-size: 1.1rem; border: 2px solid #ddd;
-            border-radius: 50px; margin-bottom: 15px; font-family: 'Poppins', sans-serif;
-            text-align: center; font-weight: bold; outline: none;
+            width: 100%; padding: 10px; font-size: 1.1rem; border: 3px solid #ddd;
+            border-radius: 10px; margin-bottom: 15px; text-align: center;
+            font-weight: bold; font-family: 'Poppins', sans-serif; outline: none;
         }
         input:focus { border-color: #4facfe; }
 
-        .btn-primary {
-            background: linear-gradient(45deg, #00c6ff, #0072ff);
-            color: #fff; border: none; padding: 12px 30px; font-size: 1rem; font-weight: 900;
-            border-radius: 50px; cursor: pointer; box-shadow: 0 5px 0 #0056b3;
-            transition: transform 0.1s; text-transform: uppercase; width: 100%; margin-bottom: 10px;
+        /* Mağaza Grid */
+        .shop-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+            max-height: 250px; overflow-y: auto; padding: 5px;
         }
-        .btn-primary:active { transform: translateY(3px); box-shadow: 0 2px 0 #0056b3; }
-        
-        .btn-shop { background: linear-gradient(45deg, #ff9966, #ff5e62); box-shadow: 0 5px 0 #c0392b; }
-        .btn-shop:active { box-shadow: 0 2px 0 #c0392b; transform: translateY(3px); }
-        
-        .btn-close { background: #555; width: auto; padding: 8px 30px; margin-top: 10px; box-shadow: 0 5px 0 #333; }
+        .shop-item {
+            border: 3px solid #eee; border-radius: 15px; padding: 10px 5px;
+            cursor: pointer; display: flex; flex-direction: column; align-items: center;
+            transition: 0.1s; background: #fff;
+        }
+        .shop-item:active { transform: scale(0.95); }
+        .shop-item.selected { border-color: #27ae60; background: #e8f5e9; border-width: 3px; }
+        .shop-item.locked { opacity: 0.5; filter: grayscale(1); }
+        .item-icon { font-size: 2rem; margin-bottom: 5px; }
+        .item-price { font-size: 0.75rem; font-weight: bold; background: #eee; padding: 2px 6px; border-radius: 8px; color: #555; }
+        .item-owned { font-size: 0.7rem; color: #27ae60; font-weight: 900; display: none; }
+        .shop-item.owned .item-price { display: none; }
+        .shop-item.owned .item-owned { display: block; }
 
-        /* Pause Butonu */
-        #pauseBtn {
-            cursor: pointer; width: 45px; height: 45px; justify-content: center;
-            background: #fff; border: 3px solid #4facfe; font-size: 1.4rem;
-            display: flex; align-items: center; border-radius: 50%;
-            box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+        /* Efekt */
+        #celebration {
+            position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%);
+            font-family: 'Fredoka One', cursive; font-size: 3rem; color: #FFD700;
+            text-shadow: 0 5px 0 rgba(0,0,0,0.2); pointer-events: none; z-index: 50;
+            animation: pop 0.5s;
         }
-        #pauseBtn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0,0,0,0.2); }
-
-        #celebrationMsg {
-            position: absolute; top: 20%; width: 100%; text-align: center; font-size: 3rem;
-            font-family: 'Fredoka One', cursive; color: #FFD700; -webkit-text-stroke: 2px #fff;
-            text-shadow: 0 5px 15px rgba(0,0,0,0.2); z-index: 50; pointer-events: none;
-            animation: popIn 0.5s;
-        }
-        @keyframes popIn { from { transform: scale(0); } to { transform: scale(1); } }
-
-        .home-btn {
-            position: absolute; top: 70px; left: 15px; background: #fff; padding: 8px 15px;
-            border-radius: 10px; text-decoration: none; color: #333; font-weight: 800;
-            border: 2px solid #ddd; z-index: 60; font-size: 0.8rem;
-        }
+        @keyframes pop { from{transform:translate(-50%,-50%) scale(0);} to{transform:translate(-50%,-50%) scale(1);} }
 
     </style>
 </head>
 <body>
 
-    <canvas id="gameCanvas"></canvas>
+    <div id="gameWrapper">
+        <canvas id="gameCanvas"></canvas>
 
-    <div class="ui-layer">
-        <div class="hud-group">
-            <div class="hud-box">👤 <span id="playerNameDisplay">Misafir</span></div>
-            <div class="hud-box" style="color:#0072ff">⚡ <span id="scoreVal">0</span></div>
-            <div class="hud-box" style="color:#27ae60">💵 <span id="moneyVal">0</span></div>
-        </div>
-        <div id="pauseBtn" onclick="togglePause()">⏸️</div>
-    </div>
-
-    <div id="leaderboard">
-        <h3>🏆 TOP 3</h3>
-        <div id="scoreList">Yükleniyor...</div>
-    </div>
-
-    <div id="celebrationMsg" class="hidden">100 PUAN! 🎉</div>
-    <a href="index.html" class="home-btn">🏠 Çıkış</a>
-
-    <div id="shopScreen" class="hidden">
-        <div class="shop-header">
-            <h1 style="font-size:1.5rem; margin:0;">KARAKTERLER</h1>
-            <div class="hud-box" style="color:#27ae60">💵 <span id="shopBalance">0</span></div>
-        </div>
-        <div class="shop-grid" id="shopGrid"></div>
-        <button class="btn-primary btn-close" onclick="closeShop()">KAPAT</button>
-    </div>
-
-    <div id="nameScreen" class="screen">
-        <h1>Dr. Özlem Koşuyor</h1>
-        <p style="color:#666; margin-bottom:15px; font-size:0.9rem;">Sıralama için adını yaz:</p>
-        <input type="text" id="nameInput" placeholder="İsminiz..." maxlength="12">
-        <button class="btn-primary" onclick="submitName()">KAYDET VE GİR</button>
-    </div>
-
-    <div id="startScreen" class="screen hidden">
-        <h1>HAZIRLAN!</h1>
-        <p style="color:#555; margin-bottom:20px; font-size:0.9rem;">
-            👆 <b>Zıpla</b> | 👇 <b>Eğil</b><br>
-            💵 Para topla, karakter al!
-        </p>
-        <button class="btn-primary" onclick="startGame()">KOŞMAYA BAŞLA 🏃‍♀️</button>
-        <button class="btn-primary btn-shop" onclick="openShop()">🏪 MAĞAZA</button>
-    </div>
-
-    <div id="pauseScreen" class="screen hidden">
-        <h1>DURAKLATILDI</h1>
-        <button class="btn-primary" onclick="togglePause()">DEVAM ET ▶️</button>
-        <button class="btn-primary" style="background:#ff4757; box-shadow:0 5px 0 #c0392b;" onclick="location.reload()">ÇIKIŞ</button>
-    </div>
-
-    <div id="gameOverScreen" class="screen hidden">
-        <h1 style="color:#e74c3c;">YANDIN!</h1>
-        <div style="display:flex; justify-content:space-around; width:100%; margin-bottom:15px;">
-            <div>
-                <p style="font-size:0.8rem; color:#555;">KAZANÇ</p>
-                <p style="font-size:1.2rem; font-weight:bold; color:#27ae60;">💵 <span id="collectedMoney">0</span></p>
+        <div class="ui-layer">
+            <div class="top-bar">
+                <div class="stats">
+                    <div class="hud-box">👤 <span id="dispName">Misafir</span></div>
+                    <div class="hud-box" style="color:#0072ff">⚡ <span id="dispScore">0</span></div>
+                    <div class="hud-box" style="color:#27ae60">💵 <span id="dispMoney">0</span></div>
+                </div>
+                <div id="btnPause" onclick="Game.togglePause()">⏸️</div>
             </div>
-            <div>
-                <p style="font-size:0.8rem; color:#555;">SKOR</p>
-                <p style="font-size:1.2rem; font-weight:bold; color:#0072ff;">⚡ <span id="finalScore">0</span></p>
+
+            <div id="leaderboard">
+                <h3>🏆 LİDERLER</h3>
+                <div id="lbContent">Yükleniyor...</div>
             </div>
         </div>
-        <button class="btn-primary" onclick="backToMenu()">MENÜYE DÖN 🏠</button>
+
+        <div id="celebration" class="hidden">100 PUAN! 🎉</div>
+
+        <div id="screenName" class="screen">
+            <div class="panel">
+                <h1>Dr. Özlem Koşuyor</h1>
+                <p>Sıralamaya girmek için ismini yaz:</p>
+                <input type="text" id="inpName" placeholder="Adın ne?" maxlength="12">
+                <button class="btn" onclick="UI.submitName()">KAYDET VE GİR</button>
+            </div>
+        </div>
+
+        <div id="screenMenu" class="screen hidden">
+            <div class="panel">
+                <h1>HAZIRLAN!</h1>
+                <p>
+                    <b>PC:</b> Boşluk (Zıpla) / Aşağı Ok (Eğil)<br>
+                    <b>Mobil:</b> Dokun (Zıpla) / Kaydır (Eğil)<br>
+                    Paraları topla, karakterleri aç!
+                </p>
+                <button class="btn" onclick="Game.start()">KOŞMAYA BAŞLA 🏃‍♀️</button>
+                <button class="btn btn-shop" onclick="UI.openShop()">🏪 MAĞAZA</button>
+            </div>
+        </div>
+
+        <div id="screenShop" class="screen hidden">
+            <div class="panel">
+                <h1>MAĞAZA</h1>
+                <div style="margin-bottom:10px; color:#27ae60; font-weight:bold;">
+                    BAKİYE: 💵 <span id="shopBalance">0</span>
+                </div>
+                <div class="shop-grid" id="shopGrid"></div>
+                <button class="btn btn-close" onclick="UI.showScreen('screenMenu')">KAPAT</button>
+            </div>
+        </div>
+
+        <div id="screenPause" class="screen hidden">
+            <div class="panel">
+                <h1>DURAKLATILDI</h1>
+                <button class="btn" onclick="Game.togglePause()">DEVAM ET ▶️</button>
+                <button class="btn btn-red" onclick="location.reload()">ÇIKIŞ</button>
+            </div>
+        </div>
+
+        <div id="screenOver" class="screen hidden">
+            <div class="panel">
+                <h1 style="color:#ff4757">YANDIN!</h1>
+                <p>SKOR: <span id="endScore" style="font-size:1.5rem; color:#0072ff; font-weight:bold;">0</span></p>
+                <p>KAZANÇ: <span id="endMoney" style="font-size:1.2rem; color:#27ae60; font-weight:bold;">0</span> 💵</p>
+                <button class="btn" onclick="UI.showScreen('screenMenu')">MENÜYE DÖN</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        // --- VERİ YÖNETİMİ ---
-        const GameData = {
-            money: 0,
-            characters: [
-                { id: 0, emoji: "👩‍⚕️", price: 0, owned: true },
-                { id: 1, emoji: "👮‍♀️", price: 50, owned: false },
-                { id: 2, emoji: "🕵️‍♀️", price: 150, owned: false },
-                { id: 3, emoji: "🧟‍♀️", price: 300, owned: false },
-                { id: 4, emoji: "🧛‍♀️", price: 500, owned: false },
-                { id: 5, emoji: "🤖", price: 1000, owned: false }
-            ],
-            selectedCharId: 0,
-            load: function() {
-                const saved = localStorage.getItem('dr_ozlem_shop_v6');
-                if(saved) {
-                    const data = JSON.parse(saved);
-                    this.money = data.money || 0;
-                    if(data.characters) this.characters = data.characters;
-                    this.selectedCharId = data.selectedCharId || 0;
-                }
-            },
-            save: function() { localStorage.setItem('dr_ozlem_shop_v6', JSON.stringify(this)); },
-            getSelectedEmoji: function() { return this.characters.find(c => c.id === this.selectedCharId).emoji; }
-        };
-        GameData.load();
-
-        // --- FIREBASE ---
-        const firebaseConfig = {
+        // --- AYARLAR ---
+        const DB_KEY = "dr_ozlem_final_fix";
+        const FIREBASE_CONF = {
             apiKey: "AIzaSyBHejjQe2dHnwDYES3Qd30HKO94-_D5lVA",
             authDomain: "ask-oyunu-5d368.firebaseapp.com",
             databaseURL: "https://ask-oyunu-5d368-default-rtdb.firebaseio.com",
@@ -258,333 +236,314 @@
             measurementId: "G-T1GCW04QD0"
         };
 
+        // --- OYUNCU VERİSİ ---
+        const Data = {
+            name: "Misafir", money: 0,
+            chars: [
+                { id:0, icon:"👩‍⚕️", price:0, owned:true },
+                { id:1, icon:"👮‍♀️", price:50, owned:false },
+                { id:2, icon:"🕵️‍♀️", price:150, owned:false },
+                { id:3, icon:"🧟‍♀️", price:300, owned:false },
+                { id:4, icon:"🧙‍♀️", price:500, owned:false },
+                { id:5, icon:"🤖", price:1000, owned:false }
+            ],
+            selected: 0,
+            save: function() {
+                localStorage.setItem(DB_KEY, JSON.stringify(this));
+                UI.update();
+            },
+            load: function() {
+                const raw = localStorage.getItem(DB_KEY);
+                if(raw) {
+                    const d = JSON.parse(raw);
+                    this.name = d.name || "Misafir";
+                    this.money = d.money || 0;
+                    if(d.chars) this.chars = d.chars;
+                    this.selected = d.selected || 0;
+                }
+                UI.update();
+            },
+            getChar: function() { return this.chars.find(c => c.id === this.selected).icon; }
+        };
+
+        // --- FIREBASE BAŞLAT ---
         try {
-            firebase.initializeApp(firebaseConfig);
+            firebase.initializeApp(FIREBASE_CONF);
             const db = firebase.database();
-            const scoresRef = db.ref('runner_scores_money'); 
-            scoresRef.orderByChild('score').limitToLast(3).on('value', (snapshot) => {
-                const list = document.getElementById('scoreList');
+            db.ref('runner_scores_final_v4').orderByChild('score').limitToLast(3).on('value', snap => {
+                const list = document.getElementById('lbContent');
                 list.innerHTML = "";
-                let scores = [];
-                snapshot.forEach((child) => { scores.push(child.val()); });
-                scores.reverse().forEach((s, index) => {
-                    list.innerHTML += `<div class="score-item"><span>${index+1}.${s.name}</span><span>${s.score}</span></div>`;
+                let arr = [];
+                snap.forEach(c => arr.push(c.val()));
+                arr.reverse().forEach((s, i) => {
+                    list.innerHTML += `<div class="lb-row"><span>#${i+1} ${s.name}</span><span>${s.score}</span></div>`;
                 });
             });
-        } catch(e) { console.error(e); }
+        } catch(e) {}
 
-        let playerName = "Misafir";
-        function submitName() {
-            const input = document.getElementById('nameInput').value.trim();
-            if(input) {
-                playerName = input;
-                document.getElementById('playerNameDisplay').innerText = playerName;
-                document.getElementById('nameScreen').classList.add('hidden');
-                document.getElementById('startScreen').classList.remove('hidden');
-                updateMoneyUI();
-            } else alert("İsim gerekli!");
-        }
-
-        function saveScore(score) {
+        function sendScore(score) {
             if(typeof firebase !== 'undefined' && score > 0) {
-                firebase.database().ref('runner_scores_money').push({ name: playerName, score: score, date: Date.now() });
+                firebase.database().ref('runner_scores_final_v4').push({
+                    name: Data.name, score: score, date: Date.now()
+                });
             }
         }
 
-        function updateMoneyUI() {
-            document.getElementById('moneyVal').innerText = GameData.money;
-            document.getElementById('shopBalance').innerText = GameData.money;
-        }
-
-        // --- MAĞAZA ---
-        function openShop() {
-            document.getElementById('startScreen').classList.add('hidden');
-            document.getElementById('shopScreen').classList.remove('hidden');
-            renderShop();
-        }
-        function closeShop() {
-            document.getElementById('shopScreen').classList.add('hidden');
-            document.getElementById('startScreen').classList.remove('hidden');
-        }
-        function renderShop() {
-            const grid = document.getElementById('shopGrid');
-            grid.innerHTML = "";
-            document.getElementById('shopBalance').innerText = GameData.money;
-            GameData.characters.forEach(char => {
-                const item = document.createElement('div');
-                item.className = `shop-item ${char.owned ? 'owned' : ''} ${GameData.selectedCharId === char.id ? 'selected' : ''}`;
-                if(!char.owned && GameData.money < char.price) item.classList.add('locked');
-                item.innerHTML = `
-                    <div class="shop-emoji">${char.emoji}</div>
-                    <div class="shop-price">💵 ${char.price}</div>
-                    <div class="shop-owned">${GameData.selectedCharId === char.id ? 'SEÇİLİ' : 'SAHİPSİN'}</div>
-                `;
-                item.onclick = () => buyOrSelect(char.id);
-                grid.appendChild(item);
-            });
-        }
-        function buyOrSelect(id) {
-            const char = GameData.characters.find(c => c.id === id);
-            if (char.owned) {
-                GameData.selectedCharId = id; GameData.save(); renderShop();
-            } else {
-                if (GameData.money >= char.price) {
-                    if(confirm(`${char.price} Para karşılığı satın al?`)) {
-                        GameData.money -= char.price; char.owned = true;
-                        GameData.selectedCharId = id; GameData.save(); renderShop(); updateMoneyUI();
-                    }
-                }
-            }
-        }
-
-        // --- OYUN MOTORU (Canvas + Fizik Optimizasyonu) ---
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        
-        let S = 1; 
-        let isPlaying = false, isPaused = false;
-        let score = 0, sessionMoney = 0;
-        let gameSpeed = 0, frames = 0;
-        let celebrated100 = false;
-
-        function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            S = canvas.height / 600; 
-            if(canvas.width < 500) S *= 0.85;
-        }
-        window.addEventListener('resize', resize);
-        resize();
-
-        // Arka Plan Objeleri (Optimize)
-        const bgLayers = {
-            clouds: { items: [], speed: 0.2 },
-            mountains: { items: [], speed: 0.5 }
-        };
-
-        function initBG() {
-            bgLayers.clouds.items = []; bgLayers.mountains.items = [];
-            for(let i=0; i<6; i++) {
-                bgLayers.clouds.items.push({ x: Math.random()*canvas.width, y: Math.random()*200*S, type: "☁️" });
-                bgLayers.mountains.items.push({ x: i*300*S, y: canvas.height-160*S, type: "🏔️" });
-            }
-        }
-
-        const ground = {
-            get h() { return 100 * S; },
-            get y() { return canvas.height - this.h; },
-            draw: function() {
-                // Zemin Çizimi (Canvas) - Eski sevdiğin stil
-                ctx.fillStyle = '#795548'; ctx.fillRect(0, this.y, canvas.width, this.h);
-                ctx.fillStyle = '#4CAF50'; ctx.fillRect(0, this.y, canvas.width, 25*S);
-                // Çizgiler
-                ctx.fillStyle = 'rgba(0,0,0,0.1)';
-                let gap = 200 * S;
-                for(let i=0; i<canvas.width + gap; i+=gap) {
-                    let off = (i - (frames*gameSpeed)) % (canvas.width + gap);
-                    if(off<0) off += canvas.width + gap;
-                    ctx.fillRect(off, this.y+25*S, 40*S, 15*S);
-                }
-            }
-        };
-
-        const player = {
-            x: 50 * S, y: 0, w: 60 * S, h: 80 * S,
-            dy: 0, gravity: 0.7 * S, jumpPower: 16 * S, // Fizik değerleri artırıldı (Keskin zıplama)
-            grounded: false, isDucking: false, emoji: "👩‍⚕️",
-            
-            draw: function() {
-                let bounce = this.grounded ? Math.sin(frames*0.2)*5*S : 0;
-                let fs = this.isDucking ? 50*S : 80*S;
-                ctx.font = `${fs}px Arial`;
-                
-                // Kontür (Netlik)
-                ctx.lineWidth = 5 * S; ctx.strokeStyle = "white"; ctx.lineJoin = "round";
-                ctx.strokeText(this.emoji, this.x, this.y + this.h + bounce);
-                ctx.fillStyle = "black"; 
-                ctx.fillText(this.emoji, this.x, this.y + this.h + bounce);
+        // --- UI KONTROL ---
+        const UI = {
+            screens: document.querySelectorAll('.screen'),
+            showScreen: function(id) {
+                this.screens.forEach(s => s.classList.add('hidden'));
+                if(id) document.getElementById(id).classList.remove('hidden');
             },
             update: function() {
-                if(this.isDucking) { this.h=50*S; this.gravity=1.3*S; } // Eğilince hızlı in
-                else { this.h=80*S; this.gravity=0.7*S; }
-
-                if(!this.grounded) { this.dy+=this.gravity; this.y+=this.dy; } else { this.dy=0; }
-                if(this.y > ground.y - this.h) { this.y = ground.y - this.h; this.grounded = true; }
+                document.getElementById('dispName').innerText = Data.name;
+                document.getElementById('dispMoney').innerText = Data.money;
+                document.getElementById('shopBalance').innerText = Data.money;
             },
-            jump: function() {
-                if(this.grounded && !this.isDucking) {
-                    this.dy = -this.jumpPower; this.grounded = false;
-                }
+            submitName: function() {
+                const val = document.getElementById('inpName').value.trim();
+                if(!val) return alert("İsim yaz!");
+                Data.name = val; Data.save(); this.showScreen('screenMenu');
+            },
+            openShop: function() {
+                this.showScreen('screenShop');
+                const grid = document.getElementById('shopGrid');
+                grid.innerHTML = "";
+                Data.chars.forEach(c => {
+                    const div = document.createElement('div');
+                    div.className = `shop-item ${c.owned ? 'owned' : ''} ${Data.selected === c.id ? 'selected' : ''}`;
+                    if(!c.owned && Data.money < c.price) div.classList.add('locked');
+                    div.innerHTML = `<div class="item-icon">${c.icon}</div><div class="item-price">💵 ${c.price}</div><div class="item-owned">SEÇİLİ</div>`;
+                    div.onclick = () => {
+                        if(c.owned) { Data.selected = c.id; Data.save(); this.openShop(); } 
+                        else if(Data.money >= c.price) {
+                            if(confirm("Al?")) { Data.money -= c.price; c.owned = true; Data.selected = c.id; Data.save(); this.openShop(); }
+                        }
+                    };
+                    grid.appendChild(div);
+                });
             }
         };
 
-        let obstacles = []; let rewards = [];
-
-        function startGame() {
-            document.getElementById('startScreen').classList.add('hidden');
-            document.getElementById('gameOverScreen').classList.add('hidden');
-            document.getElementById('celebrationMsg').classList.add('hidden');
+        // --- OYUN MOTORU (KESİN ÇÖZÜMLÜ) ---
+        const Game = {
+            wrapper: document.getElementById('gameWrapper'),
+            cvs: document.getElementById('gameCanvas'),
+            ctx: document.getElementById('gameCanvas').getContext('2d'),
+            scale: 1, state: "STOP",
+            score: 0, sessionMoney: 0, speed: 0,
             
-            score = 0; sessionMoney = 0; frames = 0; gameSpeed = 7 * S;
-            obstacles = []; rewards = []; celebrated100 = false;
-            
-            updateInGameUI();
-            initBG();
-            player.emoji = GameData.getSelectedEmoji();
-            player.y = ground.y - player.h; // Yerde başlat
-            
-            isPlaying = true; isPaused = false;
-            loop();
-        }
+            player: { x:50, y:0, w:50, h:80, dy:0, state:"run", icon:"👩‍⚕️" },
+            obstacles: [], rewards: [],
 
-        function togglePause() {
-            if(!isPlaying) return;
-            isPaused = !isPaused;
-            if(isPaused) document.getElementById('pauseScreen').classList.remove('hidden');
-            else { document.getElementById('pauseScreen').classList.add('hidden'); loop(); }
-        }
+            init: function() {
+                Data.load();
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+                
+                // --- KONTROLLER (ÖNEMLİ KISIM) ---
+                
+                // 1. KLAVYE (Window seviyesinde dinliyoruz)
+                window.addEventListener('keydown', e => {
+                    // Oyun oynanıyorsa Space ve Ok tuşlarının sayfayı kaydırmasını engelle
+                    if(this.state === "PLAY" && ['Space', 'ArrowUp', 'ArrowDown'].includes(e.code)) {
+                        e.preventDefault(); 
+                    }
+                    if(e.repeat) return;
+                    this.input(e.code);
+                });
 
-        function updateInGameUI() {
-            document.getElementById('scoreVal').innerText = score;
-            document.getElementById('moneyVal').innerText = GameData.money + sessionMoney;
-        }
+                // 2. MOUSE / DOKUNMATİK
+                let tY = 0;
+                
+                // Mouse Tıklama
+                this.wrapper.addEventListener('mousedown', () => this.input('Click'));
 
-        function spawn() {
-            let minGap = 400 * S + (gameSpeed * 20);
-            let lastX = obstacles.length > 0 ? obstacles[obstacles.length-1].x : -999;
-            if(canvas.width - lastX > minGap) {
-                if(Math.random() < 0.06) {
-                    let type = Math.random();
-                    let obs = { x: canvas.width, w: 50*S, h: 50*S, emoji: "🦠", isHigh: false };
-                    if(type > 0.7) { obs.emoji = "🦇"; obs.isHigh = true; obs.y = ground.y - 110*S; }
-                    else { obs.y = ground.y - 50*S; }
-                    obstacles.push(obs);
+                // Mobil Dokunma
+                this.wrapper.addEventListener('touchstart', e => { tY = e.touches[0].clientY; }, {passive: false});
+                this.wrapper.addEventListener('touchend', e => {
+                    let diff = tY - e.changedTouches[0].clientY;
+                    if(diff > 50) this.input('SwipeUp');       // Yukarı Kaydır
+                    else if(diff < -50) this.input('SwipeDown'); // Aşağı Kaydır
+                    else this.input('Click');                  // Dokun
+                }, {passive: false});
 
-                    if(Math.random() > 0.3) {
-                        rewards.push({
-                            x: canvas.width + 100*S + Math.random()*200*S,
-                            y: ground.y - (obs.isHigh ? 60*S : 150*S),
-                            w: 40*S, h: 40*S, emoji: "💵"
-                        });
+                this.loop();
+            },
+
+            resize: function() {
+                this.cvs.width = window.innerWidth;
+                this.cvs.height = window.innerHeight;
+                this.scale = Math.min(this.cvs.width / 400, this.cvs.height / 600);
+                if(this.scale > 1.2) this.scale = 1.2;
+            },
+
+            start: function() {
+                // Odağı butondan alıp oyun alanına veriyoruz (Space tuşu sorunu için)
+                this.wrapper.focus(); 
+                document.activeElement.blur(); 
+
+                UI.showScreen(null);
+                this.score = 0; this.sessionMoney = 0; this.speed = 6 * this.scale;
+                this.obstacles = []; this.rewards = [];
+                
+                this.player.icon = Data.getChar();
+                this.player.y = 0; 
+                this.player.dy = 0; 
+                this.player.state = "jump"; 
+                
+                document.getElementById('dispScore').innerText = 0;
+                this.state = "PLAY";
+            },
+
+            togglePause: function() {
+                if(this.state === "PLAY") { this.state = "PAUSE"; UI.showScreen('screenPause'); }
+                else if(this.state === "PAUSE") { this.state = "PLAY"; UI.showScreen(null); }
+            },
+
+            input: function(code) {
+                if(this.state !== "PLAY") {
+                    if(code === 'Escape') this.togglePause();
+                    return;
+                }
+
+                if(['Space','ArrowUp','SwipeUp','Click'].includes(code)) {
+                    if(this.player.state !== "jump") {
+                        this.player.dy = -15 * this.scale;
+                        this.player.state = "jump";
                     }
                 }
-            }
-        }
-
-        function update() {
-            if(!isPlaying || isPaused) return;
-            frames++;
-            if(frames%600===0) gameSpeed += 0.2*S;
-
-            player.update();
-            spawn();
-
-            for(let i=obstacles.length-1; i>=0; i--) {
-                let o = obstacles[i];
-                o.x -= gameSpeed;
-                let margin = 10*S;
-                if(player.x < o.x + o.w - margin && player.x + player.w - margin > o.x &&
-                   player.y < o.y + o.h - margin && player.y + player.h > o.y + margin) {
-                    gameOver();
+                else if(['ArrowDown','SwipeDown'].includes(code)) {
+                    this.player.state = "duck";
+                    setTimeout(() => { if(this.state==="PLAY" && this.player.state==="duck") this.player.state="run"; }, 600);
                 }
-                if(o.x + o.w < 0) {
-                    obstacles.splice(i,1); score++; updateInGameUI();
-                    if(score>=100 && !celebrated100) { celebrated100=true; document.getElementById('celebrationMsg').classList.remove('hidden'); setTimeout(()=>document.getElementById('celebrationMsg').classList.add('hidden'),2000); }
+                else if(code === 'Escape') this.togglePause();
+            },
+
+            update: function() {
+                this.speed += 0.002 * this.scale;
+                const S = this.scale;
+                const groundY = this.cvs.height - (100 * S);
+
+                // Fizik
+                let gravity = (this.player.state === "duck" ? 1.5 : 0.7) * S;
+                this.player.h = (this.player.state === "duck" ? 50 : 80) * S;
+
+                if(this.player.y + this.player.h < groundY) {
+                    this.player.dy += gravity;
+                    this.player.y += this.player.dy;
+                } else {
+                    this.player.dy = 0;
+                    this.player.y = groundY - this.player.h;
+                    if(this.player.state === "jump") this.player.state = "run";
                 }
+
+                // Spawn
+                let minGap = 400 * S + (this.speed * 20);
+                let lastX = this.obstacles.length > 0 ? this.obstacles[this.obstacles.length-1].x : -999;
+
+                if(this.cvs.width - lastX > minGap) {
+                    if(Math.random() < 0.06) {
+                        let high = Math.random() > 0.7;
+                        let obs = {
+                            x: this.cvs.width, w: 50*S, h: 50*S,
+                            icon: high ? "🦇" : "🦠",
+                            y: high ? groundY - (110*S) : groundY - (50*S)
+                        };
+                        this.obstacles.push(obs);
+
+                        if(Math.random() > 0.3) {
+                            this.rewards.push({
+                                x: this.cvs.width + 100*S,
+                                y: groundY - (high ? 60*S : 150*S),
+                                w: 40*S, h: 40*S, icon: "💵"
+                            });
+                        }
+                    }
+                }
+
+                // Hareket & Çarpışma
+                for(let i=this.obstacles.length-1; i>=0; i--) {
+                    let o = this.obstacles[i]; o.x -= this.speed;
+                    let m = 15*S;
+                    if(this.player.x < o.x+o.w-m && this.player.x+this.player.w-m > o.x &&
+                       this.player.y < o.y+o.h-m && this.player.y+this.player.h > o.y+m) {
+                        this.gameOver(); return;
+                    }
+                    if(o.x+o.w < 0) {
+                        this.obstacles.splice(i,1); this.score++;
+                        document.getElementById('dispScore').innerText = this.score;
+                        if(this.score%100===0) {
+                            document.getElementById('celebration').classList.remove('hidden');
+                            setTimeout(()=>document.getElementById('celebration').classList.add('hidden'), 2000);
+                        }
+                    }
+                }
+
+                for(let i=this.rewards.length-1; i>=0; i--) {
+                    let r = this.rewards[i]; r.x -= this.speed;
+                    if(this.player.x < r.x+r.w && this.player.x+this.player.w > r.x &&
+                       this.player.y < r.y+r.h && this.player.y+this.player.h > r.y) {
+                        this.sessionMoney += 5;
+                        document.getElementById('dispMoney').innerText = Data.money + this.sessionMoney;
+                        this.rewards.splice(i,1);
+                    } else if(r.x+r.w < 0) this.rewards.splice(i,1);
+                }
+            },
+
+            draw: function() {
+                const S = this.scale;
+                const groundY = this.cvs.height - (100 * S);
+                this.ctx.clearRect(0, 0, this.cvs.width, this.cvs.height);
+
+                // Zemin (Canvas ile)
+                this.ctx.fillStyle = '#795548'; 
+                this.ctx.fillRect(0, groundY, this.cvs.width, 100*S);
+                this.ctx.fillStyle = '#4CAF50'; 
+                this.ctx.fillRect(0, groundY, this.cvs.width, 20*S);
+
+                // Oyuncu
+                this.ctx.font = this.player.state === "duck" ? `${50*S}px Arial` : `${80*S}px Arial`;
+                this.ctx.lineWidth = 4 * S;
+                this.ctx.strokeStyle = "white"; 
+                this.ctx.lineJoin = "round";
+                let py = this.player.y + this.player.h;
+                this.ctx.strokeText(this.player.icon, this.player.x, py);
+                this.ctx.fillStyle = "black";
+                this.ctx.fillText(this.player.icon, this.player.x, py);
+
+                // Objeler
+                this.ctx.font = `${50*S}px Arial`;
+                this.obstacles.forEach(o => {
+                    this.ctx.strokeText(o.icon, o.x, o.y + 45*S);
+                    this.ctx.fillText(o.icon, o.x, o.y + 45*S);
+                });
+
+                this.ctx.font = `${40*S}px Arial`; this.ctx.strokeStyle = "green";
+                this.rewards.forEach(r => {
+                    this.ctx.strokeText(r.icon, r.x, r.y + 35*S);
+                    this.ctx.fillText(r.icon, r.x, r.y + 35*S);
+                });
+            },
+
+            gameOver: function() {
+                this.state = "GAMEOVER";
+                Data.money += this.sessionMoney; Data.save();
+                sendScore(this.score);
+                document.getElementById('endScore').innerText = this.score;
+                document.getElementById('endMoney').innerText = this.sessionMoney;
+                UI.showScreen('screenOver');
+            },
+
+            loop: function() {
+                if(this.state === "PLAY") this.update();
+                this.draw();
+                requestAnimationFrame(() => this.loop());
             }
+        };
 
-            for(let i=rewards.length-1; i>=0; i--) {
-                let r = rewards[i];
-                r.x -= gameSpeed;
-                if(player.x < r.x + r.w && player.x + player.w > r.x &&
-                   player.y < r.y + r.h && player.y + player.h > r.y) {
-                    sessionMoney += 5; updateInGameUI(); rewards.splice(i,1);
-                } else if(r.x + r.w < 0) rewards.splice(i,1);
-            }
-        }
-
-        function gameOver() {
-            isPlaying = false;
-            GameData.money += sessionMoney;
-            GameData.save();
-            saveScore(score);
-            document.getElementById('collectedMoney').innerText = sessionMoney;
-            document.getElementById('finalScore').innerText = score;
-            document.getElementById('gameOverScreen').classList.remove('hidden');
-        }
-
-        function backToMenu() {
-            document.getElementById('gameOverScreen').classList.add('hidden');
-            document.getElementById('startScreen').classList.remove('hidden');
-            updateMoneyUI();
-        }
-
-        function draw() {
-            // Gökyüzü Çizimi (Canvas - Eski Güzel Hali)
-            let grad = ctx.createLinearGradient(0,0,0,canvas.height);
-            grad.addColorStop(0, '#87CEEB'); grad.addColorStop(1, '#E0F7FA');
-            ctx.fillStyle = grad; ctx.fillRect(0,0,canvas.width,canvas.height);
-
-            // Arka Plan
-            ctx.font = `${120*S}px Arial`;
-            bgLayers.mountains.items.forEach(m => {
-                if(!isPaused) m.x -= bgLayers.mountains.speed * S;
-                if(m.x < -300*S) m.x = canvas.width;
-                ctx.globalAlpha = 1.0; ctx.fillText(m.type, m.x, ground.y);
-            });
-            ctx.font = `${80*S}px Arial`;
-            bgLayers.clouds.items.forEach(c => {
-                if(!isPaused) c.x -= bgLayers.clouds.speed * S;
-                if(c.x < -150*S) c.x = canvas.width;
-                ctx.globalAlpha = 0.9; ctx.fillStyle = "#fff"; ctx.fillText(c.type, c.x, c.y);
-            });
-            ctx.globalAlpha = 1.0;
-
-            ground.draw();
-            player.draw();
-
-            for(let o of obstacles) {
-                ctx.font = `${50*S}px Arial`;
-                ctx.lineWidth = 3*S; ctx.strokeStyle = "white"; 
-                ctx.strokeText(o.emoji, o.x, o.y+45*S);
-                ctx.fillStyle="black"; ctx.fillText(o.emoji, o.x, o.y+45*S);
-            }
-            for(let r of rewards) {
-                ctx.font = `${40*S}px Arial`;
-                ctx.lineWidth = 3*S; ctx.strokeStyle = "green";
-                ctx.strokeText(r.emoji, r.x, r.y+35*S);
-                ctx.fillText(r.emoji, r.x, r.y+35*S);
-            }
-        }
-
-        function loop() {
-            if(isPlaying) {
-                if(!isPaused) update();
-                draw();
-                if(!isPaused) requestAnimationFrame(loop);
-            }
-        }
-
-        // KONTROLLER
-        function jumpAction() { if(isPlaying && !isPaused) player.jump(); }
-        function duckAction(isActive) { if(isPlaying && !isPaused) player.isDucking = isActive; }
-
-        window.addEventListener('keydown', e=>{
-            if (e.repeat) return; // Tuş basılı tutulursa tekrar tetiklemeyi engelle (Performans)
-            if(e.code==='Space'||e.code==='ArrowUp') jumpAction();
-            if(e.code==='ArrowDown') duckAction(true);
-            if(e.code==='Escape') togglePause();
-        });
-        window.addEventListener('keyup', e=>{ if(e.code==='ArrowDown') duckAction(false); });
-
-        let tY = 0;
-        window.addEventListener('touchstart', e=>{ tY=e.touches[0].clientY; }, {passive:false});
-        window.addEventListener('touchend', e=>{
-            let diff = tY - e.changedTouches[0].clientY;
-            if(diff > 50) jumpAction();
-            else if(diff < -50) { player.isDucking = true; setTimeout(()=>player.isDucking=false, 600); }
-            else jumpAction();
-        }, {passive:false});
+        Game.init();
 
     </script>
 </body>
