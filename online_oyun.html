@@ -3,99 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PROTOKOL: OMEGA 💀</title>
-    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <title>ZİHİN BAĞI: RELOADED 🔄</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Orbitron:wght@900&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <style>
-        /* --- TEMA: HARDCORE CYBERPUNK TERMINAL --- */
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Share Tech Mono', monospace; }
-        
+        /* --- TEMA: NEON FLUX (DÜZELTİLMİŞ) --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
-            background-color: #050505;
-            color: #00ff00;
-            height: 100vh;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            overflow: hidden;
-            text-transform: uppercase;
-        }
-
-        /* Scanline Efekti */
-        body::before {
-            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            background-size: 100% 2px, 3px 100%; pointer-events: none; z-index: 99;
+            background: #050510; color: #fff; font-family: 'Rajdhani', sans-serif;
+            height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            overflow: hidden; user-select: none;
         }
 
         .container {
-            width: 95%; max-width: 600px;
-            border: 2px solid #333;
-            background: #0a0a0a;
-            padding: 20px;
-            position: relative;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
-            min-height: 600px;
-            display: flex; flex-direction: column;
+            width: 95%; max-width: 500px;
+            background: rgba(20, 20, 30, 0.95);
+            border: 2px solid #00e5ff;
+            border-radius: 15px; padding: 20px;
+            box-shadow: 0 0 40px rgba(0, 229, 255, 0.15);
+            position: relative; min-height: 600px;
+            display: flex; flex-direction: column; justify-content: space-between;
         }
 
-        /* Başlık Alanı */
-        .header {
-            border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        h1 { font-size: 1.5rem; color: #00ff00; text-shadow: 0 0 5px #00ff00; margin: 0; }
-        .level-tag { background: #003300; padding: 5px 10px; border: 1px solid #00ff00; font-size: 1rem; }
+        h1 { font-family: 'Orbitron', sans-serif; text-align: center; color: #fff; text-shadow: 0 0 10px #00e5ff; font-size: 2rem; margin-bottom: 5px; }
 
-        .screen { flex-grow: 1; display: flex; flex-direction: column; width: 100%; }
+        /* Level Çubuğu */
+        .level-bar { width: 100%; background: #222; height: 8px; border-radius: 4px; margin-bottom: 20px; overflow: hidden; }
+        .level-fill { height: 100%; background: #00e5ff; width: 0%; transition: width 0.5s; }
+        .level-text { text-align: center; font-size: 1rem; color: #00e5ff; margin-top: -15px; margin-bottom: 10px; font-weight: bold; }
+
+        .screen { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; }
         .hidden { display: none !important; }
 
-        /* Veri Panelleri (Data Logs) */
-        .log-panel {
-            background: #001100; border-left: 4px solid #00ff00; padding: 15px; margin-bottom: 20px;
-            font-size: 1.1rem; line-height: 1.4; color: #aaffaa; box-shadow: inset 0 0 20px #000;
+        /* İpucu Kartları */
+        .clue-card {
+            width: 100%; padding: 25px; margin-bottom: 20px; border-radius: 12px; text-align: center;
+            background: #111; border: 1px solid #333; position: relative;
         }
-        .log-panel h3 { font-size: 0.9rem; color: #005500; margin-bottom: 5px; border-bottom: 1px dashed #005500; }
-
-        /* Soru Alanı */
-        .query-box {
-            text-align: center; font-size: 1.3rem; margin: 20px 0; color: #fff;
-            border: 1px solid #333; padding: 15px; background: #111;
-        }
-
-        /* Giriş Alanları */
-        .input-grid { display: grid; gap: 10px; margin-top: auto; }
+        .clue-label { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #00e5ff; color: #000; padding: 2px 10px; font-size: 0.8rem; font-weight: bold; border-radius: 4px; }
+        .clue-text { font-size: 1.5rem; font-weight: bold; color: #fff; margin-top: 5px; }
         
+        /* Aktif / Pasif Durumları */
+        .status-box { width: 100%; padding: 15px; text-align: center; border-radius: 8px; margin-bottom: 15px; font-weight: bold; font-size: 1.1rem; }
+        .active-player { background: rgba(0, 255, 0, 0.1); border: 1px solid #0f0; color: #0f0; animation: pulse 2s infinite; }
+        .passive-player { background: rgba(255, 255, 0, 0.1); border: 1px solid #ff0; color: #ff0; }
+
+        @keyframes pulse { 0% { box-shadow: 0 0 5px #0f0; } 50% { box-shadow: 0 0 20px #0f0; } 100% { box-shadow: 0 0 5px #0f0; } }
+
+        /* Butonlar */
         button {
-            background: #000; border: 1px solid #00ff00; color: #00ff00; padding: 15px;
-            font-size: 1.2rem; cursor: pointer; transition: 0.1s; font-family: 'Share Tech Mono', monospace;
+            padding: 15px; background: #000; border: 2px solid #00e5ff; color: #00e5ff;
+            font-family: 'Rajdhani', sans-serif; font-size: 1.3rem; font-weight: bold; cursor: pointer;
+            border-radius: 8px; transition: 0.1s; text-transform: uppercase; width: 100%; margin-top: 5px;
         }
-        button:hover { background: #00ff00; color: #000; }
-        button:active { transform: scale(0.98); }
+        button:hover { background: #00e5ff; color: #000; }
+        button:active { transform: scale(0.95); }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; width: 100%; }
 
         input {
-            background: #000; border: 1px solid #00ff00; color: #fff; padding: 15px;
-            font-size: 1.5rem; text-align: center; width: 100%; outline: none; font-family: 'Share Tech Mono', monospace;
+            width: 100%; padding: 15px; background: #111; border: 2px solid #333; color: #fff;
+            font-size: 1.8rem; text-align: center; border-radius: 8px; outline: none;
+            font-family: 'Rajdhani', sans-serif; letter-spacing: 3px; margin-bottom: 10px;
+        }
+        input:focus { border-color: #00e5ff; }
+
+        /* Hata Ekranı */
+        #failOverlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(20, 0, 0, 0.98); z-index: 100; border-radius: 13px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: #ff3333; text-align: center;
         }
 
-        /* Hata Efekti */
-        .glitch-fail { animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both; background: #300 !important; border-color: red !important; }
-        @keyframes shake { 10%, 90% { transform: translate3d(-1px, 0, 0); } 20%, 80% { transform: translate3d(2px, 0, 0); } 30%, 50%, 70% { transform: translate3d(-4px, 0, 0); } 40%, 60% { transform: translate3d(4px, 0, 0); } }
-
-        /* Rol Seçimi */
-        .role-btn { height: 80px; font-size: 1.5rem; margin-bottom: 15px; border-width: 2px; }
-        
-        /* Matris Izgarası */
-        .matrix-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
-        .matrix-cell { 
-            height: 50px; border: 1px solid #004400; display: flex; align-items: center; justify-content: center;
-            cursor: pointer; font-size: 1.2rem; color: #004400; 
-        }
-        .matrix-cell.active { background: #00ff00; color: #000; box-shadow: 0 0 10px #00ff00; }
-
-        .home-icon { position: absolute; top: 15px; right: 15px; font-size: 1.5rem; text-decoration: none; color: #333; z-index: 100; transition:0.3s;}
-        .home-icon:hover { color: #00ff00; }
+        .home-icon { position: absolute; top: 15px; right: 15px; font-size: 1.8rem; text-decoration: none; color: #555; z-index: 100; }
+        .home-icon:hover { color: #fff; }
 
     </style>
 </head>
@@ -104,48 +90,43 @@
     <a href="index.html" class="home-icon">🏠</a>
 
     <div class="container">
-        <div class="header">
-            <h1>Dedektif</h1>
-            <div class="level-tag">SEVİYE <span id="lvlDisp">1</span>/50</div>
+        <h1>ZİHİN BAĞI</h1>
+        <div class="level-bar"><div class="level-fill" id="lvlFill"></div></div>
+        <div class="level-text">BÖLÜM: <span id="lvlNum">1</span> / 55</div>
+
+        <div id="failOverlay" class="hidden">
+            <h1 style="font-size:4rem; margin:0;">❌</h1>
+            <h2 style="font-size:2.5rem; margin:10px 0;">HATA!</h2>
+            <p style="font-size:1.2rem; color:#fff;">CEVAPLAR UYUŞMADI.</p>
+            <p style="color:#aaa; margin-top:20px;">1. SEVİYEYE DÖNÜLÜYOR...</p>
         </div>
 
         <div id="loginScreen" class="screen">
-            <div class="log-panel" style="margin-top: 50px;">
-                <h3>SİSTEM MESAJI</h3>
-                GÜVENLİ HAT KURULUYOR...<br>
-                LÜTFEN OPERASYON ROLÜNÜZÜ SEÇİN.
-            </div>
-            <button class="role-btn" onclick="selectRole('onur')" style="border-color:#00ffff; color:#00ffff">OPERATÖR: ONUR</button>
-            <button class="role-btn" onclick="selectRole('ozlem')" style="border-color:#ff00ff; color:#ff00ff">OPERATÖR: ÖZLEM</button>
+            <h3 style="margin-bottom: 20px; color:#aaa;">KİMLİK SEÇİMİ</h3>
+            <button onclick="selectRole('onur')" style="border-color:#00e5ff; color:#00e5ff">BEN ONUR 🔵</button>
+            <button onclick="selectRole('ozlem')" style="border-color:#d000ff; color:#d000ff">BEN ÖZLEM 🟣</button>
         </div>
 
         <div id="lobbyScreen" class="screen hidden">
-            <div class="query-box" style="border-style: dashed;">
-                <span class="blink">BAĞLANTI BEKLENİYOR...</span>
-            </div>
-            <p id="lobbyStatus" style="text-align: center; color: #666;">...</p>
-            <button onclick="resetSystem()" style="margin-top: auto; border-color: #333; color: #555;">SİSTEMİ SIFIRLA</button>
+            <div style="font-size:3rem; margin-bottom:20px;">⏳</div>
+            <p style="font-size:1.2rem;">PARTNER BEKLENİYOR...</p>
+            <p id="lobbyStatus" style="color:#666; margin-top:10px;">...</p>
+            <button onclick="resetGame()" style="margin-top:40px; border-color:#333; color:#555; font-size:0.9rem;">SORUN VARSA SIFIRLA</button>
         </div>
 
         <div id="gameScreen" class="screen hidden"></div>
 
-        <div id="failScreen" class="screen hidden" style="justify-content: center; text-align: center;">
-            <h1 style="color: red; font-size: 3rem; margin-bottom: 20px;">BAĞLANTI KOPTU</h1>
-            <p style="font-size: 1.2rem;">VERİ UYUŞMAZLIĞI TESPİT EDİLDİ.</p>
-            <p style="color: #666; margin-top: 20px;">PROTOKOL 1. SEVİYEYE SIFIRLANIYOR...</p>
-        </div>
-
-        <div id="winScreen" class="screen hidden" style="justify-content: center; text-align: center;">
-            <h1 style="color: #00ff00; font-size: 3rem;">GÖREV BAŞARILI</h1>
-            <p>SİSTEM TAMAMEN ELE GEÇİRİLDİ.</p>
-            <p style="font-size: 4rem; margin: 30px;">🔓</p>
-            <button onclick="resetSystem()">SİSTEMİ YENİDEN BAŞLAT</button>
+        <div id="winScreen" class="screen hidden">
+            <h1 style="font-size:3rem; color:#0f0;">TEBRİKLER!</h1>
+            <p style="font-size:1.2rem;">TÜM 55 GÖREV TAMAMLANDI.</p>
+            <div style="font-size:4rem; margin:20px;">🏆</div>
+            <button onclick="resetGame()">YENİDEN BAŞLA</button>
         </div>
     </div>
 
     <script>
         // =======================================================
-        // 🔥 BURAYA FIREBASE AYARLARINI YAPIŞTIR 🔥
+        // 🔥 BURAYA FIREBASE AYARLARINI YAPIŞTIR! 🔥
         // =======================================================
         const firebaseConfig = {
             apiKey: "AIzaSyBHejjQe2dHnwDYES3Qd30HKO94-_D5lVA",
@@ -161,152 +142,141 @@
 
         try { firebase.initializeApp(firebaseConfig); } catch(e){}
         const db = firebase.database();
-        const gameRef = db.ref('omega_protocol');
+        const gameRef = db.ref('mind_link_v2');
 
         let myRole = "";
-        let currentPuzzle = null;
-        let isActivePlayer = false;
+        let currentData = null;
+        let isActive = false;
 
-        // --- GELİŞMİŞ BULMACA MOTORU (YETİŞKİN SEVİYESİ) ---
-        function generateComplexPuzzle(level) {
-            // Zorluk seviyesine göre havuz belirle
-            let types = [];
-            if (level <= 10) types = ['logic_gate', 'serial_code', 'basic_cipher'];
-            else if (level <= 30) types = ['logic_gate', 'serial_code', 'coordinate', 'memory_grid'];
-            else types = ['logic_gate', 'serial_code', 'coordinate', 'memory_grid', 'complex_cipher'];
+        // --- BULMACA MOTORU (DÜZELTİLMİŞ & UYUMLU) ---
+        function generatePuzzle(level) {
+            const types = [
+                'math_simple', 'emoji_riddle', 'color_stroop', 'direction_fixed', 
+                'word_combine', 'negation', 'elemental', 'boss_math'
+            ];
+            
+            let type = "";
+            // Her 10 levelde bir BOSS
+            if (level % 10 === 0) type = 'boss_math';
+            else type = types[Math.floor(Math.random() * (types.length - 1))]; // Boss hariç seç
 
-            const type = types[Math.floor(Math.random() * types.length)];
             const activeRole = Math.random() > 0.5 ? 'onur' : 'ozlem';
-            let data = {};
+            let p = { type: type, hintOnur: "", hintOzlem: "", question: "", answer: "", input: "text" };
 
-            // 1. MANTIK KAPILARI (Logic Gates)
-            if (type === 'logic_gate') {
-                const A = Math.random() > 0.5; // True/False
-                const B = Math.random() > 0.5;
-                const gate = ['AND', 'OR', 'XOR'][Math.floor(Math.random() * 3)];
+            // 1. MATEMATİK
+            if (type === 'math_simple') {
+                let a = rdm(10, 50), b = rdm(10, 50);
+                p.hintOnur = `SENİN SAYIN: ${a}`; 
+                p.hintOzlem = `SENİN SAYIN: ${b}`;
+                p.question = "SAYILARI TOPLAYIN";
+                p.answer = (a+b).toString();
+                p.input = "numpad";
+            }
+            // 2. EMOJİ BİLMECE
+            else if (type === 'emoji_riddle') {
+                const riddles = [
+                    {a: "🦁", b: "👑", ans: "ASLAN KRAL"},
+                    {a: "🕸️", b: "🕷️", ans: "ÖRÜMCEK ADAM"},
+                    {a: "🦇", b: "👨", ans: "BATMAN"},
+                    {a: "⚡️", b: "🔨", ans: "THOR"},
+                    {a: "🍎", b: "📱", ans: "IPHONE"}
+                ];
+                const r = riddles[rdm(0, riddles.length-1)];
+                p.hintOnur = `SEMBOL 1: ${r.a}`; 
+                p.hintOzlem = `SEMBOL 2: ${r.b}`;
+                p.question = "BU İKİSİ NEYİ ANLATIYOR?";
+                p.answer = r.ans;
+                p.input = "text";
+            }
+            // 3. RENK TUZAĞI (STROOP)
+            else if (type === 'color_stroop') {
+                const colors = ["KIRMIZI", "MAVİ", "YEŞİL", "SARI"];
+                const target = colors[rdm(0, 3)];
+                p.hintOnur = `YAZI: ${target}`;
+                p.hintOzlem = `RENK: ${target}`; // İkisi de aynı şeyi görsün ki karışıklık olmasın
+                p.question = `"${target}" HANGİ RENK?`;
+                p.answer = target;
+                p.input = "colors";
+            }
+            // 4. YÖN (DÜZELTİLMİŞ)
+            else if (type === 'direction_fixed') {
+                // Burada butonlar ve cevaplar TAM EŞLEŞMELİ
+                const dirs = ["YUKARI", "AŞAĞI", "SAĞ", "SOL"];
+                const opposites = {"YUKARI":"AŞAĞI", "AŞAĞI":"YUKARI", "SAĞ":"SOL", "SOL":"SAĞ"};
+                const target = dirs[rdm(0, 3)];
                 
-                let result = false;
-                if (gate === 'AND') result = A && B;
-                if (gate === 'OR') result = A || B;
-                if (gate === 'XOR') result = (A !== B);
-
-                data.question = "DEVRE SONUCU NEDİR? (1=TRUE, 0=FALSE)";
-                data.hintOnur = `GİRİŞ A: ${A ? 'POZİTİF (1)' : 'NEGATİF (0)'}`;
-                data.hintOzlem = `GİRİŞ B: ${B ? 'POZİTİF (1)' : 'NEGATİF (0)'} | KAPI: ${gate}`;
-                data.answer = result ? "1" : "0";
-                data.inputType = "binary_btn";
+                p.hintOnur = `HEDEF YÖN: ${target}`;
+                p.hintOzlem = `GÖREV: TERSİNE GİT`;
+                p.question = "HANGİ YÖNE GİTMELİSİN?";
+                p.answer = opposites[target]; // Cevap artık direkt YUKARI/AŞAĞI vs.
+                p.input = "arrows";
+            }
+            // 5. KELİME BİRLEŞTİRME
+            else if (type === 'word_combine') {
+                const words = [
+                    {a:"KARA", b:"DENİZ", ans:"KARADENİZ"},
+                    {a:"İLK", b:"BAHAR", ans:"İLKBAHAR"},
+                    {a:"BİLGİ", b:"SAYAR", ans:"BİLGİSAYAR"},
+                    {a:"GÖK", b:"YÜZÜ", ans:"GÖKYÜZÜ"}
+                ];
+                const w = words[rdm(0, words.length-1)];
+                p.hintOnur = `BAŞLANGIÇ: ${w.a}`; 
+                p.hintOzlem = `BİTİŞ: ${w.b}`;
+                p.question = "BİRLEŞİK KELİME NEDİR?";
+                p.answer = w.ans;
+                p.input = "text";
+            }
+            // 6. TERSİ / DÜZÜ (NEGATION)
+            else if (type === 'negation') {
+                const opts = ["EVET", "HAYIR"];
+                const target = opts[rdm(0,1)];
+                const logic = rdm(0,1) === 0 ? "AYNISI" : "TERSİ";
+                
+                p.hintOnur = `DURUM: ${target}`;
+                p.hintOzlem = `KURAL: ${logic}`;
+                p.question = "NE SEÇİLMELİ?";
+                
+                if (logic === "AYNISI") p.answer = target;
+                else p.answer = (target==="EVET" ? "HAYIR" : "EVET");
+                p.input = "yesno";
+            }
+            // 7. KİMYA
+            else if (type === 'elemental') {
+                const els = [
+                    {a:"H", b:"O", ans:"SU"},
+                    {a:"Na", b:"Cl", ans:"TUZ"},
+                    {a:"C", b:"O2", ans:"KARBONDİOKSİT"}
+                ];
+                const e = els[rdm(0, els.length-1)];
+                p.hintOnur = `ELEMENT 1: ${e.a}`; 
+                p.hintOzlem = `ELEMENT 2: ${e.b}`;
+                p.question = "BİRLEŞİNCE NE OLUR?";
+                p.answer = e.ans;
+                p.input = "text";
+            }
+            // 8. BOSS MATH
+            else if (type === 'boss_math') {
+                let a = rdm(5, 15), b = rdm(2, 5), c = rdm(1, 10);
+                p.hintOnur = `X = ${a}, Y = ${b}`;
+                p.hintOzlem = `Z = ${c}, FORMÜL: (X * Y) + Z`;
+                p.question = "BOSS: FORMÜLÜ ÇÖZ!";
+                p.answer = ((a*b)+c).toString();
+                p.input = "numpad";
             }
 
-            // 2. SERİ NO ANALİZİ (Conditional Logic)
-            else if (type === 'serial_code') {
-                // Rastgele seri no üret: "A4K-9"
-                const chars = "ABCDEFGHKLMNPRSTXYZ";
-                const nums = "123456789";
-                const serial = chars[rdm(0, chars.length-1)] + nums[rdm(0, 8)] + chars[rdm(0, chars.length-1)] + "-" + nums[rdm(0, 8)];
-                
-                // Kural belirle
-                const lastDigit = parseInt(serial.split('-')[1]);
-                const isEven = lastDigit % 2 === 0;
-                
-                data.hintOnur = `SERİ NO: ${serial}`;
-                data.hintOzlem = `KURAL: Son rakam ÇİFT ise MAVİ'yi kes. TEK ise KIRMIZI'yı kes.`;
-                data.question = "HANGİ KABLOYU KESMELİ?";
-                data.answer = isEven ? "MAVİ" : "KIRMIZI";
-                data.inputType = "wire_cut";
-            }
-
-            // 3. KOORDİNAT ÜÇGENLEME (Grid Logic)
-            else if (type === 'coordinate') {
-                const cols = ['A','B','C','D'];
-                const rows = ['1','2','3','4'];
-                
-                const startColIdx = rdm(0, 3);
-                const startRowIdx = rdm(0, 3);
-                const shiftCol = rdm(-1, 1); // -1, 0, 1
-                const shiftRow = rdm(-1, 1);
-
-                // Sınır kontrolü (Basit tutmak için sınırlar içinde kalmasını sağla)
-                let endColIdx = startColIdx + shiftCol;
-                let endRowIdx = startRowIdx + shiftRow;
-                
-                // Eğer dışarı taşıyorsa tersine git
-                if (endColIdx < 0 || endColIdx > 3) endColIdx = startColIdx - shiftCol;
-                if (endRowIdx < 0 || endRowIdx > 3) endRowIdx = startRowIdx - shiftRow;
-
-                const startPos = cols[startColIdx] + rows[startRowIdx];
-                const endPos = cols[endColIdx] + rows[endRowIdx];
-
-                data.hintOnur = `BAŞLANGIÇ NOKTASI: ${startPos}`;
-                let moveText = "";
-                if (endColIdx > startColIdx) moveText += "1 SAĞA ";
-                if (endColIdx < startColIdx) moveText += "1 SOLA ";
-                if (endRowIdx > startRowIdx) moveText += "1 AŞAĞI ";
-                if (endRowIdx < startRowIdx) moveText += "1 YUKARI ";
-                if (moveText === "") moveText = "KONUMU KORU";
-
-                data.hintOzlem = `HAREKET VEKTÖRÜ: ${moveText}`;
-                data.question = "HEDEF KOORDİNAT NEDİR?";
-                data.answer = endPos;
-                data.inputType = "text_kb";
-            }
-
-            // 4. HAFIZA MATRİSİ (Memory Grid)
-            else if (type === 'memory_grid') {
-                // 16 karelik gridde 4 tane aktif nokta seç
-                let activeIndices = [];
-                while(activeIndices.length < 4) {
-                    let n = rdm(0, 15);
-                    if(!activeIndices.includes(n)) activeIndices.push(n);
-                }
-                activeIndices.sort((a,b) => a-b); // Sıralı tut ki kontrol kolay olsun
-
-                // Cevap stringi (örn: "0-5-10-15")
-                data.answer = activeIndices.join("-");
-                
-                // Aktif oyuncu gridi görür ve girmeli, pasif oyuncu desen kodunu görür (yedek)
-                // Ama buradaki mekanik şu: Pasif oyuncu ekranda deseni görür, Aktif oyuncuya tarif eder.
-                data.hintOnur = (activeRole === 'ozlem') ? "MATRİS DESENİ: [GÖRSEL]" : "ÖZLEM'İN TARİF ETTİĞİ NOKTALARA BAS.";
-                data.hintOzlem = (activeRole === 'onur') ? "MATRİS DESENİ: [GÖRSEL]" : "ONUR'UN TARİF ETTİĞİ NOKTALARA BAS.";
-                
-                // Özel durum: Pasif oyuncuya görsel verilecek (renderUI kısmında işlenecek)
-                data.pattern = activeIndices; 
-                data.question = "DESENİ GİRİN.";
-                data.inputType = "matrix_input";
-            }
-
-            // 5. KRİPTOLOJİ (Cipher)
-            else if (type === 'basic_cipher') {
-                const words = ["AJAN", "KASA", "BOMB", "PLAN", "KOD", "UZAY"];
-                const word = words[rdm(0, words.length-1)];
-                const shift = rdm(1, 3);
-                
-                // Şifrele
-                let encrypted = "";
-                for (let i = 0; i < word.length; i++) {
-                    let charCode = word.charCodeAt(i);
-                    // Basit Sezar: Sadece harfleri kaydır
-                    encrypted += String.fromCharCode(charCode + shift);
-                }
-
-                data.hintOnur = `ŞİFRELİ METİN: ${encrypted}`;
-                data.hintOzlem = `ÇÖZÜCÜ ANAHTAR: -${shift} (Geri Kaydır)`;
-                data.question = "ORİJİNAL KELİME NEDİR?";
-                data.answer = word;
-                data.inputType = "text_kb";
-            }
-
-            return { type: type, data: data, activeRole: activeRole };
+            return { puzzle: p, activeRole: activeRole };
         }
 
         function rdm(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 
-        // --- SİSTEM AKIŞI ---
+        // --- OYUN AKIŞI ---
         function selectRole(role) {
             myRole = role;
             document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('lobbyScreen').classList.remove('hidden');
             gameRef.child('players/' + role).set(true);
             
+            // Eğer Onur ise ve oyun yoksa başlat
             if (role === 'onur') {
                 gameRef.child('state').get().then(snap => {
                     if(!snap.exists()) updateGame(1);
@@ -316,28 +286,31 @@
         }
 
         function updateGame(level) {
-            const newData = generateComplexPuzzle(level);
+            const newData = generatePuzzle(level);
             gameRef.update({ level: level, data: newData });
         }
 
         function listen() {
+            // Lobi Kontrol
             gameRef.child('players').on('value', snap => {
                 const p = snap.val();
                 if(p && p.onur && p.ozlem) {
                     document.getElementById('lobbyScreen').classList.add('hidden');
                     document.getElementById('gameScreen').classList.remove('hidden');
                 } else {
-                    document.getElementById('lobbyStatus').innerText = myRole==='onur'?"ÖZLEM BEKLENİYOR...":"ONUR BEKLENİYOR...";
+                    document.getElementById('lobbyStatus').innerText = myRole==='onur'?"Özlem Bekleniyor...":"Onur Bekleniyor...";
                 }
             });
 
+            // Oyun Verisi
             gameRef.on('value', snap => {
                 const val = snap.val();
                 if(!val || !val.data) return;
 
-                document.getElementById('lvlDisp').innerText = val.level;
+                document.getElementById('lvlNum').innerText = val.level;
+                document.getElementById('lvlFill').style.width = (val.level / 55 * 100) + "%";
                 
-                if (val.level > 50) {
+                if (val.level > 55) {
                     document.getElementById('gameScreen').classList.add('hidden');
                     document.getElementById('winScreen').classList.remove('hidden');
                 } else {
@@ -348,99 +321,84 @@
 
         // --- EKRAN ÇİZİMİ ---
         function renderGame(data) {
-            currentPuzzle = data;
-            isActivePlayer = (myRole === data.activeRole);
+            currentData = data.puzzle;
+            isActive = (myRole === data.activeRole);
             const container = document.getElementById('gameScreen');
             container.innerHTML = "";
 
-            // İpucu Belirleme
-            let myHint = myRole === 'onur' ? data.data.hintOnur : data.data.hintOzlem;
+            let html = "";
             
-            // Eğer Matris oyunuysa ve ben Pasif isem, deseni görmeliyim
-            if (data.type === 'memory_grid' && !isActivePlayer) {
-                myHint = "DESEN REFERANSI (Eşine Konumları Söyle):";
-                let gridHTML = `<div class="matrix-grid" style="pointer-events:none; margin-top:10px;">`;
-                for(let i=0; i<16; i++) {
-                    let isActive = data.data.pattern.includes(i) ? 'active' : '';
-                    gridHTML += `<div class="matrix-cell ${isActive}">${i+1}</div>`;
-                }
-                gridHTML += `</div>`;
-                myHint += gridHTML;
-            }
-
-            // HTML Şablonu
-            let html = `
-                <div class="log-panel">
-                    <h3>GÖREV VERİSİ [${myRole.toUpperCase()}]</h3>
-                    ${myHint}
+            // 1. İPUCU KARTI (Herkes kendi ipucunu görür)
+            const myHint = myRole === 'onur' ? currentData.hintOnur : currentData.hintOzlem;
+            
+            html += `
+                <div class="clue-card">
+                    <div class="clue-label">GİZLİ VERİ</div>
+                    <div class="clue-text">${myHint}</div>
                 </div>
-                <div class="query-box">${data.data.question}</div>
             `;
 
-            // GİRİŞ ALANLARI (Sadece Aktif Oyuncuya)
-            if (isActivePlayer) {
-                html += `<div style="text-align:center; color:#00ff00; margin-bottom:10px;">>> KONTROL SİZDE <<</div>`;
+            // 2. SORU
+            html += `<p style="text-align:center; color:#ccc; margin-bottom:20px; font-size:1.1rem;">${currentData.question}</p>`;
+
+            // 3. KONTROL ALANI
+            if (isActive) {
+                // Aktif Oyuncu
+                html += `<div class="status-box active-player">⚡ YETKİ SENDE: CEVABI GİR</div>`;
                 
-                // 1. TEXT INPUT
-                if (data.data.inputType === 'text_kb') {
-                    html += `<div class="input-grid">
-                                <input id="ansInput" type="text" placeholder="CEVABI GİRİN" style="text-transform:uppercase">
-                                <button onclick="checkAnswer(document.getElementById('ansInput').value.toUpperCase())">ONAYLA</button>
+                // Input Tipleri
+                if (currentData.input === 'text') {
+                    html += `<input id="inp" type="text" placeholder="CEVABI YAZ" style="text-transform:uppercase">
+                             <button onclick="check(document.getElementById('inp').value)">GÖNDER</button>`;
+                }
+                else if (currentData.input === 'numpad') {
+                    html += `<input id="inp" type="number" placeholder="SONUÇ" readonly>
+                             <div class="grid-3">
+                                ${[1,2,3,4,5,6,7,8,9,0].map(n => `<button style="margin:0; background:#111; color:#fff; border-color:#333;" onclick="document.getElementById('inp').value+='${n}'">${n}</button>`).join('')}
+                             </div>
+                             <button style="background:#300; border-color:red; color:red; margin-top:5px;" onclick="document.getElementById('inp').value=''">SİL</button>
+                             <button onclick="check(document.getElementById('inp').value)">ONAYLA</button>`;
+                }
+                else if (currentData.input === 'colors') {
+                    html += `<div class="grid-2">
+                                <button style="border-color:red; color:red;" onclick="check('KIRMIZI')">KIRMIZI</button>
+                                <button style="border-color:blue; color:blue;" onclick="check('MAVİ')">MAVİ</button>
+                                <button style="border-color:green; color:green;" onclick="check('YEŞİL')">YEŞİL</button>
+                                <button style="border-color:yellow; color:yellow;" onclick="check('SARI')">SARI</button>
                              </div>`;
                 }
-                // 2. BINARY BUTTONS
-                else if (data.data.inputType === 'binary_btn') {
-                    html += `<div class="input-grid" style="grid-template-columns: 1fr 1fr;">
-                                <button onclick="checkAnswer('1')">TRUE (1)</button>
-                                <button onclick="checkAnswer('0')">FALSE (0)</button>
+                else if (currentData.input === 'arrows') {
+                    html += `<div class="grid-2">
+                                <button onclick="check('YUKARI')">⬆️ YUKARI</button>
+                                <button onclick="check('AŞAĞI')">⬇️ AŞAĞI</button>
+                                <button onclick="check('SOL')">⬅️ SOL</button>
+                                <button onclick="check('SAĞ')">➡️ SAĞ</button>
                              </div>`;
                 }
-                // 3. WIRE CUT
-                else if (data.data.inputType === 'wire_cut') {
-                    html += `<div class="input-grid" style="grid-template-columns: 1fr 1fr;">
-                                <button style="border-color:red; color:red;" onclick="checkAnswer('KIRMIZI')">KIRMIZI KES</button>
-                                <button style="border-color:#00e5ff; color:#00e5ff;" onclick="checkAnswer('MAVİ')">MAVİ KES</button>
+                else if (currentData.input === 'yesno') {
+                    html += `<div class="grid-2">
+                                <button onclick="check('EVET')">EVET</button>
+                                <button onclick="check('HAYIR')">HAYIR</button>
                              </div>`;
-                }
-                // 4. MATRIX INPUT
-                else if (data.data.inputType === 'matrix_input') {
-                    html += `<div class="matrix-grid" id="inputMatrix">`;
-                    for(let i=0; i<16; i++) {
-                        html += `<div class="matrix-cell" onclick="toggleMatrix(${i}, this)">${i+1}</div>`;
-                    }
-                    html += `</div><button style="margin-top:15px;" onclick="checkMatrix()">DESENİ GÖNDER</button>`;
                 }
 
             } else {
-                html += `<div style="text-align:center; color:#666; border:1px dashed #333; padding:20px;">DİĞER AJAN VERİ GİRİŞİ YAPIYOR...</div>`;
+                // Pasif Oyuncu
+                html += `<div class="status-box passive-player">✋ BEKLE: EŞİN CEVAPLIYOR</div>`;
+                html += `<div style="opacity:0.3; text-align:center; margin-top:30px;">
+                            <div style="font-size:2rem;">⏳</div>
+                        </div>`;
             }
 
             container.innerHTML = html;
         }
 
-        // --- KONTROLLER ---
-        // Matris Seçimi İçin
-        let selectedMatrix = [];
-        function toggleMatrix(idx, el) {
-            if (selectedMatrix.includes(idx)) {
-                selectedMatrix = selectedMatrix.filter(x => x !== idx);
-                el.classList.remove('active');
-            } else {
-                selectedMatrix.push(idx);
-                el.classList.add('active');
-            }
-        }
-        function checkMatrix() {
-            selectedMatrix.sort((a,b) => a-b);
-            const ans = selectedMatrix.join("-");
-            checkAnswer(ans);
-            selectedMatrix = []; // Reset
-        }
-
-        // Genel Cevap Kontrolü
-        function checkAnswer(val) {
-            const correct = currentPuzzle.data.answer.toString().trim().toUpperCase();
-            const given = val.toString().trim().toUpperCase();
+        // --- KONTROL MEKANİZMASI ---
+        function check(val) {
+            if(!val) return;
+            // Boşlukları temizle, büyük harf yap, Türkçe karakterleri düzelt
+            let given = val.toString().toLocaleUpperCase('tr-TR').trim();
+            let correct = currentData.answer.toString().toLocaleUpperCase('tr-TR').trim();
 
             if (given === correct) {
                 // DOĞRU
@@ -448,24 +406,19 @@
                     updateGame((snap.val()||1) + 1);
                 });
             } else {
-                // YANLIŞ -> BAŞA DÖN
-                triggerFail();
+                // YANLIŞ -> FAIL EKRANI GÖSTER
+                document.getElementById('failOverlay').classList.remove('hidden');
+                
+                // 3 Saniye sonra resetle
+                setTimeout(() => {
+                    document.getElementById('failOverlay').classList.add('hidden');
+                    updateGame(1); // LEVEL 1'E DÖN
+                }, 3000);
             }
         }
 
-        function triggerFail() {
-            document.getElementById('gameScreen').classList.add('hidden');
-            document.getElementById('failScreen').classList.remove('hidden');
-            
-            setTimeout(() => {
-                document.getElementById('failScreen').classList.add('hidden');
-                document.getElementById('gameScreen').classList.remove('hidden');
-                updateGame(1); // LEVEL 1
-            }, 3000);
-        }
-
-        function resetSystem() {
-            gameRef.set({ level: 1, players: { onur: false, ozlem: false }, data: null });
+        function resetGame() {
+            gameRef.set({ level: 1, players: {onur:false, ozlem:false}, data: null });
             location.reload();
         }
 
