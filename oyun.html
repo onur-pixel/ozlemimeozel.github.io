@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dr. Özlem: Engel Atlamaca</title>
+    <title>Dr. Özlem: Büyük Koşu</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@400;700&display=swap');
@@ -14,9 +14,11 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background-color: #87CEEB; /* Daha canlı bir gökyüzü mavisi */
+            background-color: #2563eb;
             font-family: 'Roboto', sans-serif;
-            touch-action: manipulation;
+            touch-action: none; /* Mobilde kaydırma ve zoom'u engelle */
+            user-select: none;
+            -webkit-user-select: none;
         }
 
         #gameCanvas {
@@ -25,155 +27,180 @@
             height: 100%;
         }
 
-        /* UI Katmanları */
-        .ui-layer {
-            position: absolute;
-            pointer-events: none;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        /* Lider Tablosu */
-        #leaderboard-container {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 200px;
-            background: rgba(255, 255, 255, 0.95);
-            border: 3px solid #2563eb;
-            border-radius: 12px;
-            padding: 10px;
-            color: #1e3a8a;
-            z-index: 10;
-            font-size: 0.75rem;
-            pointer-events: none;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        #leaderboard-title {
+        .pixel-font {
             font-family: 'Press Start 2P', cursive;
-            font-size: 0.6rem;
-            color: #dc2626;
-            margin-bottom: 8px;
-            text-align: center;
-            border-bottom: 2px solid #e5e7eb;
-            padding-bottom: 5px;
         }
 
-        .score-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 4px;
-            font-weight: bold;
-        }
-
-        /* Başlangıç ve Bitiş Ekranları */
-        #start-screen, #game-over-screen {
+        /* UI Katmanları */
+        .ui-screen {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(30, 58, 138, 0.95);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 20;
+            transition: opacity 0.3s;
         }
 
-        .pixel-font {
-            font-family: 'Press Start 2P', cursive;
+        /* Yarı saydam arka planlar */
+        .bg-overlay {
+            background: rgba(15, 23, 42, 0.95);
         }
 
-        /* Skor Göstergesi */
-        #score-display {
+        /* Mağaza Grid */
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .shop-item {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid #3b82f6;
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .shop-item.locked {
+            opacity: 0.6;
+            filter: grayscale(1);
+        }
+
+        .shop-item.selected {
+            border-color: #fbbf24;
+            background: rgba(251, 191, 36, 0.2);
+            box-shadow: 0 0 15px rgba(251, 191, 36, 0.4);
+        }
+
+        .shop-item:active {
+            transform: scale(0.95);
+        }
+
+        /* Lider Tablosu */
+        #leaderboard {
             position: absolute;
             top: 10px;
-            left: 10px;
-            font-family: 'Press Start 2P', cursive;
-            color: #1e3a8a;
-            font-size: 1.4rem;
-            text-shadow: 2px 2px 0 #fff, -1px -1px 0 #fff;
-            pointer-events: none;
-            background: rgba(255,255,255,0.6);
-            padding: 5px 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 2px solid #fbbf24;
             border-radius: 8px;
-        }
-        
-        /* Zıplama İpucu */
-        #jump-hint {
-            position: absolute;
-            bottom: 25%;
-            width: 100%;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.9);
-            font-weight: bold;
-            font-size: 1.5rem;
+            padding: 10px;
+            color: white;
+            z-index: 10;
             pointer-events: none;
-            animation: pulse 1.2s infinite;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            font-size: 10px;
+            min-width: 150px;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.1); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.8; }
+        /* Zıplama Butonu (Mobil İçin Görsel Yardımcı) */
+        #mobile-jump-area {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            z-index: 5; /* Canvas üzerinde ama UI altında */
+            display: none; /* JS ile mobilde açılabilir */
+        }
+        
+        button:active {
+            transform: scale(0.95);
         }
     </style>
 </head>
 <body>
 
+    <!-- Oyun Alanı -->
     <canvas id="gameCanvas"></canvas>
-    <div id="jump-hint">ZIPLAMAK İÇİN DOKUN!</div>
 
-    <!-- UI: Skor -->
-    <div id="score-display">0</div>
-
-    <!-- UI: Lider Tablosu -->
-    <div id="leaderboard-container">
-        <div id="leaderboard-title">EN İYİ KOŞUCULAR</div>
-        <div id="leaderboard-list">
-            <div class="text-center text-gray-400">Yükleniyor...</div>
+    <!-- HUD (Oyun İçi Göstergeler) -->
+    <div id="hud" class="absolute top-0 left-0 w-full p-4 pointer-events-none flex justify-between z-10 hidden">
+        <div class="text-white pixel-font text-xl drop-shadow-md">
+            SKOR: <span id="score-val" class="text-yellow-400">0</span>
+        </div>
+        <div class="text-white pixel-font text-sm drop-shadow-md flex items-center gap-2">
+            💊 <span id="coins-val">0</span>
         </div>
     </div>
 
-    <!-- UI: Başlangıç Ekranı -->
-    <div id="start-screen">
-        <div class="text-7xl mb-6 animate-bounce">👩‍⚕️</div>
-        <h1 class="pixel-font text-2xl md:text-4xl text-white mb-2 text-center leading-normal">DR. ÖZLEM<br><span class="text-yellow-400">ENGEL KOŞUSU</span></h1>
+    <!-- Global Lider Tablosu -->
+    <div id="leaderboard">
+        <div class="text-yellow-400 text-center mb-2 font-bold border-b border-gray-600 pb-1">🏆 TOP 3 GLOBAL</div>
+        <div id="leaderboard-list" class="space-y-1">
+            <div class="text-gray-400 text-center">Yükleniyor...</div>
+        </div>
+    </div>
+
+    <!-- Başlangıç Ekranı -->
+    <div id="start-screen" class="ui-screen bg-overlay">
+        <div class="text-6xl mb-4 animate-bounce" id="current-char-icon">👩‍⚕️</div>
+        <h1 class="pixel-font text-3xl md:text-5xl text-white mb-2 text-center text-shadow-lg">
+            DR. ÖZLEM<br><span class="text-yellow-400 text-2xl md:text-4xl">ZORLU KOŞU</span>
+        </h1>
         
-        <div class="bg-white p-6 rounded-xl shadow-2xl text-center max-w-sm mx-4 mt-4 w-full border-4 border-blue-500">
-            <p class="text-gray-800 mb-4 font-bold text-lg">
-                Engellerin üstünden atla!<br>
-                <span class="text-sm text-blue-600 font-normal">(Ekrana Dokun veya Space Tuşu)</span>
-            </p>
-            <input type="text" id="player-name-input" placeholder="DOKTOR İSMİ" maxlength="12" 
-                class="bg-blue-50 text-blue-900 border-2 border-blue-300 rounded-lg px-4 py-3 mb-4 w-full text-center focus:outline-none focus:border-blue-600 font-bold uppercase tracking-wider">
-            <button id="start-btn" class="w-full bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-bold py-4 px-8 rounded-lg pixel-font transform transition hover:scale-105 shadow-lg border-b-4 border-blue-800">
+        <div class="bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/20 w-80 text-center mt-4">
+            <input type="text" id="player-name" placeholder="ADINIZ (MAX 10)" maxlength="10" 
+                class="w-full bg-slate-800 text-white border-2 border-blue-500 rounded px-4 py-3 mb-4 text-center pixel-font focus:outline-none focus:border-yellow-400 uppercase">
+            
+            <button id="start-btn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-lg pixel-font shadow-lg border-b-4 border-green-700 mb-3">
                 KOŞUYA BAŞLA
+            </button>
+            
+            <button id="shop-btn" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 rounded-lg pixel-font shadow-lg border-b-4 border-blue-700 text-sm">
+                🏥 ECZANE (MAĞAZA)
+            </button>
+        </div>
+        <div class="text-gray-400 mt-4 text-xs">Masaüstü: Space/Tıkla • Mobil: Dokun</div>
+    </div>
+
+    <!-- Mağaza Ekranı -->
+    <div id="shop-screen" class="ui-screen bg-overlay hidden">
+        <h2 class="pixel-font text-2xl text-yellow-400 mb-6">ECZANE</h2>
+        <div class="text-white mb-4">BAKİYENİZ: <span id="shop-coins" class="text-green-400 font-bold">0</span> 💊</div>
+        
+        <div class="shop-grid bg-slate-800 p-4 rounded-xl border border-slate-600 w-11/12 max-w-md">
+            <!-- Market Öğeleri JS ile Doldurulacak -->
+        </div>
+
+        <button id="close-shop-btn" class="mt-6 bg-red-500 hover:bg-red-600 text-white py-3 px-8 rounded-lg pixel-font border-b-4 border-red-700">
+            KAPAT
+        </button>
+    </div>
+
+    <!-- Oyun Bitti Ekranı -->
+    <div id="game-over-screen" class="ui-screen bg-overlay hidden">
+        <h1 class="pixel-font text-red-500 text-4xl mb-4 drop-shadow-lg">YANDIN!</h1>
+        <div class="text-white text-xl mb-2">TOPLANAN SKOR</div>
+        <div id="final-score" class="pixel-font text-yellow-400 text-5xl mb-8">0</div>
+        
+        <div class="flex gap-4">
+            <button id="restart-btn" class="bg-green-500 hover:bg-green-600 text-white py-4 px-8 rounded-lg pixel-font border-b-4 border-green-700 shadow-xl">
+                TEKRAR
+            </button>
+            <button id="menu-btn" class="bg-gray-500 hover:bg-gray-600 text-white py-4 px-6 rounded-lg pixel-font border-b-4 border-gray-700 shadow-xl">
+                MENÜ
             </button>
         </div>
     </div>
 
-    <!-- UI: Oyun Bitti Ekranı -->
-    <div id="game-over-screen" style="display: none;">
-        <h1 class="pixel-font text-red-500 text-3xl md:text-4xl mb-4 text-center" style="text-shadow: 2px 2px 0 #fff;">ÇARPIŞMA!</h1>
-        <div class="text-white text-xl mb-2">SKORUNUZ</div>
-        <div id="final-score" class="pixel-font text-yellow-400 text-5xl mb-8 drop-shadow-lg">0</div>
-        <button id="restart-btn" class="bg-white hover:bg-gray-100 text-blue-900 font-bold py-4 px-8 rounded-lg pixel-font transform transition hover:scale-105 border-b-4 border-gray-300 shadow-xl">
-            TEKRAR DENE
-        </button>
-    </div>
-
-    <!-- Firebase Scripts -->
+    <!-- Firebase Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // --- FIREBASE KURULUMU ---
         const firebaseConfig = JSON.parse(new URLSearchParams(window.location.search).get('__firebase_config')) || JSON.parse(__firebase_config);
         const appId = new URLSearchParams(window.location.search).get('__app_id') || (typeof __app_id !== 'undefined' ? __app_id : 'default-app');
         
@@ -182,13 +209,13 @@
         const db = getFirestore(app);
 
         let currentUser = null;
-        let globalHighScores = [];
 
+        // Oturum Açma
         const initAuth = async () => {
              if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                 try {
                     await signInWithCustomToken(auth, __initial_auth_token);
-                } catch(e) { console.error("Token fail", e); await signInAnonymously(auth); }
+                } catch(e) { await signInAnonymously(auth); }
             } else {
                 await signInAnonymously(auth);
             }
@@ -197,210 +224,310 @@
 
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
-            if (user) listenToLeaderboard();
+            if (user) listenLeaderboard();
         });
 
-        function listenToLeaderboard() {
-            const scoresRef = collection(db, 'artifacts', appId, 'public', 'data', 'dr_ozlem_jump_scores');
+        // Global Leaderboard Dinleme (Sadece Top 3)
+        function listenLeaderboard() {
+            const q = query(
+                collection(db, 'artifacts', appId, 'public', 'data', 'dr_ozlem_global_scores'),
+                orderBy('score', 'desc'),
+                limit(3)
+            );
             
-            onSnapshot(scoresRef, (snapshot) => {
-                const scores = [];
+            onSnapshot(q, (snapshot) => {
+                const listEl = document.getElementById('leaderboard-list');
+                listEl.innerHTML = '';
+                let rank = 1;
+                
+                if (snapshot.empty) {
+                    listEl.innerHTML = '<div class="text-center text-gray-500 text-xs">Henüz skor yok</div>';
+                    return;
+                }
+
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    if (data.score && data.name) scores.push(data);
+                    const row = document.createElement('div');
+                    row.className = 'flex justify-between text-xs border-b border-gray-700 pb-1 mb-1';
+                    
+                    let medal = rank === 1 ? '🥇' : (rank === 2 ? '🥈' : '🥉');
+                    let name = data.name.substring(0, 8); // İsmi kısalt
+                    
+                    row.innerHTML = `
+                        <span class="text-white">${medal} ${name}</span>
+                        <span class="text-green-400 font-bold">${Math.floor(data.score)}</span>
+                    `;
+                    listEl.appendChild(row);
+                    rank++;
                 });
-                scores.sort((a, b) => b.score - a.score);
-                globalHighScores = scores.slice(0, 5);
-                updateLeaderboardUI();
-            }, (error) => console.error(error));
+            }, (error) => console.error("Leaderboard hatası:", error));
         }
 
-        function updateLeaderboardUI() {
-            const listEl = document.getElementById('leaderboard-list');
-            listEl.innerHTML = '';
-            if (globalHighScores.length === 0) {
-                listEl.innerHTML = '<div class="text-center text-gray-500 text-xs">Liste Boş</div>';
-                return;
-            }
-            globalHighScores.forEach((s, index) => {
-                const row = document.createElement('div');
-                row.className = 'score-row';
-                let name = s.name.length > 8 ? s.name.substring(0, 8) + '..' : s.name;
-                name = name.replace(/[^\w\sğüşıöçĞÜŞİÖÇ.]/gi, ''); 
-                
-                row.innerHTML = `
-                    <span>${index + 1}. ${name}</span>
-                    <span>${Math.floor(s.score)}</span>
-                `;
-                listEl.appendChild(row);
-            });
-        }
-
-        async function saveScore(score) {
-            if (!currentUser || score <= 0) return;
-            const playerName = document.getElementById('player-name-input').value.trim() || "Dr. Bilinmeyen";
+        // Skor Kaydetme
+        window.saveScoreToFirebase = async function(score) {
+            if (!currentUser || score < 10) return; // Çok düşük skorları kaydetme
+            const playerName = document.getElementById('player-name').value.trim() || "Dr. Anonim";
             try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'dr_ozlem_jump_scores'), {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'dr_ozlem_global_scores'), {
                     name: playerName,
                     score: Math.floor(score),
                     userId: currentUser.uid,
                     timestamp: serverTimestamp()
                 });
-            } catch (e) { console.error("Save failed", e); }
-        }
+            } catch (e) { console.error("Skor kaydedilemedi", e); }
+        };
+    </script>
 
-        // --- PLATFORM OYUN MOTORU ---
-        
+    <!-- Oyun Mantığı -->
+    <script>
+        // --- OYUN DEĞİŞKENLERİ ---
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
-        const scoreDisplay = document.getElementById('score-display');
-        const finalScoreDisplay = document.getElementById('final-score');
+        
+        // UI Elementleri
         const startScreen = document.getElementById('start-screen');
         const gameOverScreen = document.getElementById('game-over-screen');
-        const jumpHint = document.getElementById('jump-hint');
+        const shopScreen = document.getElementById('shop-screen');
+        const hud = document.getElementById('hud');
+        const scoreVal = document.getElementById('score-val');
+        const coinsVal = document.getElementById('coins-val');
+        const finalScoreVal = document.getElementById('final-score');
+        const shopCoinsVal = document.getElementById('shop-coins');
+        const currentCharIcon = document.getElementById('current-char-icon');
 
+        // Oyun Durumu
         let gameRunning = false;
         let score = 0;
-        let gameSpeed = 5;
-        let frameCount = 0;
+        let coins = parseInt(localStorage.getItem('dr_ozlem_coins')) || 0;
+        let gameSpeed = 6;
+        let gravity = 0.6;
+        let frames = 0;
+        let unlockedSkins = JSON.parse(localStorage.getItem('dr_ozlem_skins')) || ['default'];
+        let currentSkinId = localStorage.getItem('dr_ozlem_current_skin') || 'default';
 
-        let doctor = {
-            x: 60,
+        // Karakter Tanımları (Mağaza)
+        const SKINS = {
+            'default': { id: 'default', name: 'Dr. Özlem', icon: '👩‍⚕️', cost: 0, desc: 'Standart Üniforma' },
+            'surgeon': { id: 'surgeon', name: 'Cerrah', icon: '😷', cost: 200, desc: 'Ameliyathane Hazır' },
+            'scientist': { id: 'scientist', name: 'Bilim İnsanı', icon: '🧑‍🔬', cost: 500, desc: 'Laboratuvar Ustası' },
+            'super': { id: 'super', name: 'Süper Dr.', icon: '🦸‍♀️', cost: 1000, desc: 'Hızlı ve Öfkeli' },
+            'zombie': { id: 'zombie', name: 'Zombi Dr.', icon: '🧟‍♀️', cost: 2000, desc: 'Beyin Cerrahı!' }
+        };
+
+        // Oyuncu Objesi
+        let player = {
+            x: 50,
             y: 0,
-            width: 50,
-            height: 80, 
+            w: 50,
+            h: 80,
             dy: 0,
-            jumpPower: -18,
-            gravity: 0.8,
+            jumpPower: -14,
             grounded: false,
-            sprite: "👩‍⚕️"
+            skin: SKINS[currentSkinId].icon
         };
 
         let obstacles = [];
         let particles = [];
+        let houses = []; // Evler için dizi
         let groundHeight = 100;
         
-        // Bina/Ev Prosedürel Çizimi için veriler
-        let buildings = [];
-
+        // Arka Plan Paralaks
+        let bgOffset = 0;
+        
+        // --- BAŞLANGIÇ & EVENT LISTENERS ---
+        
         function resize() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            groundHeight = canvas.height - 100;
-            if(!gameRunning) {
-                 doctor.y = groundHeight - doctor.height;
-            }
-            // Bina listesini sıfırla ki resize olunca bozulmasın
-            buildings = [];
-            generateBuildings();
+            groundHeight = canvas.height - 120;
+            if(!gameRunning) player.y = groundHeight - player.h;
         }
         window.addEventListener('resize', resize);
-        
-        function generateBuildings() {
-            // Ekranı dolduracak kadar bina üret
-            let currentX = -100;
-            while(currentX < canvas.width + 200) {
-                const width = 80 + Math.random() * 100;
-                const height = 150 + Math.random() * 200;
-                // Pastel renkli evler
-                const colors = ['#fecaca', '#bfdbfe', '#bbf7d0', '#ddd6fe', '#fde68a'];
-                const color = colors[Math.floor(Math.random() * colors.length)];
-                
-                buildings.push({
-                    x: currentX,
-                    y: groundHeight - height,
-                    w: width,
-                    h: height,
-                    color: color,
-                    windows: []
-                });
-                
-                // Pencereleri oluştur
-                const floors = Math.floor(height / 40);
-                const cols = Math.floor(width / 30);
-                for(let f=0; f<floors; f++) {
-                    for(let c=0; c<cols; c++) {
-                        if(Math.random() > 0.3) { // Her yerde pencere olmasın
-                            buildings[buildings.length-1].windows.push({
-                                x: 5 + c * 25,
-                                y: 10 + f * 35,
-                                w: 15,
-                                h: 20
-                            });
-                        }
-                    }
-                }
-                currentX += width + 5 + Math.random() * 20; // Binalar arası boşluk
-            }
-        }
+        resize();
 
-        // Zıplama
+        // Butonlar
+        document.getElementById('start-btn').addEventListener('click', startGame);
+        document.getElementById('restart-btn').addEventListener('click', startGame);
+        
+        // Mobil uyumluluğu için start butonuna touchstart da ekleyelim
+        document.getElementById('start-btn').addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Ghost click önle
+            startGame();
+        });
+
+        document.getElementById('menu-btn').addEventListener('click', () => {
+            gameOverScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            hud.classList.add('hidden');
+            updateShopUI();
+        });
+
+        // Mağaza Butonları
+        document.getElementById('shop-btn').addEventListener('click', openShop);
+        document.getElementById('close-shop-btn').addEventListener('click', () => {
+            shopScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            updateCharIcon();
+        });
+
+        // Zıplama Kontrolleri
         function jump() {
-            if (doctor.grounded && gameRunning) {
-                doctor.dy = doctor.jumpPower;
-                doctor.grounded = false;
-                createParticles(doctor.x + doctor.width/2, doctor.y + doctor.height, '#fff', 8);
+            if (player.grounded && gameRunning) {
+                player.dy = player.jumpPower;
+                player.grounded = false;
+                createParticles(player.x + player.w/2, player.y + player.h, '#fff', 5);
             }
         }
 
         window.addEventListener('keydown', (e) => {
-            if (e.code === 'Space' || e.code === 'ArrowUp') jump();
+            if ((e.code === 'Space' || e.code === 'ArrowUp') && gameRunning) jump();
         });
 
+        // Global Touch Listener (Oyun için)
         window.addEventListener('touchstart', (e) => {
-            e.preventDefault(); 
-            if(gameRunning) jump();
-        }, {passive: false});
-        
+            // Eğer butona basılmadıysa ve oyun açıksa zıpla
+            if (gameRunning && !e.target.closest('button')) {
+                e.preventDefault(); 
+                jump();
+            }
+        }, { passive: false });
+
         window.addEventListener('mousedown', (e) => {
-            if(gameRunning) jump();
+            if (gameRunning && !e.target.closest('button')) jump();
         });
 
-        document.getElementById('start-btn').addEventListener('click', startGame);
-        document.getElementById('restart-btn').addEventListener('click', () => {
-            gameOverScreen.style.display = 'none';
-            startGame();
-        });
+        // --- OYUN FONKSİYONLARI ---
 
-        function startGame() {
-            const name = document.getElementById('player-name-input').value.trim();
-            if(!name) { alert("Lütfen bir isim girin!"); return; }
-            startScreen.style.display = 'none';
-            jumpHint.style.display = 'block';
+        // Yeni Ev Oluşturma
+        function generateHouse(x) {
+            let h = 80 + Math.random() * 120; // Yükseklik
+            let w = 60 + Math.random() * 80;  // Genişlik
             
-            gameRunning = true;
+            // Renk paleti (Gece/Şehir temalı)
+            const colors = ['#334155', '#475569', '#1e293b', '#0f172a'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+
+            let house = {
+                x: x,
+                y: groundHeight - h,
+                w: w,
+                h: h,
+                color: color,
+                windows: []
+            };
+
+            // Pencereleri oluştur
+            let rows = Math.floor(h / 25);
+            let cols = Math.floor(w / 20);
+
+            for(let r=0; r<rows; r++) {
+                for(let c=0; c<cols; c++) {
+                    // %40 ihtimalle yanan pencere
+                    if(Math.random() > 0.6) {
+                        house.windows.push({
+                            x: 10 + c * 20,
+                            y: 10 + r * 25
+                        });
+                    }
+                }
+            }
+            houses.push(house);
+        }
+
+        function initGame() {
+            player.y = groundHeight - player.h;
+            player.dy = 0;
+            player.grounded = true;
+            player.skin = SKINS[currentSkinId].icon;
+            
             score = 0;
-            gameSpeed = 6;
+            gameSpeed = 6; // Başlangıç hızı
             obstacles = [];
             particles = [];
-            doctor.y = groundHeight - doctor.height;
-            doctor.dy = 0;
-            doctor.grounded = true;
-            frameCount = 0;
-            buildings = [];
-            generateBuildings();
+            houses = []; // Evleri sıfırla
+            frames = 0;
             
+            // Başlangıç evlerini doldur
+            let hx = 0;
+            while(hx < canvas.width + 200) {
+                generateHouse(hx);
+                hx += houses[houses.length-1].w;
+            }
+
+            scoreVal.innerText = '0';
+            coinsVal.innerText = coins;
+        }
+
+        function startGame() {
+            const nameInput = document.getElementById('player-name');
+            if (!nameInput.value.trim()) {
+                nameInput.classList.add('border-red-500', 'animate-pulse');
+                setTimeout(() => nameInput.classList.remove('border-red-500', 'animate-pulse'), 500);
+                return;
+            }
+
+            // Ekranları Yönet
+            startScreen.classList.add('hidden');
+            gameOverScreen.classList.add('hidden');
+            shopScreen.classList.add('hidden');
+            hud.classList.remove('hidden');
+
+            initGame();
+            gameRunning = true;
             requestAnimationFrame(gameLoop);
         }
 
-        function spawnObstacle() {
-            const types = [
-                { char: "🦠", width: 40, height: 40, yOffset: 0 },
-                { char: "💉", width: 30, height: 60, yOffset: 0 },
-                { char: "🛏️", width: 70, height: 50, yOffset: 0 },
-                { char: "🧪", width: 30, height: 40, yOffset: 0 }
-            ];
-
-            const type = types[Math.floor(Math.random() * types.length)];
+        function gameOver() {
+            gameRunning = false;
+            finalScoreVal.innerText = Math.floor(score);
             
-            obstacles.push({
+            // Firebase'e kaydet (Global fonksiyon window'da tanımlı)
+            if (window.saveScoreToFirebase) {
+                window.saveScoreToFirebase(score);
+            }
+            
+            // Coinleri kaydet
+            localStorage.setItem('dr_ozlem_coins', coins);
+
+            gameOverScreen.classList.remove('hidden');
+            hud.classList.add('hidden');
+        }
+
+        function spawnObstacle() {
+            // Zorluk arttıkça daha sık ve çeşitli engeller
+            let type = Math.random();
+            let obs = {
                 x: canvas.width,
-                y: groundHeight - type.height,
-                width: type.width,
-                height: type.height,
-                char: type.char,
-                passed: false
-            });
+                y: groundHeight,
+                w: 40,
+                h: 40,
+                char: '🦠', // Varsayılan virüs
+                isCoin: false
+            };
+
+            if (type < 0.2) { // %20 İlaç (Para)
+                obs.char = '💊';
+                obs.y = groundHeight - 60 - Math.random() * 80; // Havada olabilir
+                obs.w = 30;
+                obs.h = 30;
+                obs.isCoin = true;
+            } else if (type < 0.5) { // Şırınga (Uzun engel)
+                obs.char = '💉';
+                obs.h = 60;
+                obs.w = 30;
+                obs.y = groundHeight - 60;
+            } else if (type < 0.7) { // Yatak (Geniş engel)
+                obs.char = '🛏️';
+                obs.w = 70;
+                obs.h = 40;
+                obs.y = groundHeight - 40;
+            }
+            // Aksi takdirde Virüs (Küçük engel)
+            else {
+                obs.y = groundHeight - 40;
+            }
+
+            obstacles.push(obs);
         }
 
         function createParticles(x, y, color, count) {
@@ -408,216 +535,157 @@
                 particles.push({
                     x: x,
                     y: y,
-                    vx: (Math.random() - 0.5) * 6,
-                    vy: (Math.random() - 1) * 6,
-                    life: 1.0,
+                    vx: (Math.random() - 0.5) * 8,
+                    vy: (Math.random() - 1) * 8,
+                    life: 1,
                     color: color
                 });
             }
         }
 
-        function gameOver() {
-            gameRunning = false;
-            saveScore(score);
-            finalScoreDisplay.innerText = Math.floor(score);
-            gameOverScreen.style.display = 'flex';
-            jumpHint.style.display = 'none';
-        }
-
         function drawBackground() {
-            // Şeffaflık sorunu için reset
-            ctx.globalAlpha = 1.0;
-
-            // Gökyüzü (Temizle)
-            ctx.fillStyle = '#87CEEB';
+            // Gökyüzü Gradient
+            let grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            grad.addColorStop(0, '#1e3a8a');
+            grad.addColorStop(1, '#3b82f6');
+            ctx.fillStyle = grad;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Binaları Çiz ve Kaydır
-            const buildingSpeed = gameSpeed * 0.5; // Paralaks efekt (daha yavaş)
-            
-            // Eğer binalar sola gidip kaybolursa, sağa yeni bina ekle
-            if (buildings.length > 0 && buildings[0].x + buildings[0].w < -100) {
-                buildings.shift(); // İlk binayı sil
+            // --- EVLERİ ÇİZ (ZEMİNİN ARKASINDA) ---
+            houses.forEach((house, index) => {
+                // Evi Çiz
+                ctx.fillStyle = house.color;
+                ctx.fillRect(house.x, house.y, house.w, house.h);
                 
-                // En son binanın sağına yeni ekle
-                const lastBuilding = buildings[buildings.length-1];
-                let currentX = lastBuilding.x + lastBuilding.w + 10;
-                
-                const width = 80 + Math.random() * 100;
-                const height = 150 + Math.random() * 200;
-                const colors = ['#fecaca', '#bfdbfe', '#bbf7d0', '#ddd6fe', '#fde68a'];
-                const color = colors[Math.floor(Math.random() * colors.length)];
-                
-                const newBuilding = {
-                    x: currentX,
-                    y: groundHeight - height,
-                    w: width,
-                    h: height,
-                    color: color,
-                    windows: []
-                };
-                 // Pencereleri oluştur
-                const floors = Math.floor(height / 40);
-                const cols = Math.floor(width / 30);
-                for(let f=0; f<floors; f++) {
-                    for(let c=0; c<cols; c++) {
-                        if(Math.random() > 0.3) {
-                            newBuilding.windows.push({
-                                x: 5 + c * 25,
-                                y: 10 + f * 35,
-                                w: 15, h: 20
-                            });
-                        }
-                    }
-                }
-                buildings.push(newBuilding);
-            }
-
-            // Binaları çiz
-            buildings.forEach(b => {
-                b.x -= buildingSpeed; // Sola kaydır
-                
-                // Bina Gövdesi
-                ctx.fillStyle = b.color;
-                ctx.fillRect(b.x, b.y, b.w, b.h);
-                
-                // Bina Çatısı (Üçgen)
-                ctx.beginPath();
-                ctx.moveTo(b.x - 5, b.y);
-                ctx.lineTo(b.x + b.w/2, b.y - 30);
-                ctx.lineTo(b.x + b.w + 5, b.y);
-                ctx.fillStyle = '#64748b'; // Koyu çatı
-                ctx.fill();
-
-                // Pencereler
-                ctx.fillStyle = '#e2e8f0'; // Kapalı pencere
-                b.windows.forEach(win => {
-                    // Bazı pencereler sarı yansın (Işık)
-                    if ((win.x + win.y) % 3 === 0) ctx.fillStyle = '#fef08a';
-                    else ctx.fillStyle = '#334155';
-                    ctx.fillRect(b.x + win.x, b.y + win.y, win.w, win.h);
+                // Pencereleri Çiz
+                ctx.fillStyle = '#fef08a'; // Sarı ışık
+                house.windows.forEach(win => {
+                    ctx.fillRect(house.x + win.x, house.y + win.y, 8, 12);
                 });
+
+                // Paralaks Hareketi (Daha yavaş hareket)
+                // Oyun hızının yarısı kadar hareket etsinler
+                house.x -= gameSpeed * 0.5;
             });
 
-            // Zemin (Yol)
-            ctx.fillStyle = '#475569'; // Asfalt rengi
+            // Evleri Yönet (Ekrandan çıkanları sil, yenisini ekle)
+            if(houses.length > 0 && houses[0].x + houses[0].w < -10) {
+                let lastHouseX = houses[houses.length-1].x + houses[houses.length-1].w;
+                houses.shift(); // İlki sil
+                generateHouse(lastHouseX); // Sona ekle
+            }
+
+            // --- ZEMİN (ÖN PLAN) ---
+            ctx.fillStyle = '#1e293b';
             ctx.fillRect(0, groundHeight, canvas.width, canvas.height - groundHeight);
             
-            // Yol Şeritleri
-            ctx.fillStyle = '#fbbf24'; // Sarı şerit
-            ctx.fillRect(0, groundHeight + 10, canvas.width, 5);
+            // Zemin Çizgileri (Hız hissi için)
+            ctx.fillStyle = '#334155';
+            bgOffset -= gameSpeed;
+            if (bgOffset < -50) bgOffset = 0;
+            for(let i=bgOffset; i<canvas.width; i+=50) {
+                ctx.fillRect(i, groundHeight, 40, 10);
+            }
         }
 
         function gameLoop() {
             if (!gameRunning) return;
 
-            // Her karede alpha resetle
-            ctx.globalAlpha = 1.0;
+            // Temizlik
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Fizik
-            frameCount++;
-            gameSpeed += 0.002;
-            score += 0.1;
+            // Fizik & Güncelleme
+            frames++;
+            gameSpeed += 0.001; // Giderek hızlan (Zorluk)
+            score += gameSpeed * 0.05;
+            scoreVal.innerText = Math.floor(score);
 
-            doctor.dy += doctor.gravity;
-            doctor.y += doctor.dy;
+            player.dy += gravity;
+            player.y += player.dy;
 
-            if (doctor.y + doctor.height > groundHeight) {
-                doctor.y = groundHeight - doctor.height;
-                doctor.dy = 0;
-                doctor.grounded = true;
+            // Zemin Çarpışması
+            if (player.y + player.h > groundHeight) {
+                player.y = groundHeight - player.h;
+                player.dy = 0;
+                player.grounded = true;
             } else {
-                doctor.grounded = false;
+                player.grounded = false;
             }
 
-            if (frameCount % Math.floor(1800 / gameSpeed) === 0 || Math.random() < 0.005) {
-                if (obstacles.length === 0 || (canvas.width - obstacles[obstacles.length-1].x > 350)) {
+            // Engel Spawn (Hızlandıkça daha sık)
+            let spawnRate = Math.max(40, 100 - Math.floor(gameSpeed * 2));
+            if (frames % spawnRate === 0 || Math.random() < 0.005) {
+                if (obstacles.length === 0 || canvas.width - obstacles[obstacles.length-1].x > 250) {
                     spawnObstacle();
                 }
             }
 
-            // Çizim Başla
+            // Çizimler
             drawBackground();
 
-            scoreDisplay.innerText = Math.floor(score);
-
-            // Doktor Çizimi - GÖRÜNÜRLÜK DÜZELTMESİ
+            // Oyuncu Çiz
+            ctx.font = `${player.h}px Arial`;
+            ctx.textAlign = "left";
+            ctx.textBaseline = "top";
             
-            // 1. Gölge (Ayak altı)
-            ctx.fillStyle = 'rgba(0,0,0,0.3)';
-            ctx.beginPath();
-            ctx.ellipse(doctor.x + doctor.width/2, groundHeight + 5, doctor.width/1.5, 6, 0, 0, Math.PI*2);
-            ctx.fill();
-
-            // 2. Parlama / Hale (Karakterin arkasına)
-            // Açık sarı bir daire çizelim ki karakter gökyüzünde kaybolmasın
-            ctx.shadowBlur = 20;
-            ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'; // Yarı saydam beyaz arka ışık
-            ctx.beginPath();
-            ctx.arc(doctor.x + doctor.width/2, doctor.y + doctor.height/1.8, 35, 0, Math.PI*2);
-            ctx.fill();
-            ctx.shadowBlur = 0; // Shadow reset
-
-            // 3. Karakter (Emoji)
-            ctx.font = `bold ${doctor.height}px Arial`;
-            ctx.textAlign = "center";
-            ctx.textBaseline = "bottom";
-            
-            let bounce = 0;
-            if(doctor.grounded) bounce = Math.sin(frameCount * 0.5) * 5;
-
+            // Zıplarken hafif dönme efekti
             ctx.save();
-            // Zıplama açısı
-            if(!doctor.grounded) {
-                ctx.translate(doctor.x + doctor.width/2, doctor.y + doctor.height);
-                ctx.rotate(-0.15); 
-                ctx.translate(-(doctor.x + doctor.width/2), -(doctor.y + doctor.height));
+            if (!player.grounded) {
+                ctx.translate(player.x + player.w/2, player.y + player.h/2);
+                ctx.rotate(-0.2);
+                ctx.translate(-(player.x + player.w/2), -(player.y + player.h/2));
             }
-            
-            // Karakteri çiz
-            const charX = doctor.x + doctor.width/2;
-            const charY = doctor.y + doctor.height - bounce;
-            
-            // Kontur ekle (Daha belirgin olması için)
-            ctx.strokeStyle = '#fff';
-            ctx.lineWidth = 3;
-            ctx.strokeText(doctor.sprite, charX, charY);
-            
-            // İçini doldur
-            ctx.fillStyle = '#000'; // Emoji rengi (tarayıcı yönetir ama fillStyle gerekir)
-            ctx.fillText(doctor.sprite, charX, charY);
-            
+            // Gölge
+            ctx.shadowColor = "rgba(0,0,0,0.5)";
+            ctx.shadowBlur = 10;
+            ctx.fillText(player.skin, player.x, player.y);
             ctx.restore();
 
-            // Engeller
-            for(let i = 0; i < obstacles.length; i++) {
+            // Engelleri Yönet
+            for (let i = 0; i < obstacles.length; i++) {
                 let obs = obstacles[i];
                 obs.x -= gameSpeed;
 
-                ctx.font = `${obs.height}px Arial`;
-                // Engel için de hafif kontur
-                ctx.strokeStyle = '#fff';
-                ctx.lineWidth = 2;
-                ctx.strokeText(obs.char, obs.x + obs.width/2, obs.y + obs.height);
-                ctx.fillText(obs.char, obs.x + obs.width/2, obs.y + obs.height);
-
-                const padding = 12;
-                if (
-                    doctor.x + padding < obs.x + obs.width - padding &&
-                    doctor.x + doctor.width - padding > obs.x + padding &&
-                    doctor.y + padding < obs.y + obs.height - padding &&
-                    doctor.y + doctor.height - padding > obs.y + padding
-                ) {
-                    createParticles(doctor.x, doctor.y, '#ef4444', 20);
-                    gameOver();
-                    return; 
+                // Çiz
+                ctx.font = `${obs.h}px Arial`;
+                ctx.shadowBlur = 0;
+                
+                if (obs.isCoin) {
+                     // Coin Efekti
+                    let bob = Math.sin(frames * 0.1) * 5;
+                    ctx.fillText(obs.char, obs.x, obs.y + bob);
+                } else {
+                    ctx.fillText(obs.char, obs.x, obs.y);
                 }
 
-                if (obs.x + obs.width < 0) {
+                // Çarpışma Kontrolü (Basit AABB)
+                // Tolerans (padding) ekleyelim ki oyun çok acımasız olmasın
+                let p = 10; 
+                if (
+                    player.x + p < obs.x + obs.w - p &&
+                    player.x + player.w - p > obs.x + p &&
+                    player.y + p < obs.y + obs.h - p &&
+                    player.y + player.h - p > obs.y + p
+                ) {
+                    if (obs.isCoin) {
+                        // Para toplandı
+                        coins++;
+                        coinsVal.innerText = coins;
+                        createParticles(obs.x, obs.y, '#fbbf24', 5);
+                        obstacles.splice(i, 1);
+                        i--;
+                    } else {
+                        // Çarpışma = Ölüm
+                        createParticles(player.x, player.y, '#ef4444', 20);
+                        gameOver();
+                        return;
+                    }
+                }
+
+                // Ekrandan çıkma
+                if (obs.x + obs.w < 0) {
                     obstacles.splice(i, 1);
                     i--;
-                    score += 10; 
                 }
             }
 
@@ -625,13 +693,13 @@
             particles.forEach((p, i) => {
                 p.x += p.vx;
                 p.y += p.vy;
-                p.life -= 0.02;
+                p.life -= 0.05;
                 if (p.life <= 0) particles.splice(i, 1);
                 else {
                     ctx.globalAlpha = p.life;
                     ctx.fillStyle = p.color;
                     ctx.beginPath();
-                    ctx.arc(p.x, p.y, 4, 0, Math.PI*2);
+                    ctx.arc(p.x, p.y, 5, 0, Math.PI*2);
                     ctx.fill();
                     ctx.globalAlpha = 1.0;
                 }
@@ -639,9 +707,80 @@
 
             requestAnimationFrame(gameLoop);
         }
+
+        // --- MAĞAZA MANTIĞI ---
+
+        function openShop() {
+            startScreen.classList.add('hidden');
+            shopScreen.classList.remove('hidden');
+            shopCoinsVal.innerText = coins;
+            updateShopGrid();
+        }
+
+        function updateShopGrid() {
+            const grid = document.querySelector('.shop-grid');
+            grid.innerHTML = '';
+
+            Object.values(SKINS).forEach(skin => {
+                const el = document.createElement('div');
+                const isUnlocked = unlockedSkins.includes(skin.id);
+                const isSelected = currentSkinId === skin.id;
+
+                el.className = `shop-item ${!isUnlocked ? 'locked' : ''} ${isSelected ? 'selected' : ''}`;
+                
+                let btnText = isUnlocked ? (isSelected ? 'SEÇİLDİ' : 'SEÇ') : `${skin.cost} 💊`;
+                let btnClass = isUnlocked ? (isSelected ? 'bg-green-600' : 'bg-blue-600') : (coins >= skin.cost ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-gray-500 cursor-not-allowed');
+
+                el.innerHTML = `
+                    <div class="text-4xl mb-2">${skin.icon}</div>
+                    <div class="font-bold text-white text-sm mb-1">${skin.name}</div>
+                    <div class="text-xs text-gray-300 mb-2">${skin.desc}</div>
+                    <button class="w-full py-1 rounded text-white font-bold text-xs ${btnClass}">
+                        ${btnText}
+                    </button>
+                `;
+
+                // Tıklama Olayı
+                el.onclick = () => {
+                    if (isUnlocked) {
+                        currentSkinId = skin.id;
+                        localStorage.setItem('dr_ozlem_current_skin', currentSkinId);
+                        updateShopGrid();
+                        updateCharIcon();
+                    } else {
+                        if (coins >= skin.cost) {
+                            coins -= skin.cost;
+                            unlockedSkins.push(skin.id);
+                            localStorage.setItem('dr_ozlem_coins', coins);
+                            localStorage.setItem('dr_ozlem_skins', JSON.stringify(unlockedSkins));
+                            shopCoinsVal.innerText = coins;
+                            // Otomatik seç
+                            currentSkinId = skin.id;
+                            localStorage.setItem('dr_ozlem_current_skin', currentSkinId);
+                            updateShopGrid();
+                            updateCharIcon();
+                        } else {
+                            // Yetersiz bakiye animasyonu
+                            el.classList.add('animate-shake'); // CSS'de tanımlı değil ama sallansın
+                        }
+                    }
+                };
+                grid.appendChild(el);
+            });
+        }
+
+        function updateCharIcon() {
+            if(SKINS[currentSkinId]) {
+                currentCharIcon.innerText = SKINS[currentSkinId].icon;
+            }
+        }
         
-        // İlk açılışta binaları oluştur
-        resize();
+        function updateShopUI() {
+            coinsVal.innerText = coins;
+        }
+
+        // Başlangıç Ayarı
+        updateCharIcon();
 
     </script>
 </body>
