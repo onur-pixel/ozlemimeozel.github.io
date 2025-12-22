@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dr. Özlem: Büyük Koşu</title>
+    <title>Dr. Özlem: Büyük Koşu (HIZLI)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@400;700&display=swap');
@@ -92,7 +92,7 @@
             position: absolute;
             top: 10px;
             right: 10px;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             border: 2px solid #fbbf24;
             border-radius: 8px;
             padding: 10px;
@@ -100,18 +100,16 @@
             z-index: 10;
             pointer-events: none;
             font-size: 10px;
-            min-width: 150px;
+            min-width: 160px;
+            max-width: 200px;
         }
 
-        /* Zıplama Butonu (Mobil İçin Görsel Yardımcı) */
-        #mobile-jump-area {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 50%;
-            z-index: 5; /* Canvas üzerinde ama UI altında */
-            display: none; /* JS ile mobilde açılabilir */
+        /* Hata mesajı stili */
+        .error-text {
+            color: #ef4444;
+            font-size: 9px;
+            margin-top: 5px;
+            text-align: center;
         }
         
         button:active {
@@ -136,24 +134,25 @@
 
     <!-- Global Lider Tablosu -->
     <div id="leaderboard">
-        <div class="text-yellow-400 text-center mb-2 font-bold border-b border-gray-600 pb-1">🏆 TOP 3 GLOBAL</div>
+        <div class="text-yellow-400 text-center mb-2 font-bold border-b border-gray-600 pb-1">🏆 GLOBAL TOP 3</div>
         <div id="leaderboard-list" class="space-y-1">
-            <div class="text-gray-400 text-center">Yükleniyor...</div>
+            <div class="text-gray-400 text-center animate-pulse">Yükleniyor...</div>
         </div>
+        <div id="leaderboard-error" class="error-text hidden"></div>
     </div>
 
     <!-- Başlangıç Ekranı -->
     <div id="start-screen" class="ui-screen bg-overlay">
         <div class="text-6xl mb-4 animate-bounce" id="current-char-icon">👩‍⚕️</div>
         <h1 class="pixel-font text-3xl md:text-5xl text-white mb-2 text-center text-shadow-lg">
-            DR. ÖZLEM<br><span class="text-yellow-400 text-2xl md:text-4xl">ZORLU KOŞU</span>
+            DR. ÖZLEM<br><span class="text-yellow-400 text-2xl md:text-4xl">HIZLI KOŞU</span>
         </h1>
         
         <div class="bg-white/10 backdrop-blur-md p-6 rounded-xl border border-white/20 w-80 text-center mt-4">
             <input type="text" id="player-name" placeholder="ADINIZ (MAX 10)" maxlength="10" 
                 class="w-full bg-slate-800 text-white border-2 border-blue-500 rounded px-4 py-3 mb-4 text-center pixel-font focus:outline-none focus:border-yellow-400 uppercase">
             
-            <button id="start-btn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-lg pixel-font shadow-lg border-b-4 border-green-700 mb-3">
+            <button id="start-btn" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-lg pixel-font shadow-lg border-b-4 border-green-700 mb-3 transition-transform">
                 KOŞUYA BAŞLA
             </button>
             
@@ -200,7 +199,7 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- FIREBASE KURULUMU ---
+        // --- FIREBASE AYARLARI ---
         const firebaseConfig = JSON.parse(new URLSearchParams(window.location.search).get('__firebase_config')) || JSON.parse(__firebase_config);
         const appId = new URLSearchParams(window.location.search).get('__app_id') || (typeof __app_id !== 'undefined' ? __app_id : 'default-app');
         
@@ -210,7 +209,6 @@
 
         let currentUser = null;
 
-        // Oturum Açma
         const initAuth = async () => {
              if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                 try {
@@ -224,49 +222,62 @@
 
         onAuthStateChanged(auth, (user) => {
             currentUser = user;
-            if (user) listenLeaderboard();
+            if (user) {
+                listenLeaderboard();
+            } else {
+                document.getElementById('leaderboard-list').innerHTML = '<div class="text-red-400 text-xs">Giriş Yapılamadı</div>';
+            }
         });
 
-        // Global Leaderboard Dinleme (Sadece Top 3)
         function listenLeaderboard() {
-            const q = query(
-                collection(db, 'artifacts', appId, 'public', 'data', 'dr_ozlem_global_scores'),
-                orderBy('score', 'desc'),
-                limit(3)
-            );
+            const collectionPath = collection(db, 'artifacts', appId, 'public', 'data', 'dr_ozlem_global_scores');
+            const q = query(collectionPath, orderBy('score', 'desc'), limit(3));
             
             onSnapshot(q, (snapshot) => {
                 const listEl = document.getElementById('leaderboard-list');
+                const errorEl = document.getElementById('leaderboard-error');
+                
                 listEl.innerHTML = '';
-                let rank = 1;
+                errorEl.classList.add('hidden');
                 
                 if (snapshot.empty) {
-                    listEl.innerHTML = '<div class="text-center text-gray-500 text-xs">Henüz skor yok</div>';
+                    listEl.innerHTML = '<div class="text-center text-gray-500 text-xs">Henüz skor yok.<br>İlk sen ol!</div>';
                     return;
                 }
 
+                let rank = 1;
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     const row = document.createElement('div');
-                    row.className = 'flex justify-between text-xs border-b border-gray-700 pb-1 mb-1';
+                    row.className = 'flex justify-between text-xs border-b border-gray-700 pb-1 mb-1 items-center';
                     
                     let medal = rank === 1 ? '🥇' : (rank === 2 ? '🥈' : '🥉');
-                    let name = data.name.substring(0, 8); // İsmi kısalt
+                    let name = (data.name || "Anonim").substring(0, 8); 
                     
                     row.innerHTML = `
-                        <span class="text-white">${medal} ${name}</span>
+                        <div class="flex items-center gap-1">
+                            <span>${medal}</span>
+                            <span class="text-white font-mono">${name}</span>
+                        </div>
                         <span class="text-green-400 font-bold">${Math.floor(data.score)}</span>
                     `;
                     listEl.appendChild(row);
                     rank++;
                 });
-            }, (error) => console.error("Leaderboard hatası:", error));
+            }, (error) => {
+                console.error("Leaderboard hatası:", error);
+                const listEl = document.getElementById('leaderboard-list');
+                const errorEl = document.getElementById('leaderboard-error');
+                listEl.innerHTML = '';
+                errorEl.innerText = "Bağlantı Hatası!";
+                errorEl.classList.remove('hidden');
+            });
         }
 
-        // Skor Kaydetme
         window.saveScoreToFirebase = async function(score) {
-            if (!currentUser || score < 10) return; // Çok düşük skorları kaydetme
+            if (!currentUser || score < 5) return; 
             const playerName = document.getElementById('player-name').value.trim() || "Dr. Anonim";
+            
             try {
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'dr_ozlem_global_scores'), {
                     name: playerName,
@@ -274,7 +285,9 @@
                     userId: currentUser.uid,
                     timestamp: serverTimestamp()
                 });
-            } catch (e) { console.error("Skor kaydedilemedi", e); }
+            } catch (e) { 
+                console.error("Skor kaydedilemedi", e); 
+            }
         };
     </script>
 
@@ -299,13 +312,20 @@
         let gameRunning = false;
         let score = 0;
         let coins = parseInt(localStorage.getItem('dr_ozlem_coins')) || 0;
-        let gameSpeed = 6;
-        let gravity = 0.6;
-        let frames = 0;
+        
+        // --- HIZ AYARLARI (TURBO MOD) ---
+        // Base Speed 300'den 650'ye çıkarıldı
+        let baseSpeed = 650; 
+        let currentSpeed = baseSpeed;
+        
+        // Gravity 1500'den 3000'e çıkarıldı (Daha hızlı düşüş)
+        let gravity = 3000; 
+        
+        let lastTime = 0;
+        
         let unlockedSkins = JSON.parse(localStorage.getItem('dr_ozlem_skins')) || ['default'];
         let currentSkinId = localStorage.getItem('dr_ozlem_current_skin') || 'default';
 
-        // Karakter Tanımları (Mağaza)
         const SKINS = {
             'default': { id: 'default', name: 'Dr. Özlem', icon: '👩‍⚕️', cost: 0, desc: 'Standart Üniforma' },
             'surgeon': { id: 'surgeon', name: 'Cerrah', icon: '😷', cost: 200, desc: 'Ameliyathane Hazır' },
@@ -321,25 +341,29 @@
             w: 50,
             h: 80,
             dy: 0,
-            jumpPower: -14,
+            // Jump Power -850'den -1100'e güçlendirildi (Daha sert zıplama)
+            jumpPower: -1100, 
             grounded: false,
             skin: SKINS[currentSkinId].icon
         };
 
         let obstacles = [];
         let particles = [];
-        let houses = []; // Evler için dizi
+        let houses = []; 
         let groundHeight = 100;
-        
-        // Arka Plan Paralaks
         let bgOffset = 0;
         
-        // --- BAŞLANGIÇ & EVENT LISTENERS ---
+        // --- EKRAN AYARLARI ---
         
         function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            groundHeight = canvas.height - 120;
+            const dpr = Math.min(window.devicePixelRatio || 1, 1.5); 
+            canvas.width = window.innerWidth * dpr;
+            canvas.height = window.innerHeight * dpr;
+            canvas.style.width = window.innerWidth + 'px';
+            canvas.style.height = window.innerHeight + 'px';
+            ctx.scale(dpr, dpr);
+            
+            groundHeight = window.innerHeight - 120;
             if(!gameRunning) player.y = groundHeight - player.h;
         }
         window.addEventListener('resize', resize);
@@ -349,11 +373,12 @@
         document.getElementById('start-btn').addEventListener('click', startGame);
         document.getElementById('restart-btn').addEventListener('click', startGame);
         
-        // Mobil uyumluluğu için start butonuna touchstart da ekleyelim
-        document.getElementById('start-btn').addEventListener('touchstart', (e) => {
-            e.preventDefault(); // Ghost click önle
+        const startBtn = document.getElementById('start-btn');
+        startBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault(); 
+            e.stopPropagation();
             startGame();
-        });
+        }, {passive: false});
 
         document.getElementById('menu-btn').addEventListener('click', () => {
             gameOverScreen.classList.add('hidden');
@@ -362,7 +387,6 @@
             updateShopUI();
         });
 
-        // Mağaza Butonları
         document.getElementById('shop-btn').addEventListener('click', openShop);
         document.getElementById('close-shop-btn').addEventListener('click', () => {
             shopScreen.classList.add('hidden');
@@ -370,7 +394,7 @@
             updateCharIcon();
         });
 
-        // Zıplama Kontrolleri
+        // Zıplama
         function jump() {
             if (player.grounded && gameRunning) {
                 player.dy = player.jumpPower;
@@ -383,9 +407,7 @@
             if ((e.code === 'Space' || e.code === 'ArrowUp') && gameRunning) jump();
         });
 
-        // Global Touch Listener (Oyun için)
         window.addEventListener('touchstart', (e) => {
-            // Eğer butona basılmadıysa ve oyun açıksa zıpla
             if (gameRunning && !e.target.closest('button')) {
                 e.preventDefault(); 
                 jump();
@@ -398,12 +420,9 @@
 
         // --- OYUN FONKSİYONLARI ---
 
-        // Yeni Ev Oluşturma
         function generateHouse(x) {
-            let h = 80 + Math.random() * 120; // Yükseklik
-            let w = 60 + Math.random() * 80;  // Genişlik
-            
-            // Renk paleti (Gece/Şehir temalı)
+            let h = 80 + Math.random() * 120;
+            let w = 60 + Math.random() * 80;
             const colors = ['#334155', '#475569', '#1e293b', '#0f172a'];
             const color = colors[Math.floor(Math.random() * colors.length)];
 
@@ -416,18 +435,13 @@
                 windows: []
             };
 
-            // Pencereleri oluştur
             let rows = Math.floor(h / 25);
             let cols = Math.floor(w / 20);
 
             for(let r=0; r<rows; r++) {
                 for(let c=0; c<cols; c++) {
-                    // %40 ihtimalle yanan pencere
                     if(Math.random() > 0.6) {
-                        house.windows.push({
-                            x: 10 + c * 20,
-                            y: 10 + r * 25
-                        });
+                        house.windows.push({ x: 10 + c * 20, y: 10 + r * 25 });
                     }
                 }
             }
@@ -441,15 +455,14 @@
             player.skin = SKINS[currentSkinId].icon;
             
             score = 0;
-            gameSpeed = 6; // Başlangıç hızı
+            currentSpeed = baseSpeed; 
             obstacles = [];
             particles = [];
-            houses = []; // Evleri sıfırla
-            frames = 0;
+            houses = [];
+            lastTime = performance.now();
             
-            // Başlangıç evlerini doldur
             let hx = 0;
-            while(hx < canvas.width + 200) {
+            while(hx < window.innerWidth + 200) {
                 generateHouse(hx);
                 hx += houses[houses.length-1].w;
             }
@@ -466,12 +479,12 @@
                 return;
             }
 
-            // Ekranları Yönet
             startScreen.classList.add('hidden');
             gameOverScreen.classList.add('hidden');
             shopScreen.classList.add('hidden');
             hud.classList.remove('hidden');
 
+            resize();
             initGame();
             gameRunning = true;
             requestAnimationFrame(gameLoop);
@@ -480,130 +493,123 @@
         function gameOver() {
             gameRunning = false;
             finalScoreVal.innerText = Math.floor(score);
-            
-            // Firebase'e kaydet (Global fonksiyon window'da tanımlı)
-            if (window.saveScoreToFirebase) {
-                window.saveScoreToFirebase(score);
-            }
-            
-            // Coinleri kaydet
+            if (window.saveScoreToFirebase) window.saveScoreToFirebase(score);
             localStorage.setItem('dr_ozlem_coins', coins);
-
             gameOverScreen.classList.remove('hidden');
             hud.classList.add('hidden');
         }
 
         function spawnObstacle() {
-            // Zorluk arttıkça daha sık ve çeşitli engeller
             let type = Math.random();
             let obs = {
-                x: canvas.width,
+                x: window.innerWidth, 
                 y: groundHeight,
                 w: 40,
                 h: 40,
-                char: '🦠', // Varsayılan virüs
+                char: '🦠', 
                 isCoin: false
             };
 
-            if (type < 0.2) { // %20 İlaç (Para)
+            if (type < 0.2) { 
                 obs.char = '💊';
-                obs.y = groundHeight - 60 - Math.random() * 80; // Havada olabilir
+                obs.y = groundHeight - 60 - Math.random() * 80;
                 obs.w = 30;
                 obs.h = 30;
                 obs.isCoin = true;
-            } else if (type < 0.5) { // Şırınga (Uzun engel)
+            } else if (type < 0.5) { 
                 obs.char = '💉';
                 obs.h = 60;
                 obs.w = 30;
                 obs.y = groundHeight - 60;
-            } else if (type < 0.7) { // Yatak (Geniş engel)
+            } else if (type < 0.7) { 
                 obs.char = '🛏️';
                 obs.w = 70;
                 obs.h = 40;
                 obs.y = groundHeight - 40;
-            }
-            // Aksi takdirde Virüs (Küçük engel)
-            else {
+            } else {
                 obs.y = groundHeight - 40;
             }
-
             obstacles.push(obs);
         }
 
         function createParticles(x, y, color, count) {
-            for(let i=0; i<count; i++) {
+            const limit = window.innerWidth < 600 ? 3 : count;
+            for(let i=0; i<limit; i++) {
                 particles.push({
                     x: x,
                     y: y,
-                    vx: (Math.random() - 0.5) * 8,
-                    vy: (Math.random() - 1) * 8,
+                    vx: (Math.random() - 0.5) * 300, 
+                    vy: (Math.random() - 1) * 300,
                     life: 1,
                     color: color
                 });
             }
         }
 
-        function drawBackground() {
-            // Gökyüzü Gradient
-            let grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        function drawBackground(dt) {
+            const logicalWidth = window.innerWidth;
+            const logicalHeight = window.innerHeight;
+
+            let grad = ctx.createLinearGradient(0, 0, 0, logicalHeight);
             grad.addColorStop(0, '#1e3a8a');
             grad.addColorStop(1, '#3b82f6');
             ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillRect(0, 0, logicalWidth, logicalHeight);
 
-            // --- EVLERİ ÇİZ (ZEMİNİN ARKASINDA) ---
-            houses.forEach((house, index) => {
-                // Evi Çiz
+            houses.forEach((house) => {
                 ctx.fillStyle = house.color;
                 ctx.fillRect(house.x, house.y, house.w, house.h);
                 
-                // Pencereleri Çiz
-                ctx.fillStyle = '#fef08a'; // Sarı ışık
+                ctx.fillStyle = '#fef08a';
                 house.windows.forEach(win => {
                     ctx.fillRect(house.x + win.x, house.y + win.y, 8, 12);
                 });
-
-                // Paralaks Hareketi (Daha yavaş hareket)
-                // Oyun hızının yarısı kadar hareket etsinler
-                house.x -= gameSpeed * 0.5;
+                
+                house.x -= (currentSpeed * 0.5) * dt;
             });
 
-            // Evleri Yönet (Ekrandan çıkanları sil, yenisini ekle)
             if(houses.length > 0 && houses[0].x + houses[0].w < -10) {
                 let lastHouseX = houses[houses.length-1].x + houses[houses.length-1].w;
-                houses.shift(); // İlki sil
-                generateHouse(lastHouseX); // Sona ekle
+                houses.shift();
+                generateHouse(lastHouseX);
             }
 
-            // --- ZEMİN (ÖN PLAN) ---
             ctx.fillStyle = '#1e293b';
-            ctx.fillRect(0, groundHeight, canvas.width, canvas.height - groundHeight);
+            ctx.fillRect(0, groundHeight, logicalWidth, logicalHeight - groundHeight);
             
-            // Zemin Çizgileri (Hız hissi için)
             ctx.fillStyle = '#334155';
-            bgOffset -= gameSpeed;
+            bgOffset -= currentSpeed * dt;
             if (bgOffset < -50) bgOffset = 0;
-            for(let i=bgOffset; i<canvas.width; i+=50) {
+            for(let i=bgOffset; i<logicalWidth; i+=50) {
                 ctx.fillRect(i, groundHeight, 40, 10);
             }
         }
 
-        function gameLoop() {
+        // --- ANA OYUN DÖNGÜSÜ ---
+        function gameLoop(timestamp) {
             if (!gameRunning) return;
 
-            // Temizlik
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const dt = (timestamp - lastTime) / 1000;
+            lastTime = timestamp;
 
-            // Fizik & Güncelleme
-            frames++;
-            gameSpeed += 0.001; // Giderek hızlan (Zorluk)
-            score += gameSpeed * 0.05;
+            if (dt > 0.1) {
+                requestAnimationFrame(gameLoop);
+                return;
+            }
+
+            const logicalWidth = window.innerWidth;
+            const logicalHeight = window.innerHeight;
+
+            ctx.clearRect(0, 0, logicalWidth, logicalHeight);
+
+            // Hızlanma (5'ten 20'ye çıkarıldı - Çok daha hızlı zorlaşacak)
+            currentSpeed += 20 * dt; 
+            score += currentSpeed * 0.05 * dt;
             scoreVal.innerText = Math.floor(score);
 
-            player.dy += gravity;
-            player.y += player.dy;
+            player.dy += gravity * dt;
+            player.y += player.dy * dt;
 
-            // Zemin Çarpışması
             if (player.y + player.h > groundHeight) {
                 player.y = groundHeight - player.h;
                 player.dy = 0;
@@ -612,54 +618,46 @@
                 player.grounded = false;
             }
 
-            // Engel Spawn (Hızlandıkça daha sık)
-            let spawnRate = Math.max(40, 100 - Math.floor(gameSpeed * 2));
-            if (frames % spawnRate === 0 || Math.random() < 0.005) {
-                if (obstacles.length === 0 || canvas.width - obstacles[obstacles.length-1].x > 250) {
-                    spawnObstacle();
-                }
+            // Engel Spawn Mesafesi (Hıza göre dinamik)
+            const lastObs = obstacles[obstacles.length - 1];
+            // Hız arttıkça engeller arası minimum mesafeyi de biraz açıyoruz ki oynanabilir kalsın
+            const minDistance = 250 + (currentSpeed * 0.2); 
+            
+            if (!lastObs || (logicalWidth - lastObs.x > minDistance)) {
+                 if(Math.random() < 0.6) spawnObstacle(); // %60 şans
             }
 
-            // Çizimler
-            drawBackground();
+            drawBackground(dt);
 
-            // Oyuncu Çiz
             ctx.font = `${player.h}px Arial`;
             ctx.textAlign = "left";
             ctx.textBaseline = "top";
             
-            // Zıplarken hafif dönme efekti
             ctx.save();
             if (!player.grounded) {
                 ctx.translate(player.x + player.w/2, player.y + player.h/2);
                 ctx.rotate(-0.2);
                 ctx.translate(-(player.x + player.w/2), -(player.y + player.h/2));
             }
-            // Gölge
             ctx.shadowColor = "rgba(0,0,0,0.5)";
             ctx.shadowBlur = 10;
             ctx.fillText(player.skin, player.x, player.y);
             ctx.restore();
 
-            // Engelleri Yönet
             for (let i = 0; i < obstacles.length; i++) {
                 let obs = obstacles[i];
-                obs.x -= gameSpeed;
+                obs.x -= currentSpeed * dt;
 
-                // Çiz
                 ctx.font = `${obs.h}px Arial`;
                 ctx.shadowBlur = 0;
                 
                 if (obs.isCoin) {
-                     // Coin Efekti
-                    let bob = Math.sin(frames * 0.1) * 5;
+                    let bob = Math.sin(timestamp * 0.005) * 5;
                     ctx.fillText(obs.char, obs.x, obs.y + bob);
                 } else {
                     ctx.fillText(obs.char, obs.x, obs.y);
                 }
 
-                // Çarpışma Kontrolü (Basit AABB)
-                // Tolerans (padding) ekleyelim ki oyun çok acımasız olmasın
                 let p = 10; 
                 if (
                     player.x + p < obs.x + obs.w - p &&
@@ -668,32 +666,28 @@
                     player.y + player.h - p > obs.y + p
                 ) {
                     if (obs.isCoin) {
-                        // Para toplandı
                         coins++;
                         coinsVal.innerText = coins;
                         createParticles(obs.x, obs.y, '#fbbf24', 5);
                         obstacles.splice(i, 1);
                         i--;
                     } else {
-                        // Çarpışma = Ölüm
                         createParticles(player.x, player.y, '#ef4444', 20);
                         gameOver();
-                        return;
+                        return; 
                     }
                 }
 
-                // Ekrandan çıkma
-                if (obs.x + obs.w < 0) {
+                if (obs.x + obs.w < -50) {
                     obstacles.splice(i, 1);
                     i--;
                 }
             }
 
-            // Parçacıklar
             particles.forEach((p, i) => {
-                p.x += p.vx;
-                p.y += p.vy;
-                p.life -= 0.05;
+                p.x += p.vx * dt;
+                p.y += p.vy * dt;
+                p.life -= 2.0 * dt; 
                 if (p.life <= 0) particles.splice(i, 1);
                 else {
                     ctx.globalAlpha = p.life;
@@ -708,8 +702,6 @@
             requestAnimationFrame(gameLoop);
         }
 
-        // --- MAĞAZA MANTIĞI ---
-
         function openShop() {
             startScreen.classList.add('hidden');
             shopScreen.classList.remove('hidden');
@@ -720,27 +712,19 @@
         function updateShopGrid() {
             const grid = document.querySelector('.shop-grid');
             grid.innerHTML = '';
-
             Object.values(SKINS).forEach(skin => {
                 const el = document.createElement('div');
                 const isUnlocked = unlockedSkins.includes(skin.id);
                 const isSelected = currentSkinId === skin.id;
-
                 el.className = `shop-item ${!isUnlocked ? 'locked' : ''} ${isSelected ? 'selected' : ''}`;
-                
                 let btnText = isUnlocked ? (isSelected ? 'SEÇİLDİ' : 'SEÇ') : `${skin.cost} 💊`;
                 let btnClass = isUnlocked ? (isSelected ? 'bg-green-600' : 'bg-blue-600') : (coins >= skin.cost ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-gray-500 cursor-not-allowed');
-
                 el.innerHTML = `
                     <div class="text-4xl mb-2">${skin.icon}</div>
                     <div class="font-bold text-white text-sm mb-1">${skin.name}</div>
                     <div class="text-xs text-gray-300 mb-2">${skin.desc}</div>
-                    <button class="w-full py-1 rounded text-white font-bold text-xs ${btnClass}">
-                        ${btnText}
-                    </button>
+                    <button class="w-full py-1 rounded text-white font-bold text-xs ${btnClass}">${btnText}</button>
                 `;
-
-                // Tıklama Olayı
                 el.onclick = () => {
                     if (isUnlocked) {
                         currentSkinId = skin.id;
@@ -754,14 +738,12 @@
                             localStorage.setItem('dr_ozlem_coins', coins);
                             localStorage.setItem('dr_ozlem_skins', JSON.stringify(unlockedSkins));
                             shopCoinsVal.innerText = coins;
-                            // Otomatik seç
                             currentSkinId = skin.id;
                             localStorage.setItem('dr_ozlem_current_skin', currentSkinId);
                             updateShopGrid();
                             updateCharIcon();
                         } else {
-                            // Yetersiz bakiye animasyonu
-                            el.classList.add('animate-shake'); // CSS'de tanımlı değil ama sallansın
+                            el.classList.add('animate-shake'); 
                         }
                     }
                 };
@@ -770,16 +752,9 @@
         }
 
         function updateCharIcon() {
-            if(SKINS[currentSkinId]) {
-                currentCharIcon.innerText = SKINS[currentSkinId].icon;
-            }
+            if(SKINS[currentSkinId]) currentCharIcon.innerText = SKINS[currentSkinId].icon;
         }
-        
-        function updateShopUI() {
-            coinsVal.innerText = coins;
-        }
-
-        // Başlangıç Ayarı
+        function updateShopUI() { coinsVal.innerText = coins; }
         updateCharIcon();
 
     </script>
